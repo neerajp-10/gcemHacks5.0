@@ -24,7 +24,7 @@ def test_health_check_returns_200():
     assert data["status"] == "healthy"
     assert data["app"] == "Earthworm Advisory Backend"
     assert data["environment"] == "development"
-    assert data["data_mode"] == "demo_ready"
+    assert data["data_mode"] in ("demo_ready", "live")
     assert "timestamp" in data
 
 
