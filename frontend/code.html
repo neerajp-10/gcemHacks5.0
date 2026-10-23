@@ -488,15 +488,15 @@
         <!-- 3-STAGE BREAKDOWN RIGHT ON THE CARD -->
         <div class="space-y-2 bg-surface-container-low p-3 rounded-xl border border-surface-variant text-xs">
           <div>
-            <span class="font-bold text-primary block">1. What did we notice? (ಗಮನಿಸಿದ್ದು)</span>
+            <span class="font-bold text-primary block" id="card-stage1-header">1. What did we notice? (Observation)</span>
             <span class="text-on-surface-variant" id="card-notice">Vegetation index (NDVI) shows a localized drop of 12% in the North-East quarter.</span>
           </div>
           <div>
-            <span class="font-bold text-secondary block">2. What could it mean? (ಅರ್ಥವೇನು)</span>
+            <span class="font-bold text-secondary block" id="card-stage2-header">2. What could it mean? (Interpretation)</span>
             <span class="text-on-surface-variant" id="card-meaning">Possible uneven subsoil water percolation or clogged drip line.</span>
           </div>
           <div>
-            <span class="font-bold text-tertiary block">3. What should I do next? (ಮುಂದೇನು)</span>
+            <span class="font-bold text-tertiary block" id="card-stage3-header">3. What should I do next? (Action Steps)</span>
             <span class="text-on-surface-variant" id="card-action">Walk along NE boundary and press soil by hand to check moisture depth.</span>
           </div>
         </div>
@@ -808,7 +808,7 @@
         <div class="p-3 bg-surface-container rounded-xl border-l-4 border-tertiary-container">
           <div class="flex items-center gap-1.5 font-bold text-xs text-on-surface mb-1">
             <span class="material-symbols-outlined text-tertiary-container text-[18px]">search</span>
-            <span>1. What did we notice? (ಗಮನಿಸಿದ್ದು)</span>
+            <span id="modal-stage1-header">1. What did we notice? (Observation)</span>
           </div>
           <p class="text-xs text-on-surface-variant" id="modal-notice-text">
             Multi-spectral vegetation index (NDVI) shows a localized drop of 12% in the North-East quarter. Rest of parcel maintains standard canopy vigor.
@@ -817,7 +817,7 @@
         <div class="p-3 bg-surface-container rounded-xl border-l-4 border-secondary">
           <div class="flex items-center gap-1.5 font-bold text-xs text-on-surface mb-1">
             <span class="material-symbols-outlined text-secondary text-[18px]">help_outline</span>
-            <span>2. What could it mean? (ಅರ್ಥವೇನು)</span>
+            <span id="modal-stage2-header">2. What could it mean? (Interpretation)</span>
           </div>
           <p class="text-xs text-on-surface-variant" id="modal-meaning-text">
             Possible uneven subsoil water percolation, clogged drip emitter line, or early localized blast/spotting on lower stems.
@@ -826,7 +826,7 @@
         <div class="p-3 bg-surface-container rounded-xl border-l-4 border-primary">
           <div class="flex items-center gap-1.5 font-bold text-xs text-on-surface mb-1">
             <span class="material-symbols-outlined text-primary text-[18px]">task_alt</span>
-            <span>3. What should I do next? (ಮುಂದೇನು)</span>
+            <span id="modal-stage3-header">3. What should I do next? (Action Steps)</span>
           </div>
           <p class="text-xs text-on-surface-variant" id="modal-action-text">
             Conduct perimeter walk along NE ridge. Check top 10 cm root zone moisture before activating pump. If stems show rust lesions, consult Kisan helpline.
@@ -877,19 +877,19 @@
       </div>
       <div class="space-y-2.5">
         <div class="p-3 bg-surface-container-low rounded-xl border border-surface-variant">
-          <span class="text-xs font-bold text-primary block mb-1">1. What did we notice? (ಗಮನಿಸಿದ್ದು)</span>
+          <span class="text-xs font-bold text-primary block mb-1" id="advice-stage1-header">1. What did we notice? (Observation)</span>
           <p class="text-xs text-on-surface-variant leading-relaxed" id="advice-notice-body">
             Canopy moisture index reflectance anomaly in North-East quadrant. Vegetative baseline index: 0.58 vs 0.70 benchmark.
           </p>
         </div>
         <div class="p-3 bg-surface-container-low rounded-xl border border-surface-variant">
-          <span class="text-xs font-bold text-primary block mb-1">2. What could it mean? (ಅರ್ಥವೇನು)</span>
+          <span class="text-xs font-bold text-primary block mb-1" id="advice-stage2-header">2. What could it mean? (Interpretation)</span>
           <p class="text-xs text-on-surface-variant leading-relaxed" id="advice-meaning-body">
             Topsoil drying due to sunny 31°C afternoon exposure and lack of surface mulch, or potential root aeration blockage.
           </p>
         </div>
         <div class="p-3 bg-surface-container-low rounded-xl border border-surface-variant">
-          <span class="text-xs font-bold text-primary block mb-1">3. What should I do next? (ಮುಂದೇನು)</span>
+          <span class="text-xs font-bold text-primary block mb-1" id="advice-stage3-header">3. What should I do next? (Action Steps)</span>
           <ul class="text-xs text-on-surface-variant list-disc pl-4 space-y-1" id="advice-steps-list">
             <li>Walk to the North-East boundary and press soil by hand to check moisture depth.</li>
             <li>Inspect crop stems for yellowing or fungal lesions.</li>
@@ -1124,27 +1124,139 @@
     };
 
 
-    // Full Localizations for Kannada and Hindi
-    const KANNADA_OVERRIDES = {
-      mandya: {
-        advisoryTitle: "ಹೊಲ ಪರಿಶೀಲನೆ ಅಗತ್ಯ: ತೇವಾಂಶದಲ್ಲಿ ವ್ಯತ್ಯಾಸ",
-        advisoryDesc: "ಸ್ಥಿತಿ: ಈಶಾನ್ಯ ಭಾಗದಲ್ಲಿ ಬೆಳೆ ಹಸಿರಿನಲ್ಲಿ ಶೇ. 12 ರಷ್ಟು ಇಳಿಕೆ ಕಂಡುಬಂದಿದೆ. ನೀರು ಹಾಯಿಸುವ ಮುನ್ನ ಮಣ್ಣಿನ ತೇವಾಂಶ ಪರಿಶೀಲಿಸಿ.",
-        metric: "0.58 (ಸಾಮಾನ್ಯ ಮಟ್ಟ 0.70 ಕ್ಕಿಂತ 12% ಇಳಿಕೆ)",
-        notice: "ಮಂಡ್ಯ ಪ್ಲಾಟ್ 142/A ಈಶಾನ್ಯ ವಲಯದಲ್ಲಿ ಎನ್‌ಡಿವಿಐ ಸೂಚ್ಯಂಕದಲ್ಲಿ ಶೇ. 12 ರಷ್ಟು ಕುಸಿತ ಕಂಡುಬಂದಿದೆ.",
-        meaning: "ಉಪ-ಮಣ್ಣಿನ ನೀರಿನ ಕೊರತೆ, ಹನಿ ನೀರಾವರಿ ಪೈಪ್ ಕಟ್ಟಿಕೊಂಡಿರುವುದು ಅಥವಾ ಆರಂಭಿಕ ನೀರಿನ ಕೊರತೆ ಇರಬಹುದು.",
-        action: "ಈಶಾನ್ಯ ದಿಕ್ಕಿನ ಬದುವಿನಲ್ಲಿ ನಡೆದು ಮಣ್ಣನ್ನು ಕೈಯಿಂದ ಮುಟ್ಟಿ ತೇವಾಂಶ ಪರೀಕ್ಷಿಸಿ.",
-        sms: "[ಅರ್ಥ್‌ವರ್ಮ್-ಕೃಷಿ] ಪ್ಲಾಟ್ 142/A (ಮಂಡ್ಯ): ಈಶಾನ್ಯ ಭಾಗದಲ್ಲಿ ತೇವಾಂಶ ಇಳಿಕೆ. ಮುಂದಿನ 3 ದಿನ ಮಳೆಯಿಲ್ಲ. ನೀರು ಹಾಯಿಸುವ ಮುನ್ನ ಮಣ್ಣು ಪರಿಶೀಲಿಸಿ.",
-        voiceTranscript: "ನಮಸ್ಕಾರ ರೈತ ಬಾಂಧವರೇ. ಮಂಡ್ಯ ಪ್ಲಾಟ್ 142/A ಉಪಗ್ರಹ ವರದಿಯಂತೆ ಈಶಾನ್ಯ ವಲಯದಲ್ಲಿ ಬೆಳೆ ತೇವಾಂಶ ಕಡಿಮೆಯಾಗಿದೆ. ಮುಂದಿನ ಮೂರು ದಿನ ಮಳೆಯ ಮುನ್ಸೂಚನೆ ಇಲ್ಲ. ನೀರು ಹಾಯಿಸುವ ಮೊದಲು ಮಣ್ಣನ್ನು ಪರಿಶೀಲಿಸಿ."
+    // Comprehensive Localizations for All Supported Languages
+    const LANGUAGE_OVERRIDES = {
+      kn: {
+        mandya: {
+          advisoryTitle: "ಹೊಲ ಪರಿಶೀಲನೆ ಅಗತ್ಯ: ತೇವಾಂಶದಲ್ಲಿ ವ್ಯತ್ಯಾಸ",
+          advisoryDesc: "ಸ್ಥಿತಿ: ಈಶಾನ್ಯ ಭಾಗದಲ್ಲಿ ಬೆಳೆ ಹಸಿರಿನಲ್ಲಿ ಶೇ. 12 ರಷ್ಟು ಇಳಿಕೆ ಕಂಡುಬಂದಿದೆ. ನೀರು ಹಾಯಿಸುವ ಮುನ್ನ ಮಣ್ಣಿನ ತೇವಾಂಶ ಪರಿಶೀಲಿಸಿ.",
+          metric: "0.58 (ಸಾಮಾನ್ಯ ಮಟ್ಟ 0.70 ಕ್ಕಿಂತ 12% ಇಳಿಕೆ)",
+          notice: "ಮಂಡ್ಯ ಪ್ಲಾಟ್ 142/A ಈಶಾನ್ಯ ವಲಯದಲ್ಲಿ ಎನ್‌ಡಿವಿಐ ಸೂಚ್ಯಂಕದಲ್ಲಿ ಶೇ. 12 ರಷ್ಟು ಕುಸಿತ ಕಂಡುಬಂದಿದೆ.",
+          meaning: "ಉಪ-ಮಣ್ಣಿನ ನೀರಿನ ಕೊರತೆ, ಹನಿ ನೀರಾವರಿ ಪೈಪ್ ಕಟ್ಟಿಕೊಂಡಿರುವುದು ಅಥವಾ ಆರಂಭಿಕ ನೀರಿನ ಕೊರತೆ ಇರಬಹುದು.",
+          action: "ಈಶಾನ್ಯ ದಿಕ್ಕಿನ ಬದುವಿನಲ್ಲಿ ನಡೆದು ಮಣ್ಣನ್ನು ಕೈಯಿಂದ ಮುಟ್ಟಿ ತೇವಾಂಶ ಪರೀಕ್ಷಿಸಿ.",
+          sms: "[ಅರ್ಥ್‌ವರ್ಮ್-ಕೃಷಿ] ಪ್ಲಾಟ್ 142/A (ಮಂಡ್ಯ): ಈಶಾನ್ಯ ಭಾಗದಲ್ಲಿ ತೇವಾಂಶ ಇಳಿಕೆ. ಮುಂದಿನ 3 ದಿನ ಮಳೆಯಿಲ್ಲ. ನೀರು ಹಾಯಿಸುವ ಮುನ್ನ ಮಣ್ಣು ಪರಿಶೀಲಿಸಿ.",
+          voiceTranscript: "ನಮಸ್ಕಾರ ರೈತ ಬಾಂಧವರೇ. ಮಂಡ್ಯ ಪ್ಲಾಟ್ 142/A ಉಪಗ್ರಹ ವರದಿಯಂತೆ ಈಶಾನ್ಯ ವಲಯದಲ್ಲಿ ಬೆಳೆ ತೇವಾಂಶ ಕಡಿಮೆಯಾಗಿದೆ. ಮುಂದಿನ ಮೂರು ದಿನ ಮಳೆಯ ಮುನ್ಸೂಚನೆ ಇಲ್ಲ. ನೀರು ಹಾಯಿಸುವ ಮೊದಲು ಮಣ್ಣನ್ನು ಪರಿಶೀಲಿಸಿ."
+        },
+        ludhiana: {
+          advisoryTitle: "ಗೋಧಿ ಬೆಳೆ ಆರೋಗ್ಯಕರ: ಪೋಷಕಾಂಶ ನೀಡುವ ಸಮಯ",
+          advisoryDesc: "ಸ್ಥಿತಿ: ಗೋಧಿ ಬೆಳೆಯಲ್ಲಿ ಉತ್ತಮ ಚಿಗುರು ಮತ್ತು ಹಸಿರು ಕಂಡುಬಂದಿದೆ. ಯೂರಿಯಾ ಸಿಂಪಡಣೆಗೆ ಸಕಾಲ.",
+          metric: "0.72 (ಆರೋಗ್ಯಕರ ಮಾನದಂಡ 0.70)",
+          notice: "ಇಡೀ ಪ್ಲಾಟ್‌ನಲ್ಲಿ ಬೆಳೆ ಹಸಿರು ಉತ್ತಮವಾಗಿದ್ದು ತೇವಾಂಶ ಸ್ಥಿರವಾಗಿದೆ.",
+          meaning: "ಬೇರುಗಳ ಬೆಳವಣಿಗೆ ಉತ್ತಮವಾಗಿದೆ, ಪೋಷಕಾಂಶಗಳನ್ನು ಹೀರಿಕೊಳ್ಳಲು ಸಕಾಲ.",
+          action: "ಕಾಲುವೆ ನೀರು ಬರುವ ಮುನ್ನ ಶಿಫಾರಸು ಮಾಡಿದ ಪ್ರಮಾಣದ ಗೊಬ್ಬರ ನೀಡಿ.",
+          sms: "[ಅರ್ಥ್‌ವರ್ಮ್-ಕೃಷಿ] ಪ್ಲಾಟ್ 89/C (ಲೂಧಿಯಾನ): ಗೋಧಿ ಬೆಳೆ ಉತ್ತಮವಾಗಿದೆ. ಯೂರಿಯಾ ಗೊಬ್ಬರ ನೀಡಲು ಸಕಾಲ.",
+          voiceTranscript: "ನಮಸ್ಕಾರ. ಲೂಧಿಯಾನದ ಪ್ಲಾಟ್ 89/C ಗೋಧಿ ಬೆಳೆ ಸಮೃದ್ಧವಾಗಿದೆ. ಪೋಷಕಾಂಶ ನೀಡುವ ಸಮಯ ಬಂದಿದೆ."
+        }
       },
-      ludhiana: {
-        advisoryTitle: "ಗೋಧಿ ಬೆಳೆ ಆರೋಗ್ಯಕರ: ಪೋಷಕಾಂಶ ನೀಡುವ ಸಮಯ",
-        advisoryDesc: "ಸ್ಥಿತಿ: ಗೋಧಿ ಬೆಳೆಯಲ್ಲಿ ಉತ್ತಮ ಚಿಗುರು ಮತ್ತು ಹಸಿರು ಕಂಡುಬಂದಿದೆ. ಯೂರಿಯಾ ಸಿಂಪಡಣೆಗೆ ಸಕಾಲ.",
-        metric: "0.72 (ಆರೋಗ್ಯಕರ ಮಾನದಂಡ 0.70)",
-        notice: "ಇಡೀ ಪ್ಲಾಟ್‌ನಲ್ಲಿ ಬೆಳೆ ಹಸಿರು ಉತ್ತಮವಾಗಿದ್ದು ತೇವಾಂಶ ಸ್ಥಿರವಾಗಿದೆ.",
-        meaning: "ಬೇರುಗಳ ಬೆಳವಣಿಗೆ ಉತ್ತಮವಾಗಿದೆ, ಪೋಷಕಾಂಶಗಳನ್ನು ಹೀರಿಕೊಳ್ಳಲು ಸಕಾಲ.",
-        action: "ಕಾಲುವೆ ನೀರು ಬರುವ ಮುನ್ನ ಶಿಫಾರಸು ಮಾಡಿದ ಪ್ರಮಾಣದ ಗೊಬ್ಬರ ನೀಡಿ.",
-        sms: "[ಅರ್ಥ್‌ವರ್ಮ್-ಕೃಷಿ] ಪ್ಲಾಟ್ 89/C (ಲೂಧಿಯಾನ): ಗೋಧಿ ಬೆಳೆ ಉತ್ತಮವಾಗಿದೆ. ಯೂರಿಯಾ ಗೊಬ್ಬರ ನೀಡಲು ಸಕಾಲ.",
-        voiceTranscript: "ನಮಸ್ಕಾರ. ಲೂಧಿಯಾನದ ಪ್ಲಾಟ್ 89/C ಗೋಧಿ ಬೆಳೆ ಸಮೃದ್ಧವಾಗಿದೆ. ಪೋಷಕಾಂಶ ನೀಡುವ ಸಮಯ ಬಂದಿದೆ."
+      hi: {
+        mandya: {
+          advisoryTitle: "खेत का निरीक्षण आवश्यक: नमी में बदलाव",
+          advisoryDesc: "स्थिति: उत्तर-पूर्वी हिस्से में वनस्पति सूचकांक में 12% की गिरावट। सिंचाई से पहले मिट्टी की नमी जांचें।",
+          metric: "0.58 (सामान्य से 12% गिरावट)",
+          notice: "उत्तर-पूर्वी चतुर्थांश में वनस्पति सूचकांक (NDVI) में 12% की कमी देखी गई है।",
+          meaning: "मिट्टी की ऊपरी परत का सूखना या ड्रिप नोजल में रुकावट हो सकती है।",
+          action: "उत्तर-पूर्व किनारे पर चलकर मिट्टी को हाथ से दबाकर नमी की गहराई जांचें।",
+          sms: "[अर्थवर्म-कृषि] प्लॉट 142/A (मांड्या): उत्तर-पूर्व में नमी की कमी। अगले 3 दिन बारिश नहीं। सिंचाई से पहले मिट्टी जांचें।",
+          voiceTranscript: "नमस्कार किसान भाइयों। मांड्या के प्लॉट 142/A में उत्तर-पूर्वी हिस्से में नमी की कमी दर्ज की गई है। सिंचाई करने से पहले मिट्टी की जांच अवश्य करें।"
+        },
+        ludhiana: {
+          advisoryTitle: "गेहूं की फसल स्वस्थ: यूरिया देने का सही समय",
+          advisoryDesc: "स्थिति: फसल में जोरदार कल्ले फूट रहे हैं। हल्की धूप से पहले दूसरी बार यूरिया देने का उपयुक्त समय।",
+          metric: "0.72 (सामान्य स्वस्थ मानक 0.70)",
+          notice: "पूरे खेत में वनस्पति सूचकांक उच्च और एकसमान हरा है।",
+          meaning: "जड़ों का मजबूत विकास और सक्रिय फुटाव अवस्था।",
+          action: "नहर का पानी आने से पहले अनुशंसित यूरिया डालें।",
+          sms: "[अर्थवर्म-कृषि] प्लॉट 89/C (लुधियाना): गेहूं में अच्छी वृद्धि। यूरिया टॉप-ड्रेसिंग का समय।",
+          voiceTranscript: "सत श्री अकाल। लुधियाना प्लॉट 89/C में गेहूं की फसल स्वस्थ है। यूरिया खाद देने का सही समय है।"
+        }
+      },
+      te: {
+        mandya: {
+          advisoryTitle: "క్షేత్ర పరిశీలన అవసరం: తేమలో మార్పు",
+          advisoryDesc: "స్థితి: ఈశాన్య భాగంలో పంట పచ్చదనంలో 12% తగ్గుదల గుర్తించబడింది. నీరు పెట్టే ముందు నేలలో తేమను తనిఖీ చేయండి.",
+          metric: "0.58 (సాధారణ స్థాయి కంటే 12% తగ్గుదల)",
+          notice: "మండ్య ప్లాట్ 142/A ఈశాన్య భాగంలో NDVI సూచిక 12% తగ్గింది. మిగిలిన పొలం ఆరోగ్యంగా ఉంది.",
+          meaning: "భూమి లోపల తేమ కొరత, డ్రిప్ పైపులో అడ్డంకులు లేదా ప్రాథమిక నీటి ఎద్దడి ఉండవచ్చు.",
+          action: "ఈశాన్య సరిహద్దు వెంబడి నడిచి చేత్తో నేలను ఒత్తి తేమ లోతును తనిఖీ చేయండి.",
+          sms: "[అర్థ్‌వర్మ్-అగ్రి] ప్లాట్ 142/A (మండ్య): ఈశాన్యంలో తేమ కొరత. వచ్చే 3 రోజులు వర్షం లేదు. నీరు పెట్టే ముందు నేల తనిఖీ చేయండి.",
+          voiceTranscript: "నమస్కారం రైతు సోదరులారా. మండ్య ప్లాట్ 142/A ఉపగ్రహ నివేదిక ప్రకారం ఈశాన్య భాగంలో పంట తేమ తగ్గింది. వచ్చే మూడు రోజులు వర్ష సూచన లేదు. నీరు పెట్టే ముందు నేలను తనిఖీ చేయండి."
+        },
+        ludhiana: {
+          advisoryTitle: "గోధుమ పంట ఆరోగ్యంగా ఉంది: ఎరువులు వేసే సమయం",
+          advisoryDesc: "స్థితి: పంటలో మంచి పిలకలు మరియు పచ్చదనం కనిపిస్తుంది. యూరియా వేయడానికి అనుకూల సమయం.",
+          metric: "0.72 (ఆరోగ్యకర ప్రమాణం 0.70)",
+          notice: "మొత్తం పొలంలో పంట పచ్చదనం స్థిరంగా మరియు ఆరోగ్యంగా ఉంది.",
+          meaning: "వేర్లు బలంగా అభివృద్ధి చెందుతున్నాయి, పోషకాలను గ్రహించడానికి అనుకూలం.",
+          action: "కాలువ నీరు వచ్చే ముందు సిఫార్సు చేసిన మోతాదులో యూరియా వేయండి.",
+          sms: "[అర్థ్‌వర్మ్-అగ్రి] ప్లాట్ 89/C (లూధియానా): గోధుమ పంట పచ్చగా ఉంది. యూరియా వేయడానికి సమయం.",
+          voiceTranscript: "నమస్కారం. లూధియానా ప్లాట్ 89/C లో గోధుమ పంట ఏపుగా పెరుగుతోంది. యూరియా వేయడానికి అనుకూల సమయం."
+        }
+      },
+      ta: {
+        mandya: {
+          advisoryTitle: "வயல் ஆய்வு தேவை: ஈரப்பதத்தில் மாற்றம்",
+          advisoryDesc: "நிலை: வடகிழக்கு பகுதியில் பயிர் பசுமையில் 12% குறைவு கண்டறியப்பட்டுள்ளது. பாசனம் செய்வதற்கு முன் மண்ணின் ஈரப்பதத்தை சரிபார்க்கவும்.",
+          metric: "0.58 (வழக்கமான அளவை விட 12% குறைவு)",
+          notice: "மண்டியா நிலம் 142/A வடகிழக்கு பகுதியில் NDVI குறியீட்டில் 12% குறைவு ஏற்பட்டுள்ளது.",
+          meaning: "மண்ணின் கீழ் ஈரப்பதம் குறைவு, சொட்டு நீர் குழாயில் அடைப்பு அல்லது ஆரம்ப கால நீர் பற்றாக்குறை இருக்கலாம்.",
+          action: "வடகிழக்கு வரப்பில் நடந்து சென்று கைகளால் மண்ணை அழுத்தி ஈரப்பத ஆழத்தை சரிபார்க்கவும்.",
+          sms: "[எர்த்வார்ம்-அக்ரி] நிலம் 142/A (மண்டியா): வடகிழக்கில் ஈரப்பதம் குறைவு. அடுத்த 3 நாட்களுக்கு மழை இல்லை. பாசனத்திற்கு முன் மண்ணை சோதிக்கவும்.",
+          voiceTranscript: "வணக்கம் விவசாய நண்பர்களே. மண்டியா நிலம் 142/A செயற்கைக்கோள் ஆய்வில் வடகிழக்கு பகுதியில் ஈரப்பதம் குறைந்துள்ளது. அடுத்த மூன்று நாட்களுக்கு மழை வாய்ப்பில்லை. பாசனம் செய்வதற்கு முன் மண்ணை சோதிக்கவும்."
+        },
+        ludhiana: {
+          advisoryTitle: "கோதுமை பயிர் நலம்: உரமிடுவதற்கான உகந்த நேரம்",
+          advisoryDesc: "நிலை: பயிர் தீவிர தூர் கட்டும் நிலையில் உள்ளது. யூரியா உரம் இடுவதற்கான சரியான தருணம்.",
+          metric: "0.72 (ஆரோக்கியமான குறியீடு 0.70)",
+          notice: "முழு நிலத்திலும் பயிர் சீரான பசுமையுடன் செழிப்பாக உள்ளது.",
+          meaning: "வேர்கள் நன்றாக வளர்ந்துள்ளன, ஊட்டச்சத்துக்களை உறிஞ்சும் திறன் அதிகம்.",
+          action: "கால்வாய் பாசனத்திற்கு முன் பரிந்துரைக்கப்பட்ட அளவு யூரியாவை இடவும்.",
+          sms: "[எர்த்வார்ம்-அக்ரி] நிலம் 89/C (லூதியானா): கோதுமை பயிர் நலம். யூரியா உரமிட உகந்த நேரம்.",
+          voiceTranscript: "வணக்கம். லூதியானா நிலம் 89/C கோதுமை பயிர் மிக நன்றாக உள்ளது. யூரியா மேலுரமிடும் நேரம் வந்துள்ளது."
+        }
+      },
+      mr: {
+        mandya: {
+          advisoryTitle: "शेत तपासणी आवश्यक: ओलाव्यामध्ये बदल",
+          advisoryDesc: "स्थिती: ईशान्य भागात पिकाच्या हिरवेपणात १२% घट दिसून आली आहे. पाणी देण्यापूर्वी जमिनीतील ओलावा तपासा.",
+          metric: "०.५८ (सर्वसाधारण मानकापेक्षा १२% घट)",
+          notice: "मांड्या प्लॉट १४२/A च्या ईशान्य भागात NDVI निर्देशांकात १२% घट नोंदवली गेली आहे.",
+          meaning: "जमिनीतील ओलाव्याची कमतरता, ठिबक नळीत अडथळा किंवा सुरुवातीचा पाण्याचा ताण असू शकतो.",
+          action: "ईशान्य बांधावर फिरून हाताने माती दाबून ओलाव्याची खोली तपासा.",
+          sms: "[अर्थवर्म-कृषी] प्लॉट १४२/A (मांड्या): ईशान्य भागात ओलावा कमी. पुढील ३ दिवस पाऊस नाही. पाणी देण्यापूर्वी माती तपासा.",
+          voiceTranscript: "नमस्कार शेतकरी मित्रांनो. मांड्या प्लॉट १४२/A उपग्रह तपासणीनुसार ईशान्य भागात पिकाचा ओलावा कमी झाला आहे. पुढील तीन दिवस पावसाची शक्यता नाही. पाणी देण्यापूर्वी माती तपासा."
+        },
+        ludhiana: {
+          advisoryTitle: "गहू पीक निरोगी: युरिया खत देण्याची योग्य वेळ",
+          advisoryDesc: "स्थिती: पिकाची वाढ जोमदार असून फुटवे चांगले फुटले आहेत. युरिया खताचा दुसरा हप्ता देण्याची हीच वेळ आहे.",
+          metric: "०.७२ (निरोगी मानक ०.७०)",
+          notice: "संपूर्ण शेतात पिकाचा हिरवेपणा उच्च आणि एकसमान आहे.",
+          meaning: "मुळांची वाढ चांगली असून पोषक तत्वे शोषून घेण्याची क्षमता उत्तम आहे.",
+          action: "कालव्याचे पाणी सोडण्यापूर्वी शिफारस केलेले युरिया खत द्या.",
+          sms: "[अर्थवर्म-कृषी] प्लॉट ८९/C (लुधियाना): गहू पिकाची जोमदार वाढ. युरिया खत देण्याची वेळ.",
+          voiceTranscript: "नमस्कार. लुधियाना प्लॉट ८९/C मधील गहू पीक उत्तम स्थितीत आहे. युरिया खताचा हप्ता देण्याची वेळ झाली आहे."
+        }
+      },
+      bn: {
+        mandya: {
+          advisoryTitle: "জমি পরিদর্শন প্রয়োজন: আর্দ্রতায় পরিবর্তন",
+          advisoryDesc: "অবস্থা: উত্তর-পূর্ব অংশে ফসলের সবুজ সূচকে ১২% হ্রাস লক্ষ্য করা গেছে। সেচ দেওয়ার আগে মাটির আর্দ্রতা পরীক্ষা করুন।",
+          metric: "০.৫৮ (স্বাভাবিক মানদণ্ড থেকে ১২% হ্রাস)",
+          notice: "মান্ড্য প্লট ১৪২/A-এর উত্তর-পূর্ব অংশে NDVI সূচক ১২% কমেছে।",
+          meaning: "মাটির অভ্যন্তরে পানির ঘাটতি, ড্রিপ লাইনে বাধা বা প্রাথমিক আর্দ্রতার চাপ হতে পারে।",
+          action: "উত্তর-পূর্ব সীমানায় হেঁটে হাত দিয়ে মাটি চেপে আর্দ্রতার গভীরতা পরীক্ষা করুন।",
+          sms: "[আর্থওয়ার্ম-কৃষি] প্লট ১৪২/A (মান্ড্য): উত্তর-পূর্বে আর্দ্রতার টান। আগামী ৩ দিন বৃষ্টি নেই। সেচের আগে মাটি পরীক্ষা করুন।",
+          voiceTranscript: "নমস্কার কৃষক বন্ধুরা। মান্ড্য প্লট ১৪২/A উপগ্রহ চিত্রে উত্তর-পূর্ব অংশে আর্দ্রতা হ্রাসের ইঙ্গিত মিলেছে। আগামী তিন দিন কোনো বৃষ্টির সম্ভাবনা নেই। সেচ দেওয়ার পূর্বে মাটির আর্দ্রতা যাচাই করুন।"
+        },
+        ludhiana: {
+          advisoryTitle: "গম ফসল স্বাস্থ্যকর: ইউরিয়া প্রয়োগের উপযুক্ত সময়",
+          advisoryDesc: "অবস্থা: ফসলের বৃদ্ধি জোরালো এবং কান্ড ভালো মেলছে। দ্বিতীয় দফায় ইউরিয়া সার দেওয়ার সঠিক সময়।",
+          metric: "০.৭২ (স্বাস্থ্যকর মানদণ্ড ০.৭০)",
+          notice: "পুরো জমিতে ফসলের সবুজ বর্ণ চমৎকার ও সামঞ্জস্যপূর্ণ।",
+          meaning: "শিকড় মজবুত এবং পুষ্টি গ্রহণের অনুকূল সময়।",
+          action: "সেচ প্রদানের পূর্বে নির্দেশিত মাত্রায় ইউরিয়া সার দিন।",
+          sms: "[আর্থওয়ার্ম-কৃষি] প্লট ৮৯/C (লুধিয়ানা): গমের চমৎকার বৃদ্ধি। ইউরিয়া সার প্রয়োগের সময়।",
+          voiceTranscript: "নমস্কার। লুধিয়ানা প্লট ৮৯/C-তে গম ফসল অত্যন্ত স্বাস্থ্যবান। ইউরিয়া সার প্রয়োগের অনুকূল সময় উপস্থিত।"
+        }
       }
     };
 
@@ -1166,7 +1278,10 @@
         tile1: "1. Check Crop Health",
         tile2: "2. Should I Water?",
         tile3: "3. View Weather Forecast",
-        speechLang: "en-IN"
+        speechLang: "en-IN",
+        stage1: "1. What did we notice? (Observation)",
+        stage2: "2. What could it mean? (Interpretation)",
+        stage3: "3. What should I do next? (Action Steps)"
       },
       kn: {
         heroTitle: "ಸಮಸ್ಯೆಗಳು ಬೆಳೆಯುವ ಮುನ್ನ ನಿಮ್ಮ ಬೆಳೆಗಳನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಿ.",
@@ -1177,7 +1292,7 @@
         checkField: "ನನ್ನ ಹೊಲ ಪರಿಶೀಲಿಸಿ",
         howItWorks: "ಇದು ಹೇಗೆ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತದೆ",
         viewAdvice: "ಸಂಪೂರ್ಣ ಸಲಹೆ ನೋಡಿ",
-        audioBtn: "ಧ್ವನಿ ಸಲಹೆ ಕೇಳಿ (Kannada)",
+        audioBtn: "ಧ್ವನಿ ಸಲಹೆ ಕೇಳಿ (ಕನ್ನಡ)",
         tsTitle: "ಎನ್‌ಡಿವಿಐ 20-ದಿನಗಳ ಪ್ರವೃತ್ತಿ (ಸೆಂಟಿನೆಲ್-2)",
         tsBenchmark: "ಋತುವಿನ ಮಾನದಂಡ: 0.70",
         regionHeader: "ಮಾದರಿ ಹೊಲವನ್ನು ಆಯ್ಕೆಮಾಡಿ",
@@ -1185,7 +1300,10 @@
         tile1: "೧. ಬೆಳೆ ಆರೋಗ್ಯ ಪರೀಕ್ಷಿಸಿ",
         tile2: "೨. ನೀರು ಹಾಯಿಸಬೇಕೇ?",
         tile3: "೩. ಹವಾಮಾನ ಮುನ್ಸೂಚನೆ",
-        speechLang: "kn-IN"
+        speechLang: "kn-IN",
+        stage1: "೧. ಗಮನಿಸಿದ್ದು ಏನು? (ಗಮನಿಸಿದ್ದು)",
+        stage2: "೨. ಅರ್ಥವೇನು? (ಅರ್ಥವೇನು)",
+        stage3: "೩. ಮುಂದೇನು ಮಾಡಬೇಕು? (ಮುಂದೇನು)"
       },
       hi: {
         heroTitle: "समस्या बढ़ने से पहले अपनी फसल को समझें।",
@@ -1196,7 +1314,7 @@
         checkField: "मेरा खेत जांचें",
         howItWorks: "यह कैसे काम करता है",
         viewAdvice: "पूरी सलाह देखें",
-        audioBtn: "सलाह सुनें (आवाज़)",
+        audioBtn: "सलाह सुनें (हिन्दी)",
         tsTitle: "NDVI 20-दिवसीय रुझान (सेंटिनल-2)",
         tsBenchmark: "मौसमी बेंचमार्क: 0.70",
         regionHeader: "प्रदर्शन खेत चुनें (अखिल भारतीय)",
@@ -1204,7 +1322,98 @@
         tile1: "1. फसल का स्वास्थ्य जांचें",
         tile2: "2. क्या मुझे पानी देना चाहिए?",
         tile3: "3. मौसम पूर्वानुमान देखें",
-        speechLang: "hi-IN"
+        speechLang: "hi-IN",
+        stage1: "1. हमने क्या देखा? (निरीक्षण)",
+        stage2: "2. इसका क्या मतलब हो सकता है? (अर्थ)",
+        stage3: "3. आगे क्या करना चाहिए? (कदम)"
+      },
+      te: {
+        heroTitle: "సమస్యలు పెరగకముందే మీ పంటను అర్థం చేసుకోండి.",
+        heroSubtitle: "భారతీయ రైతులకు ఉచిత అంతరిక్ష ఆధారిత పంట ఆరోగ్యం మరియు వాతావరణ సమాచారం.",
+        heroTag: "అంతరిక్ష & వాతావరణ పరిశీలనలు",
+        bannerTitle: "నమూనా ప్రదర్శన సమాచారం",
+        bannerText: "ఉపగ్రహ పరావర్తన మరియు వ్యవసాయ వాతావరణ పరిశీలనలు. చికిత్సలు వర్తించే ముందు నేల పరిస్థితులను పరిశీలించండి.",
+        checkField: "నా పొలాన్ని తనిఖీ చేయండి",
+        howItWorks: "ఇది ఎలా పని చేస్తుంది",
+        viewAdvice: "పూర్తి సలహాను చూడండి",
+        audioBtn: "వాయిస్ సలహా వినండి (తెలుగు)",
+        tsTitle: "NDVI 20 రోజుల పోకడ (సెంటినెల్-2)",
+        tsBenchmark: "సీజనల్ ప్రమాణం: 0.70",
+        regionHeader: "డెమో పొలాన్ని ఎంచుకోండి (అఖిల భారతదేశం)",
+        tilesHeader: "మూడు ఆచరణాత్మక క్షేత్ర చర్యలు",
+        tile1: "1. పంట ఆరోగ్యాన్ని తనిఖీ చేయండి",
+        tile2: "2. నీరు పెట్టాలా?",
+        tile3: "3. వాతావరణ సూచన చూడండి",
+        speechLang: "te-IN",
+        stage1: "1. మనం ఏమి గమనించాం? (గమనింపు)",
+        stage2: "2. దీని అర్థం ఏమిటి? (వివరణ)",
+        stage3: "3. తరువాత ఏమి చేయాలి? (చర్యలు)"
+      },
+      ta: {
+        heroTitle: "பிரச்சனைகள் வளர்வதற்கு முன் உங்கள் பயிர்களை புரிந்து கொள்ளுங்கள்.",
+        heroSubtitle: "இந்திய விவசாயிகளுக்கு செயற்கைக்கோள் அடிப்படையிலான இலவச பயிர் ஆரோக்கியம் மற்றும் வானிலை வழிகாட்டல்.",
+        heroTag: "விண்வெளி & வானிலை ஆய்வுகள்",
+        bannerTitle: "மாதிரி செயல்விளக்கத் தரவு",
+        bannerText: "செயற்கைக்கோள் மற்றும் வேளாண்-வானிலை அவதானிப்புகள். மருந்து தெளிக்கும் முன் நிலத்தை நேரடியாகப் பரிசோதிக்கவும்.",
+        checkField: "எனது வயலை சோதிக்கவும்",
+        howItWorks: "இது எவ்வாறு செயல்படுகிறது",
+        viewAdvice: "முழு ஆலோசனையை காண்க",
+        audioBtn: "குரல் ஆலோசனையை கேட்கவும் (தமிழ்)",
+        tsTitle: "NDVI 20-நாள் போக்கு (சென்டினல்-2)",
+        tsBenchmark: "பருவகால அளவுகோல்: 0.70",
+        regionHeader: "மாதிரி நிலத்தைத் தேர்ந்தெடுக்கவும் (அகில இந்தியா)",
+        tilesHeader: "மூன்று நடைமுறை வயல் நடவடிக்கைகள்",
+        tile1: "1. பயிர் ஆரோக்கியத்தை சரிபார்க்கவும்",
+        tile2: "2. தண்ணீர் பாய்ச்ச வேண்டுமா?",
+        tile3: "3. வானிலை முன்னறிவிப்பைப் பார்க்கவும்",
+        speechLang: "ta-IN",
+        stage1: "1. நாம் கவனித்தது என்ன? (கவனிப்பு)",
+        stage2: "2. இதற்கு என்ன அர்த்தம்? (பொருள்)",
+        stage3: "3. அடுத்து என்ன செய்ய வேண்டும்? (நடவடிக்கை)"
+      },
+      mr: {
+        heroTitle: "समस्या वाढण्यापूर्वी तुमचे पीक समजून घ्या.",
+        heroSubtitle: "भारतीय शेतकऱ्यांसाठी उपग्रह-आधारित मोफत पीक आरोग्य आणि कृषी हवामान सल्ला.",
+        heroTag: "अंतराळ आणि हवामान निरीक्षणे",
+        bannerTitle: "प्रोटोटाइप प्रात्यक्षिक डेटा",
+        bannerText: "उपग्रह परावर्तन आणि कृषी हवामान निरीक्षणे. फवारणीपूर्वी प्रत्यक्ष शेतात जाऊन खात्री करा.",
+        checkField: "माझे शेत तपासा",
+        howItWorks: "हे कसे कार्य करते",
+        viewAdvice: "संपूर्ण सल्ला पहा",
+        audioBtn: "ध्वनी सल्ला ऐका (मराठी)",
+        tsTitle: "NDVI २०-दिवसीय कल (सेंटिनेल-२)",
+        tsBenchmark: "हंगामी मानक: ०.७०",
+        regionHeader: "प्रात्यक्षिक शेत निवडा (अखिल भारतीय)",
+        tilesHeader: "तीन व्यावहारिक शेती कृती",
+        tile1: "१. पिकाचे आरोग्य तपासा",
+        tile2: "२. पाणी द्यावे का?",
+        tile3: "३. हवामान अंदाज पहा",
+        speechLang: "mr-IN",
+        stage1: "1. आम्ही काय पाहिले? (निरीक्षण)",
+        stage2: "2. याचा काय अर्थ असू शकतो? (अर्थ)",
+        stage3: "3. पुढे काय करावे? (कृती)"
+      },
+      bn: {
+        heroTitle: "সমস্যা বাড়ার আগেই আপনার ফসলকে বুঝুন।",
+        heroSubtitle: "ভারতীয় কৃষকদের জন্য উপগ্রহ-ভিত্তিক বিনামূল্যের ফসলের স্বাস্থ্য ও আবহাওয়া তথ্য।",
+        heroTag: "মহাকাশ ও আবহাওয়া পর্যবেক্ষণ",
+        bannerTitle: "নমুনা প্রদর্শনী তথ্য",
+        bannerText: "উপগ্রহ প্রতিফলন ও কৃষি আবহাওয়া পর্যবেক্ষণ। প্রয়োগের আগে সর্বদা মাঠের অবস্থা যাচাই করুন।",
+        checkField: "আমার জমি যাচাই করুন",
+        howItWorks: "এটি কীভাবে কাজ করে",
+        viewAdvice: "সম্পূর্ণ পরামর্শ দেখুন",
+        audioBtn: "ভয়েস পরামর্শ শুনুন (বাংলা)",
+        tsTitle: "NDVI ২০-দিনের প্রবণতা (সেন্টিনেল-২)",
+        tsBenchmark: "মৌসুমী মানদণ্ড: ০.৭০",
+        regionHeader: "প্রদর্শনী জমি নির্বাচন করুন (সর্বভারতীয়)",
+        tilesHeader: "তিনটি কার্যকর মাঠ পর্যায়ের পদক্ষেপ",
+        tile1: "১. ফসলের স্বাস্থ্য পরীক্ষা করুন",
+        tile2: "২. পানি কি দেওয়া উচিত?",
+        tile3: "৩. আবহাওয়ার পূর্বাভাস দেখুন",
+        speechLang: "bn-IN",
+        stage1: "1. আমরা কী লক্ষ্য করেছি? (পর্যবেক্ষণ)",
+        stage2: "2. এর অর্থ কী হতে পারে? (অর্থ)",
+        stage3: "3. এরপর কী করা উচিত? (পদক্ষেপ)"
       }
     };
 
@@ -1591,10 +1800,10 @@
         }
       }
 
-      // Apply language overrides if offline
-      if (!backendAvailable && currentLang === 'kn' && KANNADA_OVERRIDES[regionKey]) {
-        const k = KANNADA_OVERRIDES[regionKey];
-        data = { ...data, ...k };
+      // Apply language overrides for current selected language
+      if (LANGUAGE_OVERRIDES[currentLang] && LANGUAGE_OVERRIDES[currentLang][regionKey]) {
+        const o = LANGUAGE_OVERRIDES[currentLang][regionKey];
+        data = { ...data, ...o };
       }
 
       // Update UI Elements
@@ -1732,6 +1941,23 @@
       document.getElementById('tile1-title').textContent = t.tile1;
       document.getElementById('tile2-title').textContent = t.tile2;
       document.getElementById('tile3-title').textContent = t.tile3;
+
+      // Update 3-Stage Headers across the Card, Parcel Inspector Modal, and Advice Modal
+      const s1 = t.stage1 || "1. What did we notice? (Observation)";
+      const s2 = t.stage2 || "2. What could it mean? (Interpretation)";
+      const s3 = t.stage3 || "3. What should I do next? (Action Steps)";
+      ['card-stage1-header', 'modal-stage1-header', 'advice-stage1-header'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = s1;
+      });
+      ['card-stage2-header', 'modal-stage2-header', 'advice-stage2-header'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = s2;
+      });
+      ['card-stage3-header', 'modal-stage3-header', 'advice-stage3-header'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = s3;
+      });
 
       // Re-trigger selectRegion to update localized advisory text
       selectRegion(currentRegionKey);
