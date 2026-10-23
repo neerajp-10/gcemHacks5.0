@@ -5,7 +5,9 @@ from typing import Any, Dict, Optional
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
 
+from app.config import settings
 from app.db.supabase import is_supabase_configured, verify_supabase_connection
+from app.services.sentinel import sentinel_service
 
 router = APIRouter()
 
@@ -20,6 +22,16 @@ class DatabaseHealthResponse(BaseModel):
     host: Optional[str] = None
 
 
+class SentinelHealthResponse(BaseModel):
+    """Structured response for Sentinel Hub satellite connectivity."""
+
+    configured: bool
+    connected: bool
+    status: str
+    message: str
+    provider: Optional[str] = None
+
+
 class HealthResponse(BaseModel):
     """Structured response model for service health check."""
 
@@ -29,6 +41,7 @@ class HealthResponse(BaseModel):
     timestamp: str = Field(..., description="ISO 8601 UTC timestamp of the check")
     data_mode: str = Field(..., description="Current operational data mode ('demo_ready', 'live')")
     supabase_configured: bool = Field(default=False, description="Whether Supabase credentials are configured")
+    sentinel_configured: bool = Field(default=False, description="Whether Copernicus Sentinel Hub credentials are configured")
 
 
 @router.get("/health", response_model=HealthResponse, summary="Service Health Check")
@@ -41,6 +54,7 @@ def get_health() -> HealthResponse:
         timestamp=datetime.now(timezone.utc).isoformat(),
         data_mode="live" if is_supabase_configured() else "demo_ready",
         supabase_configured=is_supabase_configured(),
+        sentinel_configured=settings.is_sentinel_configured,
     )
 
 
@@ -49,3 +63,11 @@ def get_database_health() -> DatabaseHealthResponse:
     """Run a safe, read-only connection check against Supabase."""
     result = verify_supabase_connection()
     return DatabaseHealthResponse(**result)
+
+
+@router.get("/health/sentinel", response_model=SentinelHealthResponse, summary="Sentinel Hub Verification")
+def get_sentinel_health() -> SentinelHealthResponse:
+    """Run a safe, read-only connection check against Sentinel Hub."""
+    result = sentinel_service.verify_connection()
+    return SentinelHealthResponse(**result)
+

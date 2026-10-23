@@ -16,6 +16,8 @@ class FarmBase(BaseModel):
     survey_plot: Optional[str] = None
     area_hectares: Optional[float] = None
     data_status: str = Field(default="demo", description="Data provenance status: demo, observed, derived")
+    satellite_image_url: Optional[str] = None
+
 
 
 class Farm(FarmBase):

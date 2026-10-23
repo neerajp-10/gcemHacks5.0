@@ -107,6 +107,16 @@ def create_app() -> FastAPI:
             StaticFiles(directory=str(_FRONTEND_DIR), html=True),
             name="frontend_static",
         )
+        assets_dir = _FRONTEND_DIR / "assets"
+        if not assets_dir.exists():
+            assets_dir = Path(__file__).resolve().parent.parent.parent / "assets"
+        if assets_dir.exists():
+            application.mount(
+                "/assets",
+                StaticFiles(directory=str(assets_dir)),
+                name="assets",
+            )
+
 
     @application.get("/index.html", include_in_schema=False)
     @application.get("/code.html", include_in_schema=False)

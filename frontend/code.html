@@ -218,14 +218,16 @@
       <div class="relative w-full rounded-2xl overflow-hidden bg-surface-container-lowest border border-surface-variant shadow-sm" id="satellite-card">
         <!-- SATELLITE IMAGE CANVAS -->
         <div class="relative h-60 w-full overflow-hidden bg-surface-container" id="satellite-canvas">
-          <img alt="Copernicus Sentinel-2 agricultural parcel photography" class="w-full h-full object-cover transition-opacity duration-300" id="satellite-img" src="https://lh3.googleusercontent.com/aida/AEtjO1W7VVL0QnggzCHDiaokqHF7Ig5OHC0ma5Y7t_f_0tYL-WmRAcrODr_z-EiI9U-tJD0e6KZxNBbEJ8-z_By9jNexPYOhVlqkAQ97fd05msoiWHlHr3nqs_d5A2YuXXzk7mfa8Znt4SJsNT8rGu_flyVuPt43Fu6we0tNcJYHazXnKAlpyMAx50UmuQiwJakx5d2mkd8K7DypigbYsDfBXS7l2_45QHiAJ0HSsxKEWQ2W-DorAiWtguSe1g"/>
+          <img alt="Copernicus Sentinel-2 agricultural parcel photography" class="w-full h-full object-cover transition-opacity duration-300" id="satellite-img" src="assets/mandya.jpg"/>
           <!-- Crisp farm parcel boundary overlay -->
           <svg class="absolute inset-0 w-full h-full pointer-events-none" fill="none" preserveaspectratio="none" viewbox="0 0 400 240">
-            <polygon fill="rgba(232, 162, 58, 0.15)" points="125,45 285,35 305,135 145,150" stroke="#ffddb5" stroke-dasharray="6 3" stroke-width="2.5"></polygon>
+            <polygon id="parcel-polygon" fill="rgba(232, 162, 58, 0.15)" points="125,45 285,35 305,135 145,150" stroke="#ffddb5" stroke-dasharray="6 3" stroke-width="2.5"></polygon>
             <polygon fill="none" points="45,95 125,85 145,190 40,210" stroke="#8dd6a8" stroke-dasharray="4 3" stroke-width="1.8"></polygon>
-            <circle cx="210" cy="95" fill="#633f00" fill-opacity="0.9" r="14"></circle>
-            <circle cx="210" cy="95" fill="#ffddb5" r="6"></circle>
-            <text fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle" x="210" y="99">!</text>
+            <g id="parcel-alert-marker">
+              <circle cx="210" cy="95" fill="#633f00" fill-opacity="0.9" r="14"></circle>
+              <circle cx="210" cy="95" fill="#ffddb5" r="6"></circle>
+              <text fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle" x="210" y="99">!</text>
+            </g>
           </svg>
           <!-- Source Overlay Badge -->
           <div class="absolute top-2.5 left-2.5 bg-inverse-surface/85 backdrop-blur-md rounded-lg px-2.5 py-1 text-inverse-on-surface text-[11px] font-medium flex items-center gap-1.5 shadow">
@@ -731,6 +733,10 @@
         plotTitle: "142/A (Mandya, Karnataka)",
         cropTitle: "Paddy (Sona Masoori)",
         area: "1.85 Hectares (~4.5 Acres)",
+        satImage: "assets/mandya.jpg",
+        satPass: "24 Feb 2024 • Sentinel-2 Pass",
+        satPolygon: "125,45 285,35 305,135 145,150",
+        alertMarker: { cx: 210, cy: 95 },
         advisoryTitle: "Field Needs Inspection: Canopy Moisture Change",
         advisoryDesc: "Status: Possible change in vegetative reflectance detected in the North-East zone. Requires physical ground verification before scheduling irrigation or chemical treatments.",
         metric: "0.58 (Dip of 12% vs. healthy benchmark 0.70)",
@@ -762,6 +768,10 @@
         plotTitle: "89/C (Ludhiana, Punjab)",
         cropTitle: "Wheat (PBW 343 - Late Sown)",
         area: "2.4 Hectares (~5.9 Acres)",
+        satImage: "assets/ludhiana.jpg",
+        satPass: "23 Feb 2024 • Sentinel-2 Pass",
+        satPolygon: "85,45 320,40 305,170 80,165",
+        alertMarker: { cx: 200, cy: 105 },
         advisoryTitle: "Wheat Vigour Normal: Nitrogen Top-dress Window",
         advisoryDesc: "Status: Vegetative index indicates vigorous tillering. Good canopy cover observed. Optimal window for second split of urea before mild daytime rise.",
         metric: "0.72 (Normal healthy vegetative benchmark 0.70)",
@@ -793,6 +803,10 @@
         plotTitle: "214/B (Varanasi, UP)",
         cropTitle: "Mustard (Varuna) & Winter Cabbage",
         area: "1.2 Hectares (~2.9 Acres)",
+        satImage: "assets/varanasi.jpg",
+        satPass: "22 Feb 2024 • Sentinel-2 Pass",
+        satPolygon: "70,65 295,50 330,150 120,180",
+        alertMarker: { cx: 195, cy: 105 },
         advisoryTitle: "Check for Aphid Infestation on Siliquae",
         advisoryDesc: "Status: Dense vegetative cluster observed. Moderate relative humidity morning conditions create vulnerability for mustard aphids. Inspect lower leaves.",
         metric: "0.64 (Vegetative coverage high vs 0.65 benchmark)",
@@ -824,6 +838,10 @@
         plotTitle: "56/D (Dindori, Nashik)",
         cropTitle: "Late Kharif Onion (Red Pinhead)",
         area: "1.6 Hectares (~3.9 Acres)",
+        satImage: "assets/nashik.jpg",
+        satPass: "21 Feb 2024 • Sentinel-2 Pass",
+        satPolygon: "105,40 295,55 285,185 95,160",
+        alertMarker: { cx: 190, cy: 115 },
         advisoryTitle: "Bulb Development Stage: Soil Moisture Check",
         advisoryDesc: "Status: Reflectance consistent with bulb expansion. Maintain uniform micro-irrigation. Withhold irrigation 10 days prior to anticipated lifting.",
         metric: "0.61 (Expected bulb filling signature vs 0.62 benchmark)",
@@ -849,6 +867,7 @@
         ]
       }
     };
+
 
     // Full Localizations for Kannada and Hindi
     const KANNADA_OVERRIDES = {
@@ -1034,6 +1053,37 @@
       document.getElementById('card-notice').textContent = data.notice;
       document.getElementById('card-meaning').textContent = data.meaning;
       document.getElementById('card-action').textContent = data.action;
+
+      // Update Satellite Image & Parcel Boundary Overlay
+      const satImg = document.getElementById('satellite-img');
+      if (satImg) {
+        const targetSrc = backendAvailable ? `${apiBase}/api/farms/${regionKey}/satellite-image` : data.satImage;
+        const fallbackSrc = data.satImage || "assets/mandya.jpg";
+
+        satImg.onerror = function() {
+          if (this.src !== fallbackSrc && !this.src.endsWith(fallbackSrc)) {
+            this.src = fallbackSrc;
+          }
+        };
+        satImg.src = targetSrc;
+      }
+
+
+      const satDate = document.getElementById('sat-date-tag');
+      if (satDate && data.satPass) {
+        satDate.textContent = data.satPass;
+      }
+
+      const poly = document.getElementById('parcel-polygon');
+      if (poly && data.satPolygon) {
+        poly.setAttribute('points', data.satPolygon);
+      }
+
+      const alertMarker = document.getElementById('parcel-alert-marker');
+      if (alertMarker && data.alertMarker) {
+        alertMarker.setAttribute('transform', `translate(${data.alertMarker.cx - 210}, ${data.alertMarker.cy - 95})`);
+      }
+
 
       // Time series bars
       const tsContainer = document.getElementById('ndvi-history-bars');

@@ -23,7 +23,12 @@
    - [Safe Connection Verification (Zero-Leakage Probing)](#safe-connection-verification-zero-leakage-probing)
    - [Database Schema (PostgreSQL DDL)](#database-schema-postgresql-ddl)
    - [Manual Setup & Credential Management](#manual-setup--credential-management)
-6. [Deployment & Execution Instructions](#6-deployment--execution-instructions)
+6. [Copernicus Sentinel Hub Live Satellite Data Integration](#6-copernicus-sentinel-hub-live-satellite-data-integration)
+   - [OAuth2 Client Credentials & Token Caching](#oauth2-client-credentials--token-caching)
+   - [Process API & True-Color Evalscript](#process-api--true-color-evalscript)
+   - [Regional Bounding Boxes & Dynamic Imagery](#regional-bounding-boxes--dynamic-imagery)
+   - [Zero-Downtime Local Asset Fallback](#zero-downtime-local-asset-fallback)
+7. [Deployment & Execution Instructions](#7-deployment--execution-instructions)
 
 ---
 
@@ -109,7 +114,7 @@ All backend dependencies are defined in `requirements.txt` and `backend/requirem
 | **`pydantic-settings`** | `>=2.2.0` | Type-safe application configuration management, cascading `.env` file resolution, and environment variable parsing. |
 | **`supabase`** | `>=2.33.0` | Official Supabase Python SDK for connecting to PostgreSQL via Supabase's PostgREST gateway, storage buckets, and auth. |
 | **`httpx`** | `>=0.27.0` | Modern, asynchronous/synchronous HTTP client used for safe, non-destructive connection probing of Supabase and internal test clients. |
-| **`pytest`** | `>=8.0.0` | Test framework for executing the 22 automated test cases covering health checks, farm endpoints, advisories, Supabase fallbacks, and Vercel compatibility. |
+| **`pytest`** | `>=8.0.0` | Test framework for executing the 25 automated test cases covering health checks, farm endpoints, trilingual advisories, Supabase fallbacks, Copernicus Sentinel-2 live queries, and Vercel compatibility. |
 
 ---
 
@@ -153,6 +158,9 @@ backend/
 │   ├── db/
 │   │   ├── __init__.py        # Marks db package
 │   │   └── supabase.py        # Reusable client singleton & safe connection verifier
+│   ├── services/
+│   │   ├── __init__.py        # Marks services package
+│   │   └── sentinel.py        # Copernicus Sentinel-2 client & Process API service
 │   └── schemas/
 │       ├── __init__.py        # Marks schemas package
 │       ├── farm.py            # Pydantic schemas for farm metadata
@@ -163,6 +171,7 @@ backend/
     ├── __init__.py            # Marks tests package
     ├── test_health.py         # Test suite for health & error handling
     ├── test_farms.py          # Test suite for farm domain endpoints
+    ├── test_sentinel.py       # Test suite for Sentinel Hub auth & satellite imagery
     ├── test_supabase.py       # Test suite for Supabase fallback & security
     └── test_vercel.py         # Test suite for Vercel serverless compatibility
 ```
@@ -214,6 +223,20 @@ backend/
 
 ---
 
+### Earth Observation & Sentinel Service Layer
+
+#### 5. `backend/app/services/sentinel.py`
+- **Purpose**: Manages live integration with the European Space Agency (ESA) Copernicus Sentinel-2 Level-2A satellite constellation via the Sentinel Hub Process API.
+- **Key Functions & Features**:
+  - `is_configured() -> bool`: Validates availability of `SENTINEL_CLIENT_ID` and `SENTINEL_CLIENT_SECRET`.
+  - `get_access_token() -> Optional[str]`: Fetches OAuth2 Bearer token from `services.sentinel-hub.com/oauth/token` with automatic TTL caching and preemptive refresh (refreshes if remaining lifespan < 60s).
+  - `verify_connection() -> Dict[str, Any]`: Zero-leakage connection probe returning authentication status without exposing credentials.
+  - `fetch_live_satellite_image(farm_id, width, height) -> Optional[bytes]`: Queries Sentinel Hub Process API using an inline evalscript (`B04, B03, B02` true-color RGB bands) for the exact cadastral bounding box of the selected farm parcel.
+  - `_load_local_fallback(farm_key) -> Optional[bytes]`: Guaranteed zero-downtime offline fallback loading high-resolution regional satellite image assets from disk if the remote API is unreachable or unconfigured.
+
+
+---
+
 ### Domain Data Schemas (Pydantic)
 
 #### 5. `backend/app/schemas/farm.py`
@@ -245,14 +268,16 @@ backend/
 #### 9. `backend/app/api/routes/health.py`
 - **Purpose**: System health diagnostics and database connectivity monitoring.
 - **Endpoints**:
-  - `GET /api/health`: Returns service health status, application name, ISO 8601 UTC timestamp, and `data_mode` (`"live"` if Supabase is connected, `"demo_ready"` if running off fixtures).
+  - `GET /api/health`: Returns service health status, application name, ISO 8601 UTC timestamp, `data_mode` (`"live"` if Supabase is connected, `"demo_ready"` if running off fixtures), `supabase_configured`, and `sentinel_configured`.
   - `GET /api/health/db`: Executes `verify_supabase_connection()` and returns structured database connectivity status without exposing secrets.
+  - `GET /api/health/sentinel`: Executes `sentinel_service.verify_connection()` and returns Copernicus Sentinel Hub OAuth2 status safely.
 
 #### 10. `backend/app/api/routes/farms.py`
-- **Purpose**: Main business logic endpoints for farms, advisories, observations, and weather.
+- **Purpose**: Main business logic endpoints for farms, advisories, observations, weather, and satellite imagery.
 - **Endpoints**:
-  - `GET /api/farms`: Lists all monitored parcels across India.
+  - `GET /api/farms`: Lists all monitored parcels across India with dynamic satellite image endpoints.
   - `GET /api/farms/{farm_id}`: Retrieves parcel metadata for a specific farm (returns 404 if not found).
+  - `GET /api/farms/{farm_id}/satellite-image`: Serves live true-color Sentinel-2 satellite imagery for the farm's exact bounding box with automatic offline cached fallback.
   - `GET /api/farms/{farm_id}/observations`: Retrieves the latest satellite NDVI observation and 20-day historical time-series.
   - `GET /api/farms/{farm_id}/advisory?language={en|kn|hi}`: Retrieves the 3-stage explainable advisory in English, Kannada, or Hindi with graceful English fallback.
   - `GET /api/farms/{farm_id}/communications/preview?channel={sms|voice}&language={en|kn|hi}`: Generates character-budgeted SMS previews and speech transcripts.
@@ -274,7 +299,7 @@ backend/
 
 ### Automated Test Suite (Pytest)
 
-All tests are executed with `pytest -v` and run in **1.6 seconds**:
+All tests are executed with `pytest -v` and run in **~2 seconds** across **25 automated tests**:
 
 #### 12. `backend/tests/test_health.py` (4 tests)
 - Tests `test_root_endpoint`: Verifies application metadata at `GET /`.
@@ -292,14 +317,19 @@ All tests are executed with `pytest -v` and run in **1.6 seconds**:
 - Tests `test_get_communication_preview_sms`: Verifies telecom character counting and preview status.
 - Tests `test_get_weather`: Confirms 3-day meteorological forecast structure.
 
-#### 14. `backend/tests/test_supabase.py` (5 tests)
+#### 14. `backend/tests/test_sentinel.py` (3 tests)
+- Tests `test_sentinel_health_endpoint`: Verifies `GET /api/health/sentinel` returns structured status.
+- Tests `test_farm_satellite_image_endpoint`: Verifies `GET /api/farms/{id}/satellite-image` returns HTTP 200 with `image/jpeg` content.
+- Tests `test_farm_list_includes_satellite_image_url`: Verifies all farms in `GET /api/farms` contain valid `satellite_image_url` properties.
+
+#### 15. `backend/tests/test_supabase.py` (5 tests)
 - Tests `test_supabase_unconfigured_by_default`: Asserts safe demo mode fallback when `.env` is absent.
 - Tests `test_health_db_endpoint_unconfigured`: Verifies `GET /api/health/db` returns `configured: false`.
 - Tests `test_verify_connection_never_exposes_secret_key`: Proves that secrets are never leaked in responses.
 - Tests `test_verify_connection_success_mocked`: Validates HTTP 200 handling from Supabase PostgREST.
 - Tests `test_verify_connection_auth_failure_mocked`: Validates HTTP 401 handling without crashing.
 
-#### 15. `backend/tests/test_vercel.py` (5 tests)
+#### 16. `backend/tests/test_vercel.py` (5 tests)
 - Tests `test_vercel_entrypoint_health`: Verifies Vercel entrypoint routes `/api/health`.
 - Tests `test_vercel_entrypoint_farms`: Verifies Vercel entrypoint routes `/api/farms`.
 - Tests `test_vercel_entrypoint_kannada_advisory`: Verifies Vercel entrypoint localized advisories.
@@ -472,7 +502,55 @@ To connect your live Supabase project to Earthworm:
 
 ---
 
-## 6. Deployment & Execution Instructions
+## 6. Copernicus Sentinel Hub Live Satellite Data Integration
+
+Earthworm connects directly to the **European Space Agency (ESA) Copernicus Sentinel-2 constellation** via the **Sentinel Hub Process API** (`services.sentinel-hub.com`). This enables real-time retrieval of true-color surface reflectance and NDVI vegetation vigor for every monitored parcel.
+
+### OAuth2 Client Credentials & Token Caching
+Sentinel Hub authentication utilizes the OAuth2 Client Credentials grant (`POST https://services.sentinel-hub.com/oauth/token`):
+1. **Credentials**: `SENTINEL_CLIENT_ID` and `SENTINEL_CLIENT_SECRET` configured in `backend/.env`.
+2. **Token Lifecycle**: The returned Bearer token is automatically cached in memory (`_access_token`) with its expiration time (`_token_expires_at`).
+3. **Preemptive Refresh**: If the remaining token lifetime drops below 60 seconds, `get_access_token()` transparently requests a new token to prevent API interruptions.
+
+### Process API & True-Color Evalscript
+Satellite imagery requests are submitted to `POST https://services.sentinel-hub.com/api/v1/process` using an inline JavaScript Evalscript:
+
+```javascript
+//VERSION=3
+function setup() {
+  return {
+    input: ["B04", "B03", "B02"],
+    output: { bands: 3 }
+  };
+}
+function evaluatePixel(sample) {
+  return [2.5 * sample.B04, 2.5 * sample.B03, 2.5 * sample.B02];
+}
+```
+- **B04 (Red, 665nm)**, **B03 (Green, 560nm)**, **B02 (Blue, 490nm)** at 10-meter spatial resolution.
+- Pixels are normalized and boosted by a reflectance factor of `2.5` to produce crisp, true-color visible imagery.
+- Requests enforce `maxCloudCoverage: 30%` on Sentinel-2 Level-2A bottom-of-atmosphere (BOA) data.
+
+### Regional Bounding Boxes & Dynamic Imagery
+Each farm parcel maps to high-precision WGS84 geographic bounding boxes (`[min_lon, min_lat, max_lon, max_lat]`):
+- **Mandya, Karnataka**: `[76.85, 12.48, 76.92, 12.55]` (Paddy fields, Cauvery basin)
+- **Ludhiana, Punjab**: `[75.80, 30.85, 75.92, 30.95]` (Wheat cultivation belt)
+- **Varanasi, Uttar Pradesh**: `[82.95, 25.28, 83.05, 25.38]` (Gangetic alluvium mustard & vegetable plots)
+- **Nashik, Maharashtra**: `[73.75, 19.95, 73.88, 20.08]` (Deccan plateau onion & horticulture)
+
+### Zero-Downtime Local Asset Fallback
+If the external Sentinel Hub API experiences upstream latency, rate-limiting, or if the server runs without internet access:
+1. `fetch_live_satellite_image()` catches network/HTTP exceptions gracefully.
+2. The service immediately serves regional high-resolution cached imagery assets from `frontend/assets/{farm_id}.jpg` or `assets/{farm_id}.jpg`.
+3. The farmer never experiences a broken image or stalled interface.
+
+### Endpoints
+- `GET /api/farms/{farm_id}/satellite-image`: Direct JPEG image stream with `Cache-Control: public, max-age=3600`.
+- `GET /api/health/sentinel`: Safe diagnostic probe reporting Sentinel Hub OAuth2 connectivity without credential exposure.
+
+---
+
+## 7. Deployment & Execution Instructions
 
 ### Local Development
 
@@ -498,6 +576,7 @@ To connect your live Supabase project to Earthworm:
    - **Interactive Swagger Docs**: [http://127.0.0.1:8080/docs](http://127.0.0.1:8080/docs)
    - **Service Health Check**: [http://127.0.0.1:8080/api/health](http://127.0.0.1:8080/api/health)
    - **Supabase DB Probe**: [http://127.0.0.1:8080/api/health/db](http://127.0.0.1:8080/api/health/db)
+   - **Sentinel Hub Satellite Probe**: [http://127.0.0.1:8080/api/health/sentinel](http://127.0.0.1:8080/api/health/sentinel)
 
 ---
 

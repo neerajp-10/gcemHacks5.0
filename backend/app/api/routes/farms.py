@@ -2,7 +2,7 @@
 
 from datetime import datetime, timezone
 from typing import List, Optional
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Response
 
 from app.data.demo.fixtures import (
     DEMO_ADVISORIES,
@@ -14,6 +14,7 @@ from app.schemas.advisory import Advisory
 from app.schemas.communication import CommunicationPreview
 from app.schemas.farm import Farm
 from app.schemas.observation import Observation
+from app.services.sentinel import sentinel_service
 
 router = APIRouter()
 
@@ -21,7 +22,12 @@ router = APIRouter()
 @router.get("/farms", response_model=List[Farm], summary="List All Monitored Farms")
 def list_farms() -> List[Farm]:
     """Retrieve all available farms (pan-India demo set)."""
-    return [Farm(**farm) for farm in DEMO_FARMS]
+    result = []
+    for farm in DEMO_FARMS:
+        farm_copy = dict(farm)
+        farm_copy["satellite_image_url"] = f"/api/farms/{farm['id']}/satellite-image"
+        result.append(Farm(**farm_copy))
+    return result
 
 
 @router.get("/farms/{farm_id}", response_model=Farm, summary="Get Farm Details")
@@ -30,7 +36,24 @@ def get_farm(farm_id: str) -> Farm:
     farm = next((f for f in DEMO_FARMS if f["id"] == farm_id.lower()), None)
     if not farm:
         raise HTTPException(status_code=404, detail=f"Farm '{farm_id}' not found.")
-    return Farm(**farm)
+    farm_copy = dict(farm)
+    farm_copy["satellite_image_url"] = f"/api/farms/{farm['id']}/satellite-image"
+    return Farm(**farm_copy)
+
+
+@router.get("/farms/{farm_id}/satellite-image", summary="Get Copernicus Sentinel-2 Satellite Image")
+def get_farm_satellite_image(farm_id: str):
+    """Retrieve Copernicus Sentinel-2 true-color satellite imagery for farm parcel."""
+    farm_id_clean = farm_id.lower()
+    img_bytes = sentinel_service.fetch_live_satellite_image(farm_id_clean)
+    if not img_bytes:
+        raise HTTPException(status_code=404, detail=f"Satellite image not available for farm '{farm_id}'.")
+    return Response(
+        content=img_bytes,
+        media_type="image/jpeg",
+        headers={"Cache-Control": "public, max-age=3600"},
+    )
+
 
 
 @router.get("/farms/{farm_id}/observations", response_model=Observation, summary="Get Latest Satellite Observations")
