@@ -1,90 +1,79 @@
-# Earthworm Advisory Backend
+# 🌱 Earthworm (ಅರ್ಥ್‌ವರ್ಮ್) — Satellite Crop Advisory Platform
 
-Satellite-based early-warning and crop advisory backend for smallholder paddy farmers in Mandya district, Karnataka, India.
+[![Vercel Deployment Ready](https://img.shields.io/badge/Vercel-Deployment%20Ready-black?style=flat&logo=vercel)](https://vercel.com)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688.svg?style=flat&logo=fastapi)](https://fastapi.tiangolo.com)
+[![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://python.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## Phase 1 Status: Minimal Runnable Backend
-- FastAPI service with `/api/health` and `/` endpoints.
-- Structured response formats and safe configuration loading without external credentials.
-- Zero external database or service requirements for demo mode.
+**Earthworm** is an explainable, satellite-based early warning and agronomic advisory platform tailored for smallholder farmers, piloted in **Mandya district, Karnataka, India** with pan-India agricultural support.
+
+It combines **Copernicus Sentinel-2** vegetation reflectance observations, **Open-Meteo** agrometeorological insights, and contextual soil data to alert farmers to crop stress before visible leaf symptoms expand.
 
 ---
 
-## 1. Setup & Installation
+## ✨ Key Features
 
-### Prerequisites
-- Python 3.10+ (Tested with Python 3.12.14)
+- **📡 Space Agromet Observations:** Sentinel-2 Level-2A cloud-free satellite imagery with registered farm parcel overlays.
+- **📈 20-Day NDVI Trend Visualizer:** 5-point time-series history bars (04 Feb, 09 Feb, 14 Feb, 19 Feb, 24 Feb) with seasonal benchmark comparison (0.70).
+- **💡 3-Stage Explainable Advisory Framework:**
+  1. *What did we notice? (ಗಮನಿಸಿದ್ದು)* — Multi-spectral canopy index anomaly.
+  2. *What could it mean? (ಅರ್ಥವೇನು)* — Root-zone moisture or subsoil percolation changes.
+  3. *What should I do next? (ಮುಂದೇನು)* — Practical low-cost ground checks before applying water or inputs.
+- **🗣️ Multilingual & Voice Narration:** Native Web Speech API reading advisories aloud in **Kannada (`kn`)**, **Hindi (`hi`)**, and **English (`en`)**.
+- **📱 Feature Phone SMS Simulation:** 1-tap copyable SMS preview designed for rural delivery via Kisan Call Centres.
+- **🏛️ National Kisan Helpline:** One-touch direct dialing to `1800-180-1551`.
 
-### Create and Activate Virtual Environment
+---
 
-**Windows (PowerShell):**
+## 🚀 Deploy to Vercel (1-Click Ready)
+
+Earthworm is pre-configured with `vercel.json` and `api/index.py` serverless routing for zero-friction Vercel deployment:
+
+1. Import your GitHub repository (`gcemHacks5.0`) into [Vercel](https://vercel.com/new).
+2. **Framework Preset:** Select **Other**.
+3. **Root Directory:** Keep `./` (leave default).
+4. **Environment Variables (Optional):**
+   - `SUPABASE_URL`: Your Supabase project URL (e.g. `https://xyz.supabase.co`)
+   - `SUPABASE_SECRET_KEY`: Your Supabase service role key
+   *(The platform operates automatically in offline demo mode if these are omitted).*
+5. Click **Deploy**!
+
+Vercel will automatically:
+- Serve the responsive UI at `https://<your-project>.vercel.app/`
+- Execute the FastAPI serverless backend at `https://<your-project>.vercel.app/api/...`
+
+---
+
+## 💻 Running Locally
+
+### 1. Prerequisites
+- Python 3.10+
+
+### 2. Setup Virtual Environment
 ```powershell
-cd backend
+cd c:\Earthworm\backend
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-```
-
-*(Or use the direct python path if python alias is not configured)*:
-```powershell
-& "C:\Users\Balaji\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe" -m venv .venv
-```
-
-### Install Dependencies
-```powershell
 pip install -r requirements.txt
 ```
 
----
-
-## 2. Running the Development Server
-
-From the `backend/` directory:
-
-```powershell
-.\.venv\Scripts\uvicorn.exe app.main:app --reload --host 127.0.0.1 --port 8000
-```
-
-Or when the virtual environment is activated:
+### 3. Start the Server
 ```powershell
 uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-### Accessing Endpoints
-- **Interactive Swagger Docs:** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-- **Service Health Check:** [http://127.0.0.1:8000/api/health](http://127.0.0.1:8000/api/health)
-- **Root Info:** [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
+- **Web Application:** [http://127.0.0.1:8000/app/code.html](http://127.0.0.1:8000/app/code.html) or [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
+- **Swagger Documentation:** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- **API Health:** [http://127.0.0.1:8000/api/health](http://127.0.0.1:8000/api/health)
 
----
-
-## 3. Running Tests
-
-From the `backend/` directory:
-
+### 4. Run Automated Tests (20 Tests Passing)
 ```powershell
-.\.venv\Scripts\pytest.exe -v
+pytest -v
 ```
 
 ---
 
-## 4. Configuration & Supabase Setup
+## 🔒 Security & Data Integrity
 
-Default settings in `app/config.py` allow immediate execution without any environment variables (running in demo mode).
-
-### Connecting Supabase (Optional)
-
-1. Create a `backend/.env` file from the example template:
-   ```powershell
-   cd c:\Earthworm\backend
-   copy .env.example .env
-   ```
-
-2. Open `backend/.env` and supply your Supabase project credentials:
-   ```env
-   SUPABASE_URL=https://<your-project-ref>.supabase.co
-   SUPABASE_SECRET_KEY=<your-service-role-or-secret-key>
-   ```
-
-> **Security Note:** `backend/.env` is included in `.gitignore` and is never committed to version control. The client runs backend-only; never expose service-role keys in frontend code.
-
-3. Verify connection without mutating database data:
-   - Visit [http://127.0.0.1:8000/api/health/db](http://127.0.0.1:8000/api/health/db)
-   - Or run `Invoke-RestMethod http://127.0.0.1:8000/api/health/db`
+- API keys and database credentials are kept exclusively server-side in `.env` (strictly ignored by Git).
+- No destructive SQL or unverified disease claims are made without physical ground truth.

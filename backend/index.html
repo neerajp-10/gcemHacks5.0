@@ -166,7 +166,7 @@
           </div>
         </div>
       </div>
-      <!-- Controls: Multi-language selector + 2G Toggle + Replay -->
+      <!-- Controls: Multi-language selector + Replay -->
       <div class="flex items-center gap-1.5">
         <div class="relative flex items-center">
           <select class="appearance-none bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold pl-2.5 pr-6 py-2 rounded-full border border-surface-variant focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px] cursor-pointer" id="lang-selector" onchange="changeLanguage(this.value)">
@@ -180,10 +180,6 @@
           </select>
           <span class="material-symbols-outlined text-on-surface-variant text-[16px] absolute right-2 pointer-events-none">expand_more</span>
         </div>
-        <button class="flex items-center gap-1 min-h-[44px] px-2.5 py-1.5 rounded-full bg-surface-container-low border border-surface-variant text-on-surface-variant text-xs font-medium hover:bg-surface-variant transition-colors" id="low-data-btn" onclick="toggleLowData()" title="Toggle 2G Low Data Mode" type="button">
-          <span class="material-symbols-outlined text-primary text-[18px]">network_check</span>
-          <span class="text-[11px] font-bold" id="low-data-label">2G Mode</span>
-        </button>
         <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors min-h-[44px] min-w-[36px]" onclick="replaySplash()" title="Replay Brand Intro" type="button">
           <span class="material-symbols-outlined text-[18px]">replay</span>
         </button>
@@ -218,9 +214,9 @@
         </p>
       </section>
 
-      <!-- 2. SATELLITE CANVAS WITH 2G ZERO-BANDWIDTH MODE TOGGLE -->
+      <!-- 2. SATELLITE PARCEL CANVAS -->
       <div class="relative w-full rounded-2xl overflow-hidden bg-surface-container-lowest border border-surface-variant shadow-sm" id="satellite-card">
-        <!-- STANDARD 4G/BROADBAND SATELLITE IMAGE CANVAS -->
+        <!-- SATELLITE IMAGE CANVAS -->
         <div class="relative h-60 w-full overflow-hidden bg-surface-container" id="satellite-canvas">
           <img alt="Copernicus Sentinel-2 agricultural parcel photography" class="w-full h-full object-cover transition-opacity duration-300" id="satellite-img" src="https://lh3.googleusercontent.com/aida/AEtjO1W7VVL0QnggzCHDiaokqHF7Ig5OHC0ma5Y7t_f_0tYL-WmRAcrODr_z-EiI9U-tJD0e6KZxNBbEJ8-z_By9jNexPYOhVlqkAQ97fd05msoiWHlHr3nqs_d5A2YuXXzk7mfa8Znt4SJsNT8rGu_flyVuPt43Fu6we0tNcJYHazXnKAlpyMAx50UmuQiwJakx5d2mkd8K7DypigbYsDfBXS7l2_45QHiAJ0HSsxKEWQ2W-DorAiWtguSe1g"/>
           <!-- Crisp farm parcel boundary overlay -->
@@ -243,39 +239,6 @@
               <span class="text-surface-container-low text-[11px]" id="sat-date-tag">24 Feb 2024 • Cloud-free Pass</span>
             </div>
             <span class="text-[11px] font-bold text-primary-fixed bg-primary/40 px-2 py-0.5 rounded" id="parcel-id-tag">Parcel #142/A</span>
-          </div>
-        </div>
-
-        <!-- 2G LOW-BANDWIDTH TEXT-FIRST VECTOR CANVAS (Visible in 2G Mode) -->
-        <div class="relative h-60 w-full bg-[#1b2b20] text-[#e3f5e8] p-4 flex flex-col justify-between hidden" id="low-data-canvas">
-          <div class="flex justify-between items-start">
-            <div>
-              <span class="px-2 py-0.5 bg-primary rounded text-[10px] font-bold text-white uppercase tracking-wider">2G Low-Data Mode</span>
-              <h4 class="text-base font-bold text-white mt-1" id="low-data-title">Plot 142/A (Mandya)</h4>
-              <p class="text-xs text-[#9fe9b9]">Paddy (Sona Masoori) • 1.85 Hectares</p>
-            </div>
-            <span class="text-xs font-mono bg-black/40 px-2 py-1 rounded border border-[#216b45]">Zero Image Bytes</span>
-          </div>
-          <!-- High-Contrast Vector Diagram -->
-          <div class="border border-[#216b45] rounded-xl p-3 bg-black/30 flex items-center justify-around text-center">
-            <div>
-              <span class="text-[10px] text-gray-300 block">NDVI Index</span>
-              <span class="text-xl font-bold text-[#ffd095]" id="low-data-ndvi">0.58</span>
-            </div>
-            <div class="h-8 w-px bg-gray-600"></div>
-            <div>
-              <span class="text-[10px] text-gray-300 block">Canopy Dip</span>
-              <span class="text-xl font-bold text-red-400" id="low-data-dip">-12%</span>
-            </div>
-            <div class="h-8 w-px bg-gray-600"></div>
-            <div>
-              <span class="text-[10px] text-gray-300 block">Rainfall Outlook</span>
-              <span class="text-xl font-bold text-emerald-400">0 mm</span>
-            </div>
-          </div>
-          <div class="text-[11px] text-gray-300 flex items-center justify-between">
-            <span>Source: Sentinel-2 Agromet Band Ratios</span>
-            <span>Sun Glare Safe</span>
           </div>
         </div>
 
@@ -1072,10 +1035,6 @@
       document.getElementById('card-meaning').textContent = data.meaning;
       document.getElementById('card-action').textContent = data.action;
 
-      // 2G Canvas fields
-      document.getElementById('low-data-title').textContent = `${data.plotTitle}`;
-      document.getElementById('low-data-ndvi').textContent = data.metric.split(" ")[0];
-
       // Time series bars
       const tsContainer = document.getElementById('ndvi-history-bars');
       if (data.history && tsContainer) {
@@ -1147,32 +1106,6 @@
 
       // Re-trigger selectRegion to update localized advisory text
       selectRegion(currentRegionKey);
-    }
-
-    // 2G Low Data Mode Toggle (Zero Image Bytes)
-    let lowDataActive = false;
-    function toggleLowData() {
-      lowDataActive = !lowDataActive;
-      const btn = document.getElementById('low-data-btn');
-      const label = document.getElementById('low-data-label');
-      const satCanvas = document.getElementById('satellite-canvas');
-      const lowDataCanvas = document.getElementById('low-data-canvas');
-
-      if (lowDataActive) {
-        btn.classList.add('bg-primary', 'text-on-primary');
-        btn.classList.remove('bg-surface-container-low', 'text-on-surface-variant');
-        label.textContent = "2G Active";
-        satCanvas.classList.add('hidden');
-        lowDataCanvas.classList.remove('hidden');
-        showToast("2G High-Contrast Mode ON", "Heavy raster imagery disabled. Using zero-bandwidth vector metrics.");
-      } else {
-        btn.classList.remove('bg-primary', 'text-on-primary');
-        btn.classList.add('bg-surface-container-low', 'text-on-surface-variant');
-        label.textContent = "2G Mode";
-        satCanvas.classList.remove('hidden');
-        lowDataCanvas.classList.add('hidden');
-        showToast("Standard Broadband Mode", "Full satellite imagery active.");
-      }
     }
 
     // Interactive Web Speech API (Voice Advisory Readout)

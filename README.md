@@ -19,7 +19,6 @@ It combines **Copernicus Sentinel-2** vegetation reflectance observations, **Ope
   1. *What did we notice? (ಗಮನಿಸಿದ್ದು)* — Multi-spectral canopy index anomaly.
   2. *What could it mean? (ಅರ್ಥವೇನು)* — Root-zone moisture or subsoil percolation changes.
   3. *What should I do next? (ಮುಂದೇನು)* — Practical low-cost ground checks before applying water or inputs.
-- **⚡ 2G / Zero-Bandwidth Mode:** Instant switch from raster imagery to a high-contrast solar-optimized SVG vector diagram designed for direct sunlight and 2G mobile networks.
 - **🗣️ Multilingual & Voice Narration:** Native Web Speech API reading advisories aloud in **Kannada (`kn`)**, **Hindi (`hi`)**, and **English (`en`)**.
 - **📱 Feature Phone SMS Simulation:** 1-tap copyable SMS preview designed for rural delivery via Kisan Call Centres.
 - **🏛️ National Kisan Helpline:** One-touch direct dialing to `1800-180-1551`.

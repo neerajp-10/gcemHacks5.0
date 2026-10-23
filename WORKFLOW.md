@@ -37,7 +37,7 @@ Most commercial agri-tech platforms fail smallholders due to three chronic barri
 3. **Linguistic & Literacy Barriers**: Advisories delivered exclusively in English or high-density technical jargon exclude vernacular-speaking farmers.
 
 ### Earthworm's Solution
-- **Ultra-Resilient Dual-Mode Interface**: Full visual interactive dashboard on broadband with an instant one-click toggle to **2G Low-Bandwidth Mode** (strips heavy tiles and heavy charts to operate under 15 KB).
+- **High-Performance Mobile-First Interface**: Lightweight, highly optimized visual interactive dashboard with instant parcel selection, satellite overlays, and weather forecast cards.
 - **3-Stage Explainable Agronomy**: Every advisory is structured into:
   1. **Notice** (*What the satellite saw* – e.g., 14% drop in vegetation canopy greenness).
   2. **Meaning** (*Why it matters agronomically* – e.g., panicle moisture stress during critical tillering).
@@ -87,8 +87,7 @@ The following flowchart illustrates the complete lifecycle of data through Earth
                                           v
 +-----------------------------------------------------------------------------------+
 | 5. FARMER-FACING FRONTEND DASHBOARD                                               |
-| - Broadband Mode: Interactive Leaflet map + SVG NDVI trend + Weather cards        |
-| - 2G Resilient Mode: High-contrast, zero-tile text layout (< 15 KB payload)      |
+| - Interactive Satellite Visuals: Leaflet parcel map + SVG NDVI trend + Weather    |
 | - Vernacular Voice Engine: In-browser Web Speech API audio narration               |
 | - SMS Broadcast Simulator: Character-counted telecom preview for feature phones   |
 +-----------------------------------------------------------------------------------+
