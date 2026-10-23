@@ -33,3 +33,22 @@ def test_vercel_entrypoint_kannada_advisory():
     response = client.get("/api/farms/mandya/advisory?language=kn")
     assert response.status_code == 200
     assert response.json()["language"] == "kn"
+
+
+def test_vercel_entrypoint_root_browser_request():
+    """Verify that browser visits to root / receive visual HTML page."""
+    response = client.get("/", headers={"Accept": "text/html,application/xhtml+xml"})
+    assert response.status_code == 200
+    assert "text/html" in response.headers.get("content-type", "")
+    assert "Earthworm" in response.text
+    assert "Satellite Crop Advisory" in response.text
+
+
+def test_vercel_entrypoint_root_api_json_request():
+    """Verify that API consumers can request JSON metadata from root /."""
+    response = client.get("/?format=json")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["app"] == "Earthworm Advisory Backend"
+    assert "health_url" in data
+

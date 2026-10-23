@@ -1,0 +1,34 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/app/(.*)",
+      "destination": "/frontend/$1"
+    },
+    {
+      "source": "/app",
+      "destination": "/frontend/index.html"
+    },
+    {
+      "source": "/frontend/(.*)",
+      "destination": "/frontend/$1"
+    },
+    {
+      "source": "/Frontend/(.*)",
+      "destination": "/frontend/$1"
+    },
+    {
+      "source": "/code.html",
+      "destination": "/frontend/index.html"
+    },
+    {
+      "source": "/",
+      "destination": "/frontend/index.html"
+    }
+  ]
+}
+
