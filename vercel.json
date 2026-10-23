@@ -6,11 +6,19 @@
     },
     {
       "source": "/app/(.*)",
-      "destination": "/Frontend/$1"
+      "destination": "/frontend/$1"
     },
     {
       "source": "/app",
-      "destination": "/Frontend/index.html"
+      "destination": "/frontend/index.html"
+    },
+    {
+      "source": "/frontend/(.*)",
+      "destination": "/frontend/$1"
+    },
+    {
+      "source": "/Frontend/(.*)",
+      "destination": "/frontend/$1"
     }
   ]
 }

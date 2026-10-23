@@ -9,7 +9,9 @@ from fastapi.staticfiles import StaticFiles
 from app.api.routes import farms, health
 from app.config import settings
 
-_FRONTEND_DIR = Path(__file__).resolve().parent.parent.parent / "Frontend"
+_FRONTEND_DIR = Path(__file__).resolve().parent.parent.parent / "frontend"
+if not _FRONTEND_DIR.exists():
+    _FRONTEND_DIR = Path(__file__).resolve().parent.parent.parent / "Frontend"
 
 
 def create_app() -> FastAPI:
