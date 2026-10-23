@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html class="h-full" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <meta content="mobile_tab" name="shell-type"/>
+  <title>Earthworm | Satellite Crop Advisory for Smallholder Farmers</title>
+  <meta name="description" content="Satellite-based early warning and explainable crop health advisory for smallholder paddy farmers in Mandya, Karnataka and across India."/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    @layer base {
+      html, body {
+        width: 100vw;
+        min-height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        overscroll-behavior-y: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+      .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+    }
+    ::-webkit-scrollbar { display: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .motion-animated, #splash-worm, .sprout-anim { animation: none !important; transition: none !important; }
+    }
+    @keyframes crawlWorm {
+      0% { transform: translate(-20px, 34px) scale(0.85); opacity: 0; }
+      15% { opacity: 1; }
+      50% { transform: translate(52px, 25px) scale(1.02); }
+      100% { transform: translate(114px, 18px) scale(0.96); opacity: 1; }
+    }
+    @keyframes sproutBloom {
+      0% { transform: scale(0); opacity: 0; }
+      55% { transform: scale(1.22); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .sprout-anim { animation: sproutBloom 0.8s cubic-bezier(0.17, 0.89, 0.32, 1.28) 0.55s forwards; transform-origin: bottom center; }
+  </style>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#005230",
+            "primary-container": "#216b45",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#9fe9b9",
+            "primary-fixed": "#a8f3c2",
+            "primary-fixed-dim": "#8dd6a8",
+            "surface": "#FAFAF6",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#EAF4EC",
+            "surface-container": "#e1f2e5",
+            "surface-container-high": "#dbeddf",
+            "surface-container-highest": "#d5e7da",
+            "surface-variant": "#d5e7da",
+            "on-surface": "#26352C",
+            "on-surface-variant": "#404942",
+            "secondary": "#57615b",
+            "secondary-container": "#dbe5dd",
+            "on-secondary": "#ffffff",
+            "on-secondary-container": "#5d6761",
+            "tertiary": "#633f00",
+            "tertiary-container": "#E8A23A",
+            "on-tertiary": "#ffffff",
+            "on-tertiary-container": "#332002",
+            "tertiary-fixed": "#ffddb5",
+            "tertiary-fixed-dim": "#ffb957",
+            "inverse-surface": "#25342b",
+            "inverse-on-surface": "#e3f5e8",
+            "outline": "#707a71",
+            "outline-variant": "#bfc9bf",
+            "error": "#ba1a1a"
+          },
+          fontFamily: {
+            "body-md": ["Noto Sans", "Noto Sans Kannada", "sans-serif"],
+            "headline-sm": ["Noto Sans", "Noto Sans Kannada", "sans-serif"],
+            "headline-md": ["Noto Sans", "Noto Sans Kannada", "sans-serif"],
+            "headline-lg": ["Noto Sans", "Noto Sans Kannada", "sans-serif"],
+            "headline-xl": ["Noto Sans", "Noto Sans Kannada", "sans-serif"],
+            "label-sm": ["Noto Sans", "Noto Sans Kannada", "sans-serif"],
+            "label-md": ["Noto Sans", "Noto Sans Kannada", "sans-serif"],
+            "label-lg": ["Noto Sans", "Noto Sans Kannada", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen selection:bg-primary-container selection:text-on-primary antialiased">
+
+  <!-- 1. MEMORABLE LIGHTWEIGHT OPENING ANIMATION OVERLAY -->
+  <div class="fixed inset-0 z-[100] bg-surface flex flex-col items-center justify-center p-6 text-center transition-opacity duration-500 pointer-events-auto" id="intro-splash">
+    <div class="relative w-64 h-32 mb-2 flex items-center justify-center">
+      <svg class="w-full h-full overflow-visible" fill="none" viewbox="0 0 160 80" xmlns="http://www.w3.org/2000/svg">
+        <!-- Deep rich soil furrow wave -->
+        <path d="M10 58 C 45 36, 75 70, 114 42 C 132 30, 146 38, 154 36" stroke="#d5e7da" stroke-linecap="round" stroke-width="8"></path>
+        <path d="M10 58 C 45 36, 75 70, 114 42 C 132 30, 146 38, 154 36" stroke="#216b45" stroke-dasharray="5 7" stroke-linecap="round" stroke-width="3"></path>
+        <!-- Friendly realistic earthworm traversing soil furrow -->
+        <g id="splash-worm" style="animation: crawlWorm 1.4s ease-in-out forwards;">
+          <ellipse cx="0" cy="0" fill="#a45d22" rx="9" ry="5.8" transform="rotate(-15)"></ellipse>
+          <ellipse cx="-6" cy="3" fill="#8d4a15" rx="7" ry="5" transform="rotate(-8)"></ellipse>
+          <ellipse cx="-13" cy="5" fill="#783c0f" rx="5.5" ry="4"></ellipse>
+          <circle cx="5.5" cy="-1.5" fill="#ffffff" r="1.8"></circle>
+          <circle cx="6.2" cy="-1.5" fill="#25342b" r="0.9"></circle>
+          <path d="M5.5 2 Q 7 3.5 8 1" stroke="#ffddb5" stroke-linecap="round" stroke-width="1.2"></path>
+        </g>
+        <!-- Fresh vibrant sprout emerging at top right furrow -->
+        <g class="sprout-anim" style="opacity: 0;" transform="translate(116, 22)">
+          <path d="M0 16 Q 2 6 0 0" stroke="#005230" stroke-linecap="round" stroke-width="2.5"></path>
+          <path d="M0 5 Q 7 1 8 -5 Q 2 -4 0 4" fill="#216b45"></path>
+          <path d="M-1 9 Q -8 5 -7 -1 Q -2 -1 -1 7" fill="#8dd6a8"></path>
+        </g>
+      </svg>
+    </div>
+    <div class="flex flex-col items-center">
+      <div class="flex items-center gap-2">
+        <span class="text-3xl font-extrabold tracking-tight text-primary font-headline-xl">EARTHWORM</span>
+      </div>
+      <p class="text-[12px] font-bold text-secondary tracking-wider uppercase mt-0.5">National Agri-Sat Prototype</p>
+      <p class="text-sm font-semibold text-on-surface-variant mt-2 max-w-xs">See Your Fields. Understand Your Crops.</p>
+    </div>
+    <div class="mt-4 flex items-center gap-1.5 px-3 py-1 bg-surface-container rounded-full text-on-surface-variant text-xs">
+      <span class="w-2 h-2 rounded-full bg-primary"></span>
+      <span>Reference Space Agromet Data • ISRO &amp; ESA</span>
+    </div>
+    <div class="mt-6 flex items-center gap-3">
+      <button class="px-5 py-2.5 rounded-full bg-primary-container text-on-primary font-semibold text-sm shadow-sm active:scale-95 transition-all" onclick="dismissSplash()" type="button">
+        Enter Advisory Dashboard →
+      </button>
+      <button class="px-3.5 py-2 text-on-surface-variant text-xs underline decoration-dotted" onclick="dismissSplash()" type="button">
+        Skip intro
+      </button>
+    </div>
+  </div>
+
+  <!-- FIXED APP HEADER -->
+  <header class="fixed top-0 inset-x-0 z-50 bg-surface/90 backdrop-blur-xl border-b border-surface-variant/60 shadow-[0_1px_6px_rgba(0,0,0,0.03)] pt-safe">
+    <div class="h-16 px-4 flex items-center justify-between gap-2 max-w-[640px] mx-auto">
+      <!-- Brand Identity -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shrink-0 shadow-sm relative overflow-hidden">
+          <svg class="w-7 h-7" fill="none" viewbox="0 0 24 24">
+            <path d="M3 18 C 7 15, 12 21, 16 16 C 18 14, 20 15, 21 14" stroke="#a8f3c2" stroke-linecap="round" stroke-width="2.2"></path>
+            <path d="M12 17 C 12 11, 15 8, 18 6" stroke="#ffffff" stroke-linecap="round" stroke-width="2"></path>
+            <path d="M18 6 Q 21 7 20 10 Q 16 9 17 6" fill="#8dd6a8"></path>
+            <circle cx="8" cy="16.5" fill="#ffddb5" r="2.2"></circle>
+          </svg>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xl font-extrabold tracking-tight text-primary leading-none">EARTHWORM</span>
+          <div class="flex items-center gap-1.5 mt-0.5">
+            <span class="text-[10px] font-semibold text-on-surface-variant tracking-wider uppercase leading-tight">Agri-Sat</span>
+            <span id="api-status-pill" class="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-surface-container text-secondary flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary" id="api-status-dot"></span>
+              <span id="api-status-text">Checking API...</span>
+            </span>
+          </div>
+        </div>
+      </div>
+      <!-- Controls: Multi-language selector + 2G Toggle + Replay -->
+      <div class="flex items-center gap-1.5">
+        <div class="relative flex items-center">
+          <select class="appearance-none bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold pl-2.5 pr-6 py-2 rounded-full border border-surface-variant focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px] cursor-pointer" id="lang-selector" onchange="changeLanguage(this.value)">
+            <option selected="" value="en">English</option>
+            <option value="kn">ಕನ್ನಡ (Kannada)</option>
+            <option value="hi">हिन्दी (Hindi)</option>
+            <option value="te">తెలుగు (Telugu)</option>
+            <option value="ta">தமிழ் (Tamil)</option>
+            <option value="mr">मराठी (Marathi)</option>
+            <option value="bn">বাংলা (Bengali)</option>
+          </select>
+          <span class="material-symbols-outlined text-on-surface-variant text-[16px] absolute right-2 pointer-events-none">expand_more</span>
+        </div>
+        <button class="flex items-center gap-1 min-h-[44px] px-2.5 py-1.5 rounded-full bg-surface-container-low border border-surface-variant text-on-surface-variant text-xs font-medium hover:bg-surface-variant transition-colors" id="low-data-btn" onclick="toggleLowData()" title="Toggle 2G Low Data Mode" type="button">
+          <span class="material-symbols-outlined text-primary text-[18px]">network_check</span>
+          <span class="text-[11px] font-bold" id="low-data-label">2G Mode</span>
+        </button>
+        <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors min-h-[44px] min-w-[36px]" onclick="replaySplash()" title="Replay Brand Intro" type="button">
+          <span class="material-symbols-outlined text-[18px]">replay</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN SCROLLABLE CONTENT -->
+  <main class="flex-1 flex flex-col relative w-full px-4 pt-20 pb-28 bg-surface max-w-[640px] mx-auto">
+    <div class="flex flex-col gap-4 w-full">
+
+      <!-- TOP BANNER: HONEST PROTOTYPE DISCLOSURE -->
+      <div class="bg-surface-container-high border-l-4 border-primary rounded-r-xl p-2.5 flex items-start gap-2 shadow-sm text-xs text-on-surface-variant">
+        <span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">verified_user</span>
+        <div>
+          <span class="font-bold text-on-surface" id="banner-title">Prototype Demonstration Data</span>:
+          <span id="banner-text">Satellite reflectance & agromet observations. Always verify ground conditions before applying treatments.</span>
+        </div>
+      </div>
+
+      <!-- HERO HEADLINE & VALUE INTRO -->
+      <section class="flex flex-col gap-1 pt-1">
+        <div class="inline-flex items-center gap-1.5 self-start px-2.5 py-0.5 rounded-full bg-surface-container text-primary text-[11px] font-semibold">
+          <span class="material-symbols-outlined text-[14px]">satellite_alt</span>
+          <span id="hero-tag">Space &amp; Weather Observations</span>
+        </div>
+        <h1 class="text-[22px] sm:text-[24px] font-extrabold text-on-surface leading-tight" id="hero-title">
+          Understand Your Crops Before Problems Grow.
+        </h1>
+        <p class="text-sm text-on-surface-variant leading-relaxed" id="hero-subtitle">
+          Free space-based vegetative index and agrometeorological insights for Indian farmers.
+        </p>
+      </section>
+
+      <!-- 2. SATELLITE CANVAS WITH 2G ZERO-BANDWIDTH MODE TOGGLE -->
+      <div class="relative w-full rounded-2xl overflow-hidden bg-surface-container-lowest border border-surface-variant shadow-sm" id="satellite-card">
+        <!-- STANDARD 4G/BROADBAND SATELLITE IMAGE CANVAS -->
+        <div class="relative h-60 w-full overflow-hidden bg-surface-container" id="satellite-canvas">
+          <img alt="Copernicus Sentinel-2 agricultural parcel photography" class="w-full h-full object-cover transition-opacity duration-300" id="satellite-img" src="https://lh3.googleusercontent.com/aida/AEtjO1W7VVL0QnggzCHDiaokqHF7Ig5OHC0ma5Y7t_f_0tYL-WmRAcrODr_z-EiI9U-tJD0e6KZxNBbEJ8-z_By9jNexPYOhVlqkAQ97fd05msoiWHlHr3nqs_d5A2YuXXzk7mfa8Znt4SJsNT8rGu_flyVuPt43Fu6we0tNcJYHazXnKAlpyMAx50UmuQiwJakx5d2mkd8K7DypigbYsDfBXS7l2_45QHiAJ0HSsxKEWQ2W-DorAiWtguSe1g"/>
+          <!-- Crisp farm parcel boundary overlay -->
+          <svg class="absolute inset-0 w-full h-full pointer-events-none" fill="none" preserveaspectratio="none" viewbox="0 0 400 240">
+            <polygon fill="rgba(232, 162, 58, 0.15)" points="125,45 285,35 305,135 145,150" stroke="#ffddb5" stroke-dasharray="6 3" stroke-width="2.5"></polygon>
+            <polygon fill="none" points="45,95 125,85 145,190 40,210" stroke="#8dd6a8" stroke-dasharray="4 3" stroke-width="1.8"></polygon>
+            <circle cx="210" cy="95" fill="#633f00" fill-opacity="0.9" r="14"></circle>
+            <circle cx="210" cy="95" fill="#ffddb5" r="6"></circle>
+            <text fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle" x="210" y="99">!</text>
+          </svg>
+          <!-- Source Overlay Badge -->
+          <div class="absolute top-2.5 left-2.5 bg-inverse-surface/85 backdrop-blur-md rounded-lg px-2.5 py-1 text-inverse-on-surface text-[11px] font-medium flex items-center gap-1.5 shadow">
+            <span class="material-symbols-outlined text-primary-fixed text-[14px]">satellite</span>
+            <span id="sat-source-badge">Copernicus Sentinel-2 (ESA) Level-2A</span>
+          </div>
+          <!-- Observation Metadata Bar -->
+          <div class="absolute bottom-2 left-2 right-2 bg-inverse-surface/90 backdrop-blur-md rounded-xl p-2.5 px-3 text-inverse-on-surface flex items-center justify-between text-xs">
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-primary-fixed-dim text-[16px]">calendar_today</span>
+              <span class="text-surface-container-low text-[11px]" id="sat-date-tag">24 Feb 2024 • Cloud-free Pass</span>
+            </div>
+            <span class="text-[11px] font-bold text-primary-fixed bg-primary/40 px-2 py-0.5 rounded" id="parcel-id-tag">Parcel #142/A</span>
+          </div>
+        </div>
+
+        <!-- 2G LOW-BANDWIDTH TEXT-FIRST VECTOR CANVAS (Visible in 2G Mode) -->
+        <div class="relative h-60 w-full bg-[#1b2b20] text-[#e3f5e8] p-4 flex flex-col justify-between hidden" id="low-data-canvas">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="px-2 py-0.5 bg-primary rounded text-[10px] font-bold text-white uppercase tracking-wider">2G Low-Data Mode</span>
+              <h4 class="text-base font-bold text-white mt-1" id="low-data-title">Plot 142/A (Mandya)</h4>
+              <p class="text-xs text-[#9fe9b9]">Paddy (Sona Masoori) • 1.85 Hectares</p>
+            </div>
+            <span class="text-xs font-mono bg-black/40 px-2 py-1 rounded border border-[#216b45]">Zero Image Bytes</span>
+          </div>
+          <!-- High-Contrast Vector Diagram -->
+          <div class="border border-[#216b45] rounded-xl p-3 bg-black/30 flex items-center justify-around text-center">
+            <div>
+              <span class="text-[10px] text-gray-300 block">NDVI Index</span>
+              <span class="text-xl font-bold text-[#ffd095]" id="low-data-ndvi">0.58</span>
+            </div>
+            <div class="h-8 w-px bg-gray-600"></div>
+            <div>
+              <span class="text-[10px] text-gray-300 block">Canopy Dip</span>
+              <span class="text-xl font-bold text-red-400" id="low-data-dip">-12%</span>
+            </div>
+            <div class="h-8 w-px bg-gray-600"></div>
+            <div>
+              <span class="text-[10px] text-gray-300 block">Rainfall Outlook</span>
+              <span class="text-xl font-bold text-emerald-400">0 mm</span>
+            </div>
+          </div>
+          <div class="text-[11px] text-gray-300 flex items-center justify-between">
+            <span>Source: Sentinel-2 Agromet Band Ratios</span>
+            <span>Sun Glare Safe</span>
+          </div>
+        </div>
+
+        <!-- HISTORICAL NDVI TIME-SERIES BAR (FEATURE B) -->
+        <div class="px-3 pt-2.5 pb-2 bg-surface-container-low border-t border-surface-variant">
+          <div class="flex items-center justify-between text-xs mb-1.5">
+            <span class="font-bold text-on-surface flex items-center gap-1">
+              <span class="material-symbols-outlined text-[16px] text-primary">show_chart</span>
+              <span id="ts-title">NDVI 20-Day Trend (Sentinel-2)</span>
+            </span>
+            <span class="text-[10px] text-secondary font-semibold" id="ts-benchmark">Seasonal Benchmark: 0.70</span>
+          </div>
+          <div class="grid grid-cols-5 gap-1.5 text-center" id="ndvi-history-bars">
+            <div class="bg-surface-container-lowest p-1 rounded-lg border border-surface-variant flex flex-col items-center">
+              <span class="text-[9px] text-secondary">04 Feb</span>
+              <div class="w-full bg-primary/20 h-7 rounded-sm flex items-end justify-center my-0.5">
+                <div class="w-full bg-primary rounded-sm" style="height: 97%;"></div>
+              </div>
+              <span class="text-[10px] font-bold text-primary">0.68</span>
+            </div>
+            <div class="bg-surface-container-lowest p-1 rounded-lg border border-surface-variant flex flex-col items-center">
+              <span class="text-[9px] text-secondary">09 Feb</span>
+              <div class="w-full bg-primary/20 h-7 rounded-sm flex items-end justify-center my-0.5">
+                <div class="w-full bg-primary rounded-sm" style="height: 94%;"></div>
+              </div>
+              <span class="text-[10px] font-bold text-primary">0.66</span>
+            </div>
+            <div class="bg-surface-container-lowest p-1 rounded-lg border border-surface-variant flex flex-col items-center">
+              <span class="text-[9px] text-secondary">14 Feb</span>
+              <div class="w-full bg-primary/20 h-7 rounded-sm flex items-end justify-center my-0.5">
+                <div class="w-full bg-primary rounded-sm" style="height: 90%;"></div>
+              </div>
+              <span class="text-[10px] font-bold text-primary">0.63</span>
+            </div>
+            <div class="bg-surface-container-lowest p-1 rounded-lg border border-surface-variant flex flex-col items-center">
+              <span class="text-[9px] text-secondary">19 Feb</span>
+              <div class="w-full bg-primary/20 h-7 rounded-sm flex items-end justify-center my-0.5">
+                <div class="w-full bg-primary rounded-sm" style="height: 87%;"></div>
+              </div>
+              <span class="text-[10px] font-bold text-primary">0.61</span>
+            </div>
+            <div class="bg-surface-container-lowest p-1 rounded-lg border-2 border-tertiary-container flex flex-col items-center">
+              <span class="text-[9px] font-bold text-tertiary">24 Feb</span>
+              <div class="w-full bg-tertiary-container/30 h-7 rounded-sm flex items-end justify-center my-0.5">
+                <div class="w-full bg-tertiary-container rounded-sm" style="height: 82%;"></div>
+              </div>
+              <span class="text-[10px] font-bold text-tertiary">0.58</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="p-3 bg-surface-container-lowest border-t border-surface-variant flex flex-col gap-2.5">
+          <div class="grid grid-cols-2 gap-2">
+            <button class="min-h-[48px] rounded-xl bg-primary text-on-primary font-semibold text-sm flex items-center justify-center gap-2 active:bg-primary-container shadow-sm transition-colors" onclick="openModal('fieldModal')" type="button">
+              <span id="btn-check-field">Check My Field</span>
+              <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+            </button>
+            <button class="min-h-[48px] rounded-xl bg-surface-container hover:bg-surface-variant text-primary font-semibold text-sm flex items-center justify-center gap-1.5 transition-colors" onclick="openModal('guideModal')" type="button">
+              <span class="material-symbols-outlined text-[18px]">play_circle</span>
+              <span id="btn-guide">How It Works</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. PAN-INDIA REACH & INTERACTIVE FARM SELECTOR -->
+      <section class="flex flex-col gap-2 bg-surface-container-low p-3.5 rounded-2xl border border-surface-variant/80">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-[20px]">pin_drop</span>
+            <span class="text-xs font-bold uppercase tracking-wider text-on-surface" id="region-selector-header">Select Demo Field (Pan-India)</span>
+          </div>
+          <span class="text-[11px] text-secondary font-medium">No login required</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1" id="farm-pills-container">
+          <button class="region-pill active-pill p-2.5 rounded-xl border text-left flex items-start gap-2.5 transition-all bg-primary-container text-on-primary border-primary min-h-[48px]" id="pill-mandya" onclick="selectRegion('mandya')" type="button">
+            <span class="material-symbols-outlined text-[20px] shrink-0 mt-0.5">rice_bowl</span>
+            <div class="flex flex-col min-w-0">
+              <span class="text-xs font-bold leading-tight truncate">Mandya (Karnataka)</span>
+              <span class="text-[11px] opacity-90 truncate">Paddy (Sona Masoori) • Demo Field A</span>
+            </div>
+          </button>
+          <button class="region-pill p-2.5 rounded-xl border text-left flex items-start gap-2.5 transition-all bg-surface-container-lowest text-on-surface border-surface-variant hover:bg-surface-container min-h-[48px]" id="pill-ludhiana" onclick="selectRegion('ludhiana')" type="button">
+            <span class="material-symbols-outlined text-[20px] text-tertiary-container shrink-0 mt-0.5">grass</span>
+            <div class="flex flex-col min-w-0">
+              <span class="text-xs font-bold leading-tight truncate">Ludhiana (Punjab)</span>
+              <span class="text-[11px] text-on-surface-variant truncate">Wheat (PBW 343) • Demo Field B</span>
+            </div>
+          </button>
+          <button class="region-pill p-2.5 rounded-xl border text-left flex items-start gap-2.5 transition-all bg-surface-container-lowest text-on-surface border-surface-variant hover:bg-surface-container min-h-[48px]" id="pill-varanasi" onclick="selectRegion('varanasi')" type="button">
+            <span class="material-symbols-outlined text-[20px] text-primary shrink-0 mt-0.5">psychiatry</span>
+            <div class="flex flex-col min-w-0">
+              <span class="text-xs font-bold leading-tight truncate">Varanasi (Uttar Pradesh)</span>
+              <span class="text-[11px] text-on-surface-variant truncate">Mustard &amp; Vegetables • Demo Field C</span>
+            </div>
+          </button>
+          <button class="region-pill p-2.5 rounded-xl border text-left flex items-start gap-2.5 transition-all bg-surface-container-lowest text-on-surface border-surface-variant hover:bg-surface-container min-h-[48px]" id="pill-nashik" onclick="selectRegion('nashik')" type="button">
+            <span class="material-symbols-outlined text-[20px] text-tertiary-container shrink-0 mt-0.5">nutrition</span>
+            <div class="flex flex-col min-w-0">
+              <span class="text-xs font-bold leading-tight truncate">Nashik (Maharashtra)</span>
+              <span class="text-[11px] text-on-surface-variant truncate">Onion / Grapes • Demo Field D</span>
+            </div>
+          </button>
+        </div>
+      </section>
+
+      <!-- 4. 3-STAGE EXPLAINABLE ADVISORY CARD -->
+      <section class="rounded-2xl bg-surface-container-lowest p-4 border border-tertiary-fixed shadow-sm flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary-container text-on-tertiary-container text-xs font-bold" id="alert-badge-wrap">
+            <span class="material-symbols-outlined text-[16px]">warning</span>
+            <span id="alert-badge">ATTENTION • ACTION RECOMMENDED</span>
+          </div>
+          <span class="text-[10px] font-semibold text-secondary bg-surface-container px-2 py-0.5 rounded">Reference Agromet</span>
+        </div>
+        <div class="flex flex-col gap-1">
+          <h2 class="text-lg font-bold text-on-surface" id="advisory-title">Field Needs Inspection: Canopy Moisture Change</h2>
+          <p class="text-sm text-on-surface-variant leading-relaxed" id="advisory-desc">
+            Status: Possible change in vegetative reflectance detected in the North-East zone. Requires physical ground verification before scheduling irrigation or chemical treatments.
+          </p>
+        </div>
+
+        <!-- 3-STAGE BREAKDOWN RIGHT ON THE CARD -->
+        <div class="space-y-2 bg-surface-container-low p-3 rounded-xl border border-surface-variant text-xs">
+          <div>
+            <span class="font-bold text-primary block">1. What did we notice? (ಗಮನಿಸಿದ್ದು)</span>
+            <span class="text-on-surface-variant" id="card-notice">Vegetation index (NDVI) shows a localized drop of 12% in the North-East quarter.</span>
+          </div>
+          <div>
+            <span class="font-bold text-secondary block">2. What could it mean? (ಅರ್ಥವೇನು)</span>
+            <span class="text-on-surface-variant" id="card-meaning">Possible uneven subsoil water percolation or clogged drip line.</span>
+          </div>
+          <div>
+            <span class="font-bold text-tertiary block">3. What should I do next? (ಮುಂದೇನು)</span>
+            <span class="text-on-surface-variant" id="card-action">Walk along NE boundary and press soil by hand to check moisture depth.</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 p-2.5 rounded-xl bg-surface-container text-xs text-on-surface">
+          <span class="material-symbols-outlined text-primary text-[20px]">analytics</span>
+          <div class="flex flex-col">
+            <span class="text-on-surface-variant text-[11px]">Vegetative Health Index (NDVI Reference)</span>
+            <span class="font-bold text-primary" id="advisory-metric">0.58 (Dip of 12% vs. healthy benchmark 0.70)</span>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-2 pt-1">
+          <button class="flex-1 min-h-[48px] rounded-xl bg-primary text-on-primary font-semibold text-sm flex items-center justify-center gap-2 active:bg-primary-container shadow-sm transition-colors" onclick="openModal('adviceModal')" type="button">
+            <span class="material-symbols-outlined text-[18px]">fact_check</span>
+            <span id="btn-view-advice">View Full Advice</span>
+          </button>
+          <button class="min-h-[48px] px-4 rounded-xl bg-surface-container hover:bg-surface-variant text-primary font-semibold text-sm flex items-center justify-center gap-1.5 transition-colors" id="btn-audio-voice" onclick="toggleAudioAdvice()" type="button">
+            <span class="material-symbols-outlined text-[18px]" id="audio-icon">volume_up</span>
+            <span id="btn-audio-listen">Listen Voice Advice</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- 5. THREE PRACTICAL ACTION TILES -->
+      <section class="flex flex-col gap-2.5">
+        <div class="flex items-center justify-between">
+          <h3 class="text-base font-bold text-on-surface" id="tiles-header">Three Practical Field Actions</h3>
+          <span class="text-xs text-secondary">Tap tile to inspect</span>
+        </div>
+        <button class="w-full p-3.5 rounded-2xl bg-surface-container-lowest border border-surface-variant shadow-sm flex items-start gap-3.5 text-left hover:bg-surface-container-low active:bg-surface-container transition-all min-h-[48px]" onclick="openModal('healthModal')" type="button">
+          <div class="w-11 h-11 rounded-xl bg-primary-fixed flex items-center justify-center shrink-0 text-on-primary-fixed">
+            <span class="material-symbols-outlined text-[24px]">eco</span>
+          </div>
+          <div class="flex flex-col flex-1 min-w-0">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-bold text-on-surface" id="tile1-title">1. Check Crop Health</span>
+              <span class="material-symbols-outlined text-secondary text-[20px]">chevron_right</span>
+            </div>
+            <p class="text-xs text-on-surface-variant mt-0.5 leading-normal" id="action-health-desc">Inspect vigor map with clear green, yellow, and dry soil alert parcels.</p>
+          </div>
+        </button>
+        <button class="w-full p-3.5 rounded-2xl bg-surface-container-lowest border border-surface-variant shadow-sm flex items-start gap-3.5 text-left hover:bg-surface-container-low active:bg-surface-container transition-all min-h-[48px]" onclick="openModal('waterModal')" type="button">
+          <div class="w-11 h-11 rounded-xl bg-secondary-container flex items-center justify-center shrink-0 text-on-secondary-container">
+            <span class="material-symbols-outlined text-[24px]">water_drop</span>
+          </div>
+          <div class="flex flex-col flex-1 min-w-0">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-bold text-on-surface" id="tile2-title">2. Should I Water?</span>
+              <span class="material-symbols-outlined text-secondary text-[20px]">chevron_right</span>
+            </div>
+            <p class="text-xs text-on-surface-variant mt-0.5 leading-normal" id="action-water-desc">Check root-zone moisture estimate &amp; evaporation window before turning pumps on.</p>
+          </div>
+        </button>
+        <button class="w-full p-3.5 rounded-2xl bg-surface-container-lowest border border-surface-variant shadow-sm flex items-start gap-3.5 text-left hover:bg-surface-container-low active:bg-surface-container transition-all min-h-[48px]" onclick="openModal('weatherModal')" type="button">
+          <div class="w-11 h-11 rounded-xl bg-tertiary-fixed flex items-center justify-center shrink-0 text-tertiary">
+            <span class="material-symbols-outlined text-[24px]">partly_cloudy_day</span>
+          </div>
+          <div class="flex flex-col flex-1 min-w-0">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-bold text-on-surface" id="tile3-title">3. View Weather Forecast</span>
+              <span class="material-symbols-outlined text-secondary text-[20px]">chevron_right</span>
+            </div>
+            <p class="text-xs text-on-surface-variant mt-0.5 leading-normal" id="action-weather-desc">Regional 3-Day Outlook: Mandya (31°C, 0mm rain expected).</p>
+          </div>
+        </button>
+      </section>
+
+      <!-- 6. 3-DAY WEATHER OUTLOOK -->
+      <section class="rounded-2xl bg-surface-container p-4 border border-surface-variant flex flex-col gap-3 shadow-sm">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-primary text-[18px]">wb_sunny</span>
+            <span class="text-xs font-bold text-primary uppercase tracking-wide" id="weather-source-tag">Regional 3-Day Outlook (Open-Meteo Demonstration)</span>
+          </div>
+          <span class="text-[11px] text-secondary">Demonstration</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-center" id="forecast-grid">
+          <div class="bg-surface-container-lowest p-2.5 rounded-xl border border-surface-variant flex flex-col items-center">
+            <span class="text-[11px] font-semibold text-secondary">Day 1</span>
+            <span class="material-symbols-outlined text-tertiary-container my-1 text-[22px]">sunny</span>
+            <span class="text-sm font-bold text-on-surface">31° / 21°</span>
+            <span class="text-[10px] text-primary font-medium">0 mm rain</span>
+          </div>
+          <div class="bg-surface-container-lowest p-2.5 rounded-xl border border-surface-variant flex flex-col items-center">
+            <span class="text-[11px] font-semibold text-secondary">Day 2</span>
+            <span class="material-symbols-outlined text-tertiary-container my-1 text-[22px]">partly_cloudy_day</span>
+            <span class="text-sm font-bold text-on-surface">32° / 20°</span>
+            <span class="text-[10px] text-primary font-medium">0 mm rain</span>
+          </div>
+          <div class="bg-surface-container-lowest p-2.5 rounded-xl border border-surface-variant flex flex-col items-center">
+            <span class="text-[11px] font-semibold text-secondary">Day 3</span>
+            <span class="material-symbols-outlined text-secondary my-1 text-[22px]">cloud</span>
+            <span class="text-sm font-bold text-on-surface">30° / 22°</span>
+            <span class="text-[10px] text-secondary font-medium">&lt;1 mm rain</span>
+          </div>
+        </div>
+        <div class="bg-surface-container-high px-3 py-2 rounded-xl text-on-surface text-xs flex items-center gap-2" id="weather-recommendation">
+          <span class="material-symbols-outlined text-primary text-[18px] shrink-0">check_circle</span>
+          <span class="leading-tight">Stable dry weather next 3 days. Suitable for weed clearing and ground parcel inspection.</span>
+        </div>
+      </section>
+
+      <!-- 7. FARMER CALL CENTRE SUPPORT & AUDIO ACCESS -->
+      <section class="rounded-2xl bg-surface-container-lowest p-4 border border-surface-variant shadow-sm flex flex-col gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container shrink-0">
+            <span class="material-symbols-outlined text-[22px]">support_agent</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-sm font-bold text-on-surface">Kisan Call Centre (Toll-Free)</span>
+            <span class="text-xs text-on-surface-variant">Free government agronomist consultation in your regional tongue</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 pt-1">
+          <a class="flex-1 min-h-[48px] rounded-xl bg-primary text-on-primary flex items-center justify-center gap-2 text-sm font-bold active:bg-primary-container shadow-sm transition-colors" href="tel:18001801551">
+            <span class="material-symbols-outlined text-[20px]">call</span>
+            <span>1800-180-1551</span>
+          </a>
+          <button class="min-h-[48px] px-4 rounded-xl bg-surface-container text-on-surface font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-surface-variant transition-colors" onclick="playAudioHelp()" type="button">
+            <span class="material-symbols-outlined text-primary text-[20px]">hearing</span>
+            <span>Voice Help</span>
+          </button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- 8. FIXED 3-ITEM BOTTOM NAVIGATION BAR -->
+  <nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface/90 backdrop-blur-xl border-t border-surface-variant shadow-[0_-2px_10px_rgba(0,0,0,0.04)]">
+    <div class="flex justify-around items-center h-18 max-w-[480px] mx-auto px-2 py-1">
+      <button class="flex flex-col items-center justify-center gap-0.5 min-w-[80px] h-14 rounded-xl font-bold text-primary bg-surface-container transition-all" id="tab-home" onclick="switchTab('home')">
+        <span class="material-symbols-outlined text-[24px]">home</span>
+        <span class="text-[12px]">Home</span>
+      </button>
+      <button class="flex flex-col items-center justify-center gap-0.5 min-w-[80px] h-14 rounded-xl font-medium text-secondary hover:text-primary transition-all" id="tab-myfarm" onclick="switchTab('myfarm')">
+        <span class="material-symbols-outlined text-[24px]">agriculture</span>
+        <span class="text-[12px]">My Farm</span>
+      </button>
+      <button class="flex flex-col items-center justify-center gap-0.5 min-w-[80px] h-14 rounded-xl font-medium text-secondary hover:text-primary transition-all" id="tab-advice" onclick="switchTab('advice')">
+        <span class="material-symbols-outlined text-[24px]">wb_incandescent</span>
+        <span class="text-[12px]">Advice</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- MODALS -->
+  <!-- Modal: Check Field / My Farm -->
+  <div class="fixed inset-0 z-50 bg-inverse-surface/50 backdrop-blur-xs flex flex-col justify-end hidden opacity-0 transition-opacity duration-200" id="fieldModal">
+    <div class="w-full max-w-[640px] mx-auto bg-surface-container-lowest rounded-t-3xl p-5 flex flex-col gap-4 max-h-[88vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-[24px]">map</span>
+          <div>
+            <h3 class="text-base font-bold text-on-surface">My Farm • Parcel Inspector</h3>
+            <p class="text-[11px] text-secondary">Demonstration Field Diagnostic View</p>
+          </div>
+        </div>
+        <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface" onclick="closeModal('fieldModal')" type="button">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Farm Metadata Card -->
+      <div class="p-3 bg-surface-container-low rounded-xl text-xs space-y-1.5 border border-surface-variant">
+        <div class="flex justify-between"><strong>Survey Plot:</strong> <span class="font-semibold text-primary" id="modal-plot-id">142/A (Mandya)</span></div>
+        <div class="flex justify-between"><strong>Crop &amp; Variety:</strong> <span class="font-semibold" id="modal-crop-id">Paddy (Sona Masoori)</span></div>
+        <div class="flex justify-between"><strong>Total Area:</strong> <span id="modal-area-id">1.85 Hectares (~4.5 Acres)</span></div>
+        <div class="flex justify-between"><strong>Satellite pass:</strong> <span>Copernicus Sentinel-2 (ESA) Level-2A</span></div>
+      </div>
+
+      <!-- Structured 3-Stage Agronomic Diagnostic Framework -->
+      <div class="space-y-3">
+        <div class="p-3 bg-surface-container rounded-xl border-l-4 border-tertiary-container">
+          <div class="flex items-center gap-1.5 font-bold text-xs text-on-surface mb-1">
+            <span class="material-symbols-outlined text-tertiary-container text-[18px]">search</span>
+            <span>1. What did we notice? (ಗಮನಿಸಿದ್ದು)</span>
+          </div>
+          <p class="text-xs text-on-surface-variant" id="modal-notice-text">
+            Multi-spectral vegetation index (NDVI) shows a localized drop of 12% in the North-East quarter. Rest of parcel maintains standard canopy vigor.
+          </p>
+        </div>
+        <div class="p-3 bg-surface-container rounded-xl border-l-4 border-secondary">
+          <div class="flex items-center gap-1.5 font-bold text-xs text-on-surface mb-1">
+            <span class="material-symbols-outlined text-secondary text-[18px]">help_outline</span>
+            <span>2. What could it mean? (ಅರ್ಥವೇನು)</span>
+          </div>
+          <p class="text-xs text-on-surface-variant" id="modal-meaning-text">
+            Possible uneven subsoil water percolation, clogged drip emitter line, or early localized blast/spotting on lower stems.
+          </p>
+        </div>
+        <div class="p-3 bg-surface-container rounded-xl border-l-4 border-primary">
+          <div class="flex items-center gap-1.5 font-bold text-xs text-on-surface mb-1">
+            <span class="material-symbols-outlined text-primary text-[18px]">task_alt</span>
+            <span>3. What should I do next? (ಮುಂದೇನು)</span>
+          </div>
+          <p class="text-xs text-on-surface-variant" id="modal-action-text">
+            Conduct perimeter walk along NE ridge. Check top 10 cm root zone moisture before activating pump. If stems show rust lesions, consult Kisan helpline.
+          </p>
+        </div>
+      </div>
+
+      <!-- SMS Preview Box with Copy Button -->
+      <div class="p-3 bg-surface-container-low rounded-xl border border-dashed border-surface-variant flex flex-col gap-2">
+        <div class="flex items-center justify-between text-[11px] font-bold text-secondary">
+          <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">sms</span> SMS Advisory Preview (Feature Phone)</span>
+          <button class="px-2 py-0.5 rounded bg-surface-container text-primary font-bold hover:bg-surface-variant transition-colors flex items-center gap-1" onclick="copySmsText()" type="button">
+            <span class="material-symbols-outlined text-[14px]">content_copy</span>
+            <span id="copy-sms-label">Copy SMS</span>
+          </button>
+        </div>
+        <p class="text-xs text-on-surface font-mono bg-surface-container-lowest p-2 rounded border border-surface-variant select-all" id="modal-sms-text">
+          [EARTHWORM-AGRI] Plot 142/A: Moisture stress detected in NE zone. No rain expected next 3 days. Inspect topsoil before irrigating.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button class="flex-1 min-h-[48px] rounded-xl bg-primary text-on-primary font-bold text-sm flex items-center justify-center gap-1.5" onclick="closeModal('fieldModal')" type="button">
+          Return to Dashboard
+        </button>
+        <button class="min-h-[48px] px-3 rounded-xl bg-surface-container text-primary font-semibold text-xs flex items-center justify-center gap-1" onclick="toggleAudioAdvice()" type="button">
+          <span class="material-symbols-outlined text-[18px]">volume_up</span>
+          <span>Listen</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Full Advisory Details -->
+  <div class="fixed inset-0 z-50 bg-inverse-surface/50 backdrop-blur-xs flex flex-col justify-end hidden opacity-0 transition-opacity duration-200" id="adviceModal">
+    <div class="w-full max-w-[640px] mx-auto bg-surface-container-lowest rounded-t-3xl p-5 flex flex-col gap-4 max-h-[88vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-[24px]">assignment</span>
+          <div>
+            <h3 class="text-base font-bold text-on-surface">Agronomic Advisory Notice</h3>
+            <p class="text-[11px] text-secondary">Demonstration Advisory Protocol</p>
+          </div>
+        </div>
+        <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface" onclick="closeModal('adviceModal')" type="button">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+      <div class="space-y-2.5">
+        <div class="p-3 bg-surface-container-low rounded-xl border border-surface-variant">
+          <span class="text-xs font-bold text-primary block mb-1">1. What did we notice? (ಗಮನಿಸಿದ್ದು)</span>
+          <p class="text-xs text-on-surface-variant leading-relaxed" id="advice-notice-body">
+            Canopy moisture index reflectance anomaly in North-East quadrant. Vegetative baseline index: 0.58 vs 0.70 benchmark.
+          </p>
+        </div>
+        <div class="p-3 bg-surface-container-low rounded-xl border border-surface-variant">
+          <span class="text-xs font-bold text-primary block mb-1">2. What could it mean? (ಅರ್ಥವೇನು)</span>
+          <p class="text-xs text-on-surface-variant leading-relaxed" id="advice-meaning-body">
+            Topsoil drying due to sunny 31°C afternoon exposure and lack of surface mulch, or potential root aeration blockage.
+          </p>
+        </div>
+        <div class="p-3 bg-surface-container-low rounded-xl border border-surface-variant">
+          <span class="text-xs font-bold text-primary block mb-1">3. What should I do next? (ಮುಂದೇನು)</span>
+          <ul class="text-xs text-on-surface-variant list-disc pl-4 space-y-1" id="advice-steps-list">
+            <li>Walk to the North-East boundary and press soil by hand to check moisture depth.</li>
+            <li>Inspect crop stems for yellowing or fungal lesions.</li>
+            <li>If top 5 cm is dry, irrigate in late afternoon when evaporation drops.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 p-2.5 bg-surface-container rounded-xl text-xs text-on-surface">
+        <span class="material-symbols-outlined text-primary shrink-0">verified</span>
+        <span id="advice-disclaimer">Standard ICAR / State Agricultural University Demonstration Protocol.</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button class="flex-1 min-h-[48px] rounded-xl bg-primary text-on-primary font-bold text-sm" onclick="closeModal('adviceModal')" type="button">
+          Understood &amp; Close
+        </button>
+        <button class="min-h-[48px] px-3 rounded-xl bg-surface-container text-primary font-semibold text-xs flex items-center justify-center gap-1" onclick="toggleAudioAdvice()" type="button">
+          <span class="material-symbols-outlined text-[18px]">volume_up</span>
+          <span>Voice Readout</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Guide & How It Works -->
+  <div class="fixed inset-0 z-50 bg-inverse-surface/50 backdrop-blur-xs flex flex-col justify-end hidden opacity-0 transition-opacity duration-200" id="guideModal">
+    <div class="w-full max-w-[640px] mx-auto bg-surface-container-lowest rounded-t-3xl p-5 flex flex-col gap-4 max-h-[85vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-[24px]">school</span>
+          <h3 class="text-lg font-bold text-on-surface">How EARTHWORM Works</h3>
+        </div>
+        <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface" onclick="closeModal('guideModal')" type="button">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+      <div class="space-y-3 text-xs text-on-surface-variant leading-relaxed">
+        <div class="p-3 bg-surface-container rounded-xl">
+          <span class="font-bold text-on-surface block mb-1">1. Satellites scan crop light reflectance</span>
+          Sentinel-2 scans districts regularly using multi-spectral bands to measure chlorophyll and green biomass reflection.
+        </div>
+        <div class="p-3 bg-surface-container rounded-xl">
+          <span class="font-bold text-on-surface block mb-1">2. Local Weather Integration</span>
+          Combines rain forecast and humidity data to estimate if soil drying or crop stress is occurring.
+        </div>
+        <div class="p-3 bg-surface-container rounded-xl">
+          <span class="font-bold text-on-surface block mb-1">3. Timely Farmer Notice</span>
+          Alerts you before crop stress visibly expands across the field so you save water, inputs, and protect yield.
+        </div>
+      </div>
+      <button class="w-full min-h-[48px] rounded-xl bg-primary text-on-primary font-bold text-sm" onclick="closeModal('guideModal')" type="button">
+        Got it!
+      </button>
+    </div>
+  </div>
+
+  <!-- Interactive Modal for Health & Water Actions -->
+  <div class="fixed inset-0 z-50 bg-inverse-surface/50 backdrop-blur-xs flex flex-col justify-end hidden opacity-0 transition-opacity duration-200" id="infoModal">
+    <div class="w-full max-w-[640px] mx-auto bg-surface-container-lowest rounded-t-3xl p-5 flex flex-col gap-4 max-h-[85vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-bold text-on-surface" id="info-modal-title">Action Detail</h3>
+        <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface" onclick="closeModal('infoModal')" type="button">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+      <div class="text-xs text-on-surface-variant leading-relaxed p-3 bg-surface-container-low rounded-xl" id="info-modal-body">
+        Action details go here.
+      </div>
+      <button class="w-full min-h-[48px] rounded-xl bg-primary text-on-primary font-bold text-sm" onclick="closeModal('infoModal')" type="button">
+        Close
+      </button>
+    </div>
+  </div>
+
+  <!-- Audio Toast Notification & Player Bar -->
+  <div class="fixed top-20 inset-x-4 max-w-[380px] mx-auto z-50 bg-inverse-surface text-inverse-on-surface p-3.5 rounded-xl shadow-lg flex items-center justify-between gap-3 hidden transition-all" id="audioToast">
+    <div class="flex items-center gap-3 min-w-0">
+      <span class="material-symbols-outlined text-primary-fixed-dim text-[24px] shrink-0" id="audioToastIcon">volume_up</span>
+      <div class="flex flex-col text-xs min-w-0">
+        <span class="font-bold truncate" id="audioToastTitle">Reading Voice Advisory</span>
+        <span class="text-surface-variant text-[11px] truncate" id="audioToastSub">Reading in English...</span>
+      </div>
+    </div>
+    <button class="px-2.5 py-1 rounded-lg bg-surface-container text-primary font-bold text-xs shrink-0 hover:bg-surface-variant" onclick="stopAudioAdvice()" type="button">
+      Stop
+    </button>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC & BACKEND API INTEGRATION -->
+  <script>
+    // Region Dataset for Pan-India Selector (Offline Fixture + Fallback)
+    const REGIONS_DATA = {
+      mandya: {
+        location: "Mandya, Karnataka",
+        crop: "Paddy (Sona Masoori)",
+        parcel: "Parcel #142/A",
+        plotTitle: "142/A (Mandya, Karnataka)",
+        cropTitle: "Paddy (Sona Masoori)",
+        area: "1.85 Hectares (~4.5 Acres)",
+        advisoryTitle: "Field Needs Inspection: Canopy Moisture Change",
+        advisoryDesc: "Status: Possible change in vegetative reflectance detected in the North-East zone. Requires physical ground verification before scheduling irrigation or chemical treatments.",
+        metric: "0.58 (Dip of 12% vs. healthy benchmark 0.70)",
+        notice: "Multi-spectral vegetation index (NDVI) shows a localized drop of 12% in the North-East quarter. Rest of parcel maintains standard canopy vigor.",
+        meaning: "Possible uneven subsoil water percolation, clogged drip emitter line, or early localized moisture stress on lower stems.",
+        action: "Conduct perimeter walk along NE ridge. Check top 10 cm root zone moisture before activating pump. If stems show rust lesions, consult Kisan helpline.",
+        sms: "[EARTHWORM-AGRI] Plot 142/A (Mandya): Moisture stress detected in NE zone. No rain expected next 3 days. Inspect topsoil before irrigating.",
+        voiceTranscript: "Namaskara farmer. Earthworm satellite check for plot 142/A in Mandya shows lower canopy moisture in the northeast zone. No rain is expected for three days. Please check the topsoil before turning on irrigation pumps.",
+        weatherOutlook: "Mandya: 31°C • No rain expected next 3 days • 12 km/h gentle wind.",
+        weatherHeader: "Regional 3-Day Outlook (Open-Meteo Demonstration)",
+        days: [
+          { day: "Day 1", icon: "sunny", temp: "31° / 21°", rain: "0 mm rain" },
+          { day: "Day 2", icon: "partly_cloudy_day", temp: "32° / 20°", rain: "0 mm rain" },
+          { day: "Day 3", icon: "cloud", temp: "30° / 22°", rain: "<1 mm rain" }
+        ],
+        recommendation: "Stable dry weather next 3 days. Suitable for weed clearing and ground parcel inspection.",
+        history: [
+          { date: "04 Feb", ndvi: 0.68, height: "97%" },
+          { date: "09 Feb", ndvi: 0.66, height: "94%" },
+          { date: "14 Feb", ndvi: 0.63, height: "90%" },
+          { date: "19 Feb", ndvi: 0.61, height: "87%" },
+          { date: "24 Feb", ndvi: 0.58, height: "82%" }
+        ]
+      },
+      ludhiana: {
+        location: "Ludhiana, Punjab",
+        crop: "Wheat (PBW 343)",
+        parcel: "Parcel #89/C",
+        plotTitle: "89/C (Ludhiana, Punjab)",
+        cropTitle: "Wheat (PBW 343 - Late Sown)",
+        area: "2.4 Hectares (~5.9 Acres)",
+        advisoryTitle: "Wheat Vigour Normal: Nitrogen Top-dress Window",
+        advisoryDesc: "Status: Vegetative index indicates vigorous tillering. Good canopy cover observed. Optimal window for second split of urea before mild daytime rise.",
+        metric: "0.72 (Normal healthy vegetative benchmark 0.70)",
+        notice: "Vegetative reflectance is high and uniformly green across the entire field parcel.",
+        meaning: "Strong root establishment and active tillering stage. High nutrient uptake potential.",
+        action: "Apply recommended urea dose ahead of scheduled light canal run. Check for yellow rust signs on lower leaf blades.",
+        sms: "[EARTHWORM-AGRI] Plot 89/C (Ludhiana): High vigor detected. Excellent tillering. Urea top-dressing window open.",
+        voiceTranscript: "Sat Sri Akal. Earthworm report for plot 89/C in Ludhiana shows healthy wheat tillering with strong vigor. Optimal window for urea application is open.",
+        weatherOutlook: "Ludhiana: 24°C • Sunny skies • Morning fog clearing • 8 km/h NW wind.",
+        weatherHeader: "Regional 3-Day Outlook (Open-Meteo Demonstration)",
+        days: [
+          { day: "Day 1", icon: "wb_sunny", temp: "24° / 11°", rain: "0 mm rain" },
+          { day: "Day 2", icon: "sunny", temp: "25° / 12°", rain: "0 mm rain" },
+          { day: "Day 3", icon: "partly_cloudy_day", temp: "23° / 10°", rain: "0 mm rain" }
+        ],
+        recommendation: "Mild temperatures and clear sun favorable for wheat tillering and light intercultural operations.",
+        history: [
+          { date: "03 Feb", ndvi: 0.62, height: "88%" },
+          { date: "08 Feb", ndvi: 0.66, height: "94%" },
+          { date: "13 Feb", ndvi: 0.69, height: "98%" },
+          { date: "18 Feb", ndvi: 0.71, height: "100%" },
+          { date: "23 Feb", ndvi: 0.72, height: "100%" }
+        ]
+      },
+      varanasi: {
+        location: "Varanasi, Uttar Pradesh",
+        crop: "Mustard & Vegetables",
+        parcel: "Parcel #214/B",
+        plotTitle: "214/B (Varanasi, UP)",
+        cropTitle: "Mustard (Varuna) & Winter Cabbage",
+        area: "1.2 Hectares (~2.9 Acres)",
+        advisoryTitle: "Check for Aphid Infestation on Siliquae",
+        advisoryDesc: "Status: Dense vegetative cluster observed. Moderate relative humidity morning conditions create vulnerability for mustard aphids. Inspect lower leaves.",
+        metric: "0.64 (Vegetative coverage high vs 0.65 benchmark)",
+        notice: "Dense biomass canopy detected with high relative humidity retention in central furrow.",
+        meaning: "Optimal microclimate for aphid proliferation during early morning flowering hours.",
+        action: "Scout central rows at 8 AM. If aphids exceed 10-15 per twig, prepare yellow sticky traps or neem seed kernel extract.",
+        sms: "[EARTHWORM-AGRI] Plot 214/B (Varanasi): Dense foliage & morning humidity favor aphids. Scout inner rows before watering.",
+        voiceTranscript: "Namaskar farmer. Earthworm advisory for plot 214/B in Varanasi warns that high canopy density may foster aphids. Please scout morning rows.",
+        weatherOutlook: "Varanasi: 28°C • Warm afternoons • Low humidity • Clear skies.",
+        weatherHeader: "Regional 3-Day Outlook (Open-Meteo Demonstration)",
+        days: [
+          { day: "Day 1", icon: "wb_sunny", temp: "28° / 14°", rain: "0 mm rain" },
+          { day: "Day 2", icon: "sunny", temp: "29° / 15°", rain: "0 mm rain" },
+          { day: "Day 3", icon: "wb_sunny", temp: "28° / 14°", rain: "0 mm rain" }
+        ],
+        recommendation: "Dry spells persist. Check pod formation. Avoid excessive watering during peak flowering.",
+        history: [
+          { date: "02 Feb", ndvi: 0.58, height: "89%" },
+          { date: "07 Feb", ndvi: 0.61, height: "93%" },
+          { date: "12 Feb", ndvi: 0.63, height: "96%" },
+          { date: "17 Feb", ndvi: 0.64, height: "98%" },
+          { date: "22 Feb", ndvi: 0.64, height: "98%" }
+        ]
+      },
+      nashik: {
+        location: "Nashik, Maharashtra",
+        crop: "Onion / Grapes",
+        parcel: "Parcel #56/D",
+        plotTitle: "56/D (Dindori, Nashik)",
+        cropTitle: "Late Kharif Onion (Red Pinhead)",
+        area: "1.6 Hectares (~3.9 Acres)",
+        advisoryTitle: "Bulb Development Stage: Soil Moisture Check",
+        advisoryDesc: "Status: Reflectance consistent with bulb expansion. Maintain uniform micro-irrigation. Withhold irrigation 10 days prior to anticipated lifting.",
+        metric: "0.61 (Expected bulb filling signature vs 0.62 benchmark)",
+        notice: "Canopy expansion stabilizing; spectral shift indicates transition into bulb swelling.",
+        meaning: "Crop requires steady moisture but no waterlogging; high vulnerability to purple blotch.",
+        action: "Maintain 2-hour drip runs every alternate day. Check drip emitters for salt blockage in lateral lines.",
+        sms: "[EARTHWORM-AGRI] Plot 56/D (Nashik): Bulb filling stage in progress. Maintain alternate-day drip irrigation.",
+        voiceTranscript: "Namaskar. Earthworm advisory for plot 56/D in Nashik indicates active bulb swelling. Maintain alternate day drip cycles.",
+        weatherOutlook: "Nashik: 30°C • Dry afternoon heat • 14 km/h wind • Zero rain.",
+        weatherHeader: "Regional 3-Day Outlook (Open-Meteo Demonstration)",
+        days: [
+          { day: "Day 1", icon: "sunny", temp: "30° / 16°", rain: "0 mm rain" },
+          { day: "Day 2", icon: "sunny", temp: "31° / 17°", rain: "0 mm rain" },
+          { day: "Day 3", icon: "partly_cloudy_day", temp: "29° / 15°", rain: "0 mm rain" }
+        ],
+        recommendation: "High day temperatures accelerate drying. Monitor drip line emitters for salt clogging.",
+        history: [
+          { date: "01 Feb", ndvi: 0.54, height: "87%" },
+          { date: "06 Feb", ndvi: 0.57, height: "91%" },
+          { date: "11 Feb", ndvi: 0.59, height: "95%" },
+          { date: "16 Feb", ndvi: 0.60, height: "96%" },
+          { date: "21 Feb", ndvi: 0.61, height: "98%" }
+        ]
+      }
+    };
+
+    // Full Localizations for Kannada and Hindi
+    const KANNADA_OVERRIDES = {
+      mandya: {
+        advisoryTitle: "ಹೊಲ ಪರಿಶೀಲನೆ ಅಗತ್ಯ: ತೇವಾಂಶದಲ್ಲಿ ವ್ಯತ್ಯಾಸ",
+        advisoryDesc: "ಸ್ಥಿತಿ: ಈಶಾನ್ಯ ಭಾಗದಲ್ಲಿ ಬೆಳೆ ಹಸಿರಿನಲ್ಲಿ ಶೇ. 12 ರಷ್ಟು ಇಳಿಕೆ ಕಂಡುಬಂದಿದೆ. ನೀರು ಹಾಯಿಸುವ ಮುನ್ನ ಮಣ್ಣಿನ ತೇವಾಂಶ ಪರಿಶೀಲಿಸಿ.",
+        metric: "0.58 (ಸಾಮಾನ್ಯ ಮಟ್ಟ 0.70 ಕ್ಕಿಂತ 12% ಇಳಿಕೆ)",
+        notice: "ಮಂಡ್ಯ ಪ್ಲಾಟ್ 142/A ಈಶಾನ್ಯ ವಲಯದಲ್ಲಿ ಎನ್‌ಡಿವಿಐ ಸೂಚ್ಯಂಕದಲ್ಲಿ ಶೇ. 12 ರಷ್ಟು ಕುಸಿತ ಕಂಡುಬಂದಿದೆ.",
+        meaning: "ಉಪ-ಮಣ್ಣಿನ ನೀರಿನ ಕೊರತೆ, ಹನಿ ನೀರಾವರಿ ಪೈಪ್ ಕಟ್ಟಿಕೊಂಡಿರುವುದು ಅಥವಾ ಆರಂಭಿಕ ನೀರಿನ ಕೊರತೆ ಇರಬಹುದು.",
+        action: "ಈಶಾನ್ಯ ದಿಕ್ಕಿನ ಬದುವಿನಲ್ಲಿ ನಡೆದು ಮಣ್ಣನ್ನು ಕೈಯಿಂದ ಮುಟ್ಟಿ ತೇವಾಂಶ ಪರೀಕ್ಷಿಸಿ.",
+        sms: "[ಅರ್ಥ್‌ವರ್ಮ್-ಕೃಷಿ] ಪ್ಲಾಟ್ 142/A (ಮಂಡ್ಯ): ಈಶಾನ್ಯ ಭಾಗದಲ್ಲಿ ತೇವಾಂಶ ಇಳಿಕೆ. ಮುಂದಿನ 3 ದಿನ ಮಳೆಯಿಲ್ಲ. ನೀರು ಹಾಯಿಸುವ ಮುನ್ನ ಮಣ್ಣು ಪರಿಶೀಲಿಸಿ.",
+        voiceTranscript: "ನಮಸ್ಕಾರ ರೈತ ಬಾಂಧವರೇ. ಮಂಡ್ಯ ಪ್ಲಾಟ್ 142/A ಉಪಗ್ರಹ ವರದಿಯಂತೆ ಈಶಾನ್ಯ ವಲಯದಲ್ಲಿ ಬೆಳೆ ತೇವಾಂಶ ಕಡಿಮೆಯಾಗಿದೆ. ಮುಂದಿನ ಮೂರು ದಿನ ಮಳೆಯ ಮುನ್ಸೂಚನೆ ಇಲ್ಲ. ನೀರು ಹಾಯಿಸುವ ಮೊದಲು ಮಣ್ಣನ್ನು ಪರಿಶೀಲಿಸಿ."
+      },
+      ludhiana: {
+        advisoryTitle: "ಗೋಧಿ ಬೆಳೆ ಆರೋಗ್ಯಕರ: ಪೋಷಕಾಂಶ ನೀಡುವ ಸಮಯ",
+        advisoryDesc: "ಸ್ಥಿತಿ: ಗೋಧಿ ಬೆಳೆಯಲ್ಲಿ ಉತ್ತಮ ಚಿಗುರು ಮತ್ತು ಹಸಿರು ಕಂಡುಬಂದಿದೆ. ಯೂರಿಯಾ ಸಿಂಪಡಣೆಗೆ ಸಕಾಲ.",
+        metric: "0.72 (ಆರೋಗ್ಯಕರ ಮಾನದಂಡ 0.70)",
+        notice: "ಇಡೀ ಪ್ಲಾಟ್‌ನಲ್ಲಿ ಬೆಳೆ ಹಸಿರು ಉತ್ತಮವಾಗಿದ್ದು ತೇವಾಂಶ ಸ್ಥಿರವಾಗಿದೆ.",
+        meaning: "ಬೇರುಗಳ ಬೆಳವಣಿಗೆ ಉತ್ತಮವಾಗಿದೆ, ಪೋಷಕಾಂಶಗಳನ್ನು ಹೀರಿಕೊಳ್ಳಲು ಸಕಾಲ.",
+        action: "ಕಾಲುವೆ ನೀರು ಬರುವ ಮುನ್ನ ಶಿಫಾರಸು ಮಾಡಿದ ಪ್ರಮಾಣದ ಗೊಬ್ಬರ ನೀಡಿ.",
+        sms: "[ಅರ್ಥ್‌ವರ್ಮ್-ಕೃಷಿ] ಪ್ಲಾಟ್ 89/C (ಲೂಧಿಯಾನ): ಗೋಧಿ ಬೆಳೆ ಉತ್ತಮವಾಗಿದೆ. ಯೂರಿಯಾ ಗೊಬ್ಬರ ನೀಡಲು ಸಕಾಲ.",
+        voiceTranscript: "ನಮಸ್ಕಾರ. ಲೂಧಿಯಾನದ ಪ್ಲಾಟ್ 89/C ಗೋಧಿ ಬೆಳೆ ಸಮೃದ್ಧವಾಗಿದೆ. ಪೋಷಕಾಂಶ ನೀಡುವ ಸಮಯ ಬಂದಿದೆ."
+      }
+    };
+
+    const TRANSLATIONS = {
+      en: {
+        heroTitle: "Understand Your Crops Before Problems Grow.",
+        heroSubtitle: "Free space-based vegetative index and agrometeorological insights for Indian farmers.",
+        heroTag: "Space & Weather Observations",
+        bannerTitle: "Prototype Demonstration Data",
+        bannerText: "Satellite reflectance & agromet observations. Always verify ground conditions before applying treatments.",
+        checkField: "Check My Field",
+        howItWorks: "How It Works",
+        viewAdvice: "View Full Advice",
+        audioBtn: "Listen Voice Advice",
+        tsTitle: "NDVI 20-Day Trend (Sentinel-2)",
+        tsBenchmark: "Seasonal Benchmark: 0.70",
+        regionHeader: "Select Demo Field (Pan-India)",
+        tilesHeader: "Three Practical Field Actions",
+        tile1: "1. Check Crop Health",
+        tile2: "2. Should I Water?",
+        tile3: "3. View Weather Forecast",
+        speechLang: "en-IN"
+      },
+      kn: {
+        heroTitle: "ಸಮಸ್ಯೆಗಳು ಬೆಳೆಯುವ ಮುನ್ನ ನಿಮ್ಮ ಬೆಳೆಗಳನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಿ.",
+        heroSubtitle: "ಭಾರತೀಯ ರೈತರಿಗೆ ಉಪಗ್ರಹ ಆಧಾರಿತ ಉಚಿತ ಬೆಳೆ ಆರೋಗ್ಯ ಮತ್ತು ಹವಾಮಾನ ಮಾಹಿತಿ.",
+        heroTag: "ಉಪಗ್ರಹ ಮತ್ತು ಹವಾಮಾನ ಮಾಹಿತಿ",
+        bannerTitle: "ಮಾದರಿ ಪ್ರದರ್ಶನ ದತ್ತಾಂಶ",
+        bannerText: "ಉಪಗ್ರಹ ಪ್ರತಿಫಲನ ಮತ್ತು ಹವಾಮಾನ ಮಾಹಿತಿ. ಚಿಕಿತ್ಸೆ ನೀಡುವ ಮುನ್ನ ಹೊಲದಲ್ಲಿ ಪರಿಶೀಲಿಸಿ.",
+        checkField: "ನನ್ನ ಹೊಲ ಪರಿಶೀಲಿಸಿ",
+        howItWorks: "ಇದು ಹೇಗೆ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತದೆ",
+        viewAdvice: "ಸಂಪೂರ್ಣ ಸಲಹೆ ನೋಡಿ",
+        audioBtn: "ಧ್ವನಿ ಸಲಹೆ ಕೇಳಿ (Kannada)",
+        tsTitle: "ಎನ್‌ಡಿವಿಐ 20-ದಿನಗಳ ಪ್ರವೃತ್ತಿ (ಸೆಂಟಿನೆಲ್-2)",
+        tsBenchmark: "ಋತುವಿನ ಮಾನದಂಡ: 0.70",
+        regionHeader: "ಮಾದರಿ ಹೊಲವನ್ನು ಆಯ್ಕೆಮಾಡಿ",
+        tilesHeader: "ಮೂರು ಮುಖ್ಯ ಹೊಲದ ಕ್ರಮಗಳು",
+        tile1: "೧. ಬೆಳೆ ಆರೋಗ್ಯ ಪರೀಕ್ಷಿಸಿ",
+        tile2: "೨. ನೀರು ಹಾಯಿಸಬೇಕೇ?",
+        tile3: "೩. ಹವಾಮಾನ ಮುನ್ಸೂಚನೆ",
+        speechLang: "kn-IN"
+      },
+      hi: {
+        heroTitle: "समस्या बढ़ने से पहले अपनी फसल को समझें।",
+        heroSubtitle: "भारतीय किसानों के लिए मुफ्त उपग्रह वनस्पति सूचकांक और कृषि मौसम सलाह।",
+        heroTag: "अंतरिक्ष एवं मौसम अवलोकन",
+        bannerTitle: "प्रोटोटाइप प्रदर्शन डेटा",
+        bannerText: "उपग्रह परावर्तन और मौसम संबंधी डेटा। उपचार लागू करने से पहले खेत में जांचें।",
+        checkField: "मेरा खेत जांचें",
+        howItWorks: "यह कैसे काम करता है",
+        viewAdvice: "पूरी सलाह देखें",
+        audioBtn: "सलाह सुनें (आवाज़)",
+        tsTitle: "NDVI 20-दिवसीय रुझान (सेंटिनल-2)",
+        tsBenchmark: "मौसमी बेंचमार्क: 0.70",
+        regionHeader: "प्रदर्शन खेत चुनें (अखिल भारतीय)",
+        tilesHeader: "तीन व्यावहारिक क्षेत्रीय कार्य",
+        tile1: "1. फसल का स्वास्थ्य जांचें",
+        tile2: "2. क्या मुझे पानी देना चाहिए?",
+        tile3: "3. मौसम पूर्वानुमान देखें",
+        speechLang: "hi-IN"
+      }
+    };
+
+    let currentRegionKey = 'mandya';
+    let currentLang = 'en';
+    let isSpeaking = false;
+    let backendAvailable = false;
+
+    function getApiBase() {
+      if (window.location.protocol === 'file:') {
+        return 'http://127.0.0.1:8000';
+      }
+      return '';
+    }
+
+    // Detect and Connect to FastAPI Backend
+    async function checkBackendHealth() {
+      const pill = document.getElementById('api-status-pill');
+      const dot = document.getElementById('api-status-dot');
+      const text = document.getElementById('api-status-text');
+      const apiBase = getApiBase();
+
+      try {
+        const res = await fetch(`${apiBase}/api/health`);
+        if (res.ok) {
+          const data = await res.json();
+          backendAvailable = true;
+          dot.className = "w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse";
+          text.textContent = data.data_mode === "live" ? "Backend: Live" : "Backend: Demo";
+          pill.className = "text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 flex items-center gap-1";
+          return;
+        }
+      } catch (err) {
+        // Fallback for file:// protocol or mismatched dev ports
+        try {
+          const res2 = await fetch('http://127.0.0.1:8000/api/health');
+          if (res2.ok) {
+            backendAvailable = true;
+            dot.className = "w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse";
+            text.textContent = "API: Connected";
+            pill.className = "text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 flex items-center gap-1";
+            return;
+          }
+        } catch (e2) {}
+      }
+
+      // Offline fallback
+      backendAvailable = false;
+      dot.className = "w-1.5 h-1.5 rounded-full bg-amber-500";
+      text.textContent = "Offline Demo";
+      pill.className = "text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-800 flex items-center gap-1";
+    }
+
+    async function selectRegion(regionKey) {
+      currentRegionKey = regionKey;
+      let data = REGIONS_DATA[regionKey];
+      if (!data) return;
+
+      // Update active pill button
+      document.querySelectorAll('.region-pill').forEach(btn => {
+        btn.classList.remove('bg-primary-container', 'text-on-primary', 'border-primary');
+        btn.classList.add('bg-surface-container-lowest', 'text-on-surface', 'border-surface-variant');
+      });
+      const activeBtn = document.getElementById('pill-' + regionKey);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-primary-container', 'text-on-primary', 'border-primary');
+        activeBtn.classList.remove('bg-surface-container-lowest', 'text-on-surface', 'border-surface-variant');
+      }
+
+      // If backend available, try fetching live advisory from FastAPI
+      if (backendAvailable) {
+        try {
+          const apiBase = getApiBase();
+          const res = await fetch(`${apiBase}/api/farms/${regionKey}/advisory?language=${currentLang}`);
+          if (res.ok) {
+            const adv = await res.json();
+            data.advisoryTitle = adv.headline;
+            data.advisoryDesc = adv.description;
+            data.notice = adv.notice;
+            data.meaning = adv.meaning;
+            data.action = adv.next_steps[0] || data.action;
+            data.sms = adv.sms_preview;
+            data.voiceTranscript = adv.voice_transcript;
+          }
+        } catch (e) {
+          console.warn("Backend fetch failed, using fixture fallback:", e);
+        }
+      }
+
+      // Apply language overrides if offline
+      if (!backendAvailable && currentLang === 'kn' && KANNADA_OVERRIDES[regionKey]) {
+        const k = KANNADA_OVERRIDES[regionKey];
+        data = { ...data, ...k };
+      }
+
+      // Update UI Elements
+      document.getElementById('parcel-id-tag').textContent = data.parcel;
+      document.getElementById('advisory-title').textContent = data.advisoryTitle;
+      document.getElementById('advisory-desc').textContent = data.advisoryDesc;
+      document.getElementById('advisory-metric').textContent = data.metric;
+      document.getElementById('card-notice').textContent = data.notice;
+      document.getElementById('card-meaning').textContent = data.meaning;
+      document.getElementById('card-action').textContent = data.action;
+
+      // 2G Canvas fields
+      document.getElementById('low-data-title').textContent = `${data.plotTitle}`;
+      document.getElementById('low-data-ndvi').textContent = data.metric.split(" ")[0];
+
+      // Time series bars
+      const tsContainer = document.getElementById('ndvi-history-bars');
+      if (data.history && tsContainer) {
+        tsContainer.innerHTML = data.history.map((pt, idx) => {
+          const isCurrent = idx === data.history.length - 1;
+          const borderClass = isCurrent ? "border-2 border-tertiary-container" : "border border-surface-variant";
+          const barColor = isCurrent ? "bg-tertiary-container" : "bg-primary";
+          const textColor = isCurrent ? "text-tertiary font-bold" : "text-primary font-bold";
+          return `
+            <div class="bg-surface-container-lowest p-1 rounded-lg ${borderClass} flex flex-col items-center">
+              <span class="text-[9px] ${isCurrent ? 'font-bold text-tertiary' : 'text-secondary'}">${pt.date}</span>
+              <div class="w-full bg-primary/15 h-7 rounded-sm flex items-end justify-center my-0.5">
+                <div class="w-full ${barColor} rounded-sm" style="height: ${pt.height};"></div>
+              </div>
+              <span class="text-[10px] ${textColor}">${pt.ndvi}</span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Weather Card
+      document.getElementById('weather-source-tag').textContent = data.weatherHeader;
+      document.getElementById('action-weather-desc').textContent = data.weatherOutlook;
+      document.getElementById('weather-recommendation').innerHTML = `
+        <span class="material-symbols-outlined text-primary text-[18px] shrink-0">check_circle</span>
+        <span class="leading-tight">${data.recommendation}</span>
+      `;
+      const grid = document.getElementById('forecast-grid');
+      grid.innerHTML = data.days.map(d => `
+        <div class="bg-surface-container-lowest p-2.5 rounded-xl border border-surface-variant flex flex-col items-center">
+          <span class="text-[11px] font-semibold text-secondary">${d.day}</span>
+          <span class="material-symbols-outlined text-tertiary-container my-1 text-[22px]">${d.icon}</span>
+          <span class="text-sm font-bold text-on-surface">${d.temp}</span>
+          <span class="text-[10px] text-primary font-medium">${d.rain}</span>
+        </div>
+      `).join('');
+
+      // Modal Data
+      document.getElementById('modal-plot-id').textContent = data.plotTitle;
+      document.getElementById('modal-crop-id').textContent = data.cropTitle;
+      document.getElementById('modal-area-id').textContent = data.area || "1.85 Hectares";
+      document.getElementById('modal-notice-text').textContent = data.notice;
+      document.getElementById('modal-meaning-text').textContent = data.meaning;
+      document.getElementById('modal-action-text').textContent = data.action;
+      document.getElementById('modal-sms-text').textContent = data.sms;
+      document.getElementById('advice-notice-body').textContent = data.notice;
+      document.getElementById('advice-meaning-body').textContent = data.meaning;
+    }
+
+    function changeLanguage(langCode) {
+      currentLang = langCode;
+      const t = TRANSLATIONS[langCode] || TRANSLATIONS.en;
+      document.getElementById('hero-title').textContent = t.heroTitle;
+      document.getElementById('hero-subtitle').textContent = t.heroSubtitle;
+      document.getElementById('hero-tag').textContent = t.heroTag;
+      document.getElementById('banner-title').textContent = t.bannerTitle;
+      document.getElementById('banner-text').textContent = t.bannerText;
+      document.getElementById('btn-check-field').textContent = t.checkField;
+      document.getElementById('btn-guide').textContent = t.howItWorks;
+      document.getElementById('btn-view-advice').textContent = t.viewAdvice;
+      document.getElementById('btn-audio-listen').textContent = t.audioBtn;
+      document.getElementById('ts-title').textContent = t.tsTitle;
+      document.getElementById('ts-benchmark').textContent = t.tsBenchmark;
+      document.getElementById('region-selector-header').textContent = t.regionHeader;
+      document.getElementById('tiles-header').textContent = t.tilesHeader;
+      document.getElementById('tile1-title').textContent = t.tile1;
+      document.getElementById('tile2-title').textContent = t.tile2;
+      document.getElementById('tile3-title').textContent = t.tile3;
+
+      // Re-trigger selectRegion to update localized advisory text
+      selectRegion(currentRegionKey);
+    }
+
+    // 2G Low Data Mode Toggle (Zero Image Bytes)
+    let lowDataActive = false;
+    function toggleLowData() {
+      lowDataActive = !lowDataActive;
+      const btn = document.getElementById('low-data-btn');
+      const label = document.getElementById('low-data-label');
+      const satCanvas = document.getElementById('satellite-canvas');
+      const lowDataCanvas = document.getElementById('low-data-canvas');
+
+      if (lowDataActive) {
+        btn.classList.add('bg-primary', 'text-on-primary');
+        btn.classList.remove('bg-surface-container-low', 'text-on-surface-variant');
+        label.textContent = "2G Active";
+        satCanvas.classList.add('hidden');
+        lowDataCanvas.classList.remove('hidden');
+        showToast("2G High-Contrast Mode ON", "Heavy raster imagery disabled. Using zero-bandwidth vector metrics.");
+      } else {
+        btn.classList.remove('bg-primary', 'text-on-primary');
+        btn.classList.add('bg-surface-container-low', 'text-on-surface-variant');
+        label.textContent = "2G Mode";
+        satCanvas.classList.remove('hidden');
+        lowDataCanvas.classList.add('hidden');
+        showToast("Standard Broadband Mode", "Full satellite imagery active.");
+      }
+    }
+
+    // Interactive Web Speech API (Voice Advisory Readout)
+    function toggleAudioAdvice() {
+      if (isSpeaking) {
+        stopAudioAdvice();
+        return;
+      }
+
+      const data = REGIONS_DATA[currentRegionKey];
+      const textToSpeak = data.voiceTranscript || data.advisoryDesc;
+      const langConfig = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
+
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        utterance.lang = langConfig.speechLang || 'en-IN';
+        utterance.rate = 0.95; // Slightly slower for clarity
+        utterance.pitch = 1.0;
+
+        utterance.onstart = () => {
+          isSpeaking = true;
+          document.getElementById('audio-icon').textContent = "pause";
+          document.getElementById('btn-audio-listen').textContent = "Pause Voice Advice";
+          showAudioBar("Playing Advisory Aloud", `Speaking in ${currentLang.toUpperCase()}...`);
+        };
+
+        utterance.onend = () => {
+          stopAudioAdvice();
+        };
+
+        utterance.onerror = () => {
+          stopAudioAdvice();
+        };
+
+        window.speechSynthesis.speak(utterance);
+      } else {
+        showToast("Voice Readout Simulated", textToSpeak.substring(0, 75) + "...");
+      }
+    }
+
+    function stopAudioAdvice() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      isSpeaking = false;
+      const t = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
+      document.getElementById('audio-icon').textContent = "volume_up";
+      document.getElementById('btn-audio-listen').textContent = t.audioBtn;
+      document.getElementById('audioToast').classList.add('hidden');
+    }
+
+    function showAudioBar(title, subtitle) {
+      const toast = document.getElementById('audioToast');
+      document.getElementById('audioToastTitle').textContent = title;
+      document.getElementById('audioToastSub').textContent = subtitle;
+      toast.classList.remove('hidden');
+    }
+
+    function playAudioHelp() {
+      showToast("Kisan Helpline 1800-180-1551", "Toll-Free from any mobile or landline across India. Multilingual support.");
+    }
+
+    // Modal Helpers
+    function openModal(id) {
+      if (id === 'healthModal') {
+        document.getElementById('info-modal-title').textContent = "1. Crop Health Inspector";
+        document.getElementById('info-modal-body').innerHTML = `
+          <strong>Multispectral Chlorophyll Assessment:</strong><br>
+          Sentinel-2 vegetative index analysis shows 84% normal vigor in ${REGIONS_DATA[currentRegionKey].location}.<br><br>
+          <span class="inline-block px-2.5 py-1 bg-surface-container font-mono text-xs rounded border border-surface-variant">NDVI Index: ${REGIONS_DATA[currentRegionKey].metric}</span><br><br>
+          <em>Note:</em> Cloud-free reference pass. Ground walk recommended along perimeter to inspect localized soil moisture and early disease signs.
+        `;
+        id = 'infoModal';
+      } else if (id === 'waterModal') {
+        document.getElementById('info-modal-title').textContent = "2. Should I Water?";
+        document.getElementById('info-modal-body').innerHTML = `
+          <strong>Root-Zone Moisture &amp; Evaporative Demand:</strong><br>
+          Current estimated soil moisture in upper 15 cm: <strong>Adequate</strong> for ${REGIONS_DATA[currentRegionKey].crop}.<br><br>
+          Upcoming rainfall outlook is dry (0 mm). If you observe surface cracking or afternoon leaf-wilting, apply 2.5 cm depth irrigation in late afternoon to minimize evaporation loss.
+        `;
+        id = 'infoModal';
+      } else if (id === 'weatherModal') {
+        document.getElementById('info-modal-title').textContent = "3. Weather & Spraying Windows";
+        document.getElementById('info-modal-body').innerHTML = `
+          <strong>72-Hour Spraying &amp; Field Operations:</strong><br>
+          Wind speed: 8 - 14 km/h (Favorable, low spray drift risk).<br>
+          Rain probability: Under 10%.<br>
+          Dew point: Normal seasonal condensation during early morning hours. Optimal spray window: 7:30 AM to 10:30 AM.
+        `;
+        id = 'infoModal';
+      }
+
+      const modal = document.getElementById(id);
+      if (modal) {
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.remove('opacity-0'), 10);
+      }
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) {
+        modal.classList.add('opacity-0');
+        setTimeout(() => modal.classList.add('hidden'), 200);
+      }
+    }
+
+    function switchTab(tab) {
+      const tabs = ['home', 'myfarm', 'advice'];
+      tabs.forEach(t => {
+        const el = document.getElementById('tab-' + t);
+        if (t === tab) {
+          el.className = "flex flex-col items-center justify-center gap-0.5 min-w-[80px] h-14 rounded-xl font-bold text-primary bg-surface-container transition-all";
+        } else {
+          el.className = "flex flex-col items-center justify-center gap-0.5 min-w-[80px] h-14 rounded-xl font-medium text-secondary hover:text-primary transition-all";
+        }
+      });
+
+      if (tab === 'myfarm') {
+        openModal('fieldModal');
+      } else if (tab === 'advice') {
+        openModal('adviceModal');
+      }
+    }
+
+    // Copy SMS text
+    function copySmsText() {
+      const text = document.getElementById('modal-sms-text').textContent.trim();
+      navigator.clipboard.writeText(text).then(() => {
+        const label = document.getElementById('copy-sms-label');
+        label.textContent = "Copied!";
+        setTimeout(() => { label.textContent = "Copy SMS"; }, 2000);
+      }).catch(() => {
+        showToast("SMS Text", text);
+      });
+    }
+
+    function showToast(title, subtitle) {
+      const toast = document.getElementById('audioToast');
+      document.getElementById('audioToastTitle').textContent = title;
+      document.getElementById('audioToastSub').textContent = subtitle;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        if (!isSpeaking) toast.classList.add('hidden');
+      }, 3500);
+    }
+
+    // Splash Intro Handling
+    function dismissSplash() {
+      const splash = document.getElementById('intro-splash');
+      if (splash) {
+        splash.style.opacity = '0';
+        splash.style.pointerEvents = 'none';
+        setTimeout(() => { splash.style.display = 'none'; }, 500);
+      }
+      try { sessionStorage.setItem('earthworm_splash_shown', 'true'); } catch (e) {}
+    }
+
+    function replaySplash() {
+      const splash = document.getElementById('intro-splash');
+      if (splash) {
+        splash.style.display = 'flex';
+        splash.style.pointerEvents = 'auto';
+        setTimeout(() => { splash.style.opacity = '1'; }, 10);
+        const worm = document.getElementById('splash-worm');
+        if (worm) {
+          worm.style.animation = 'none';
+          void worm.offsetWidth;
+          worm.style.animation = 'crawlWorm 1.4s ease-in-out forwards';
+        }
+      }
+    }
+
+    // Startup Initialization
+    window.addEventListener('DOMContentLoaded', () => {
+      checkBackendHealth();
+      selectRegion('mandya');
+
+      try {
+        if (sessionStorage.getItem('earthworm_splash_shown') === 'true') {
+          const splash = document.getElementById('intro-splash');
+          if (splash) splash.style.display = 'none';
+          return;
+        }
+      } catch (e) {}
+
+      setTimeout(() => { dismissSplash(); }, 1800);
+    });
+  </script>
+</body>
+</html>
