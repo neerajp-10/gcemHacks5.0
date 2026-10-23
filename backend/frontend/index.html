@@ -416,9 +416,9 @@
         <!-- Action Buttons -->
         <div class="p-3 bg-surface-container-lowest border-t border-surface-variant flex flex-col gap-2.5">
           <div class="grid grid-cols-2 gap-2">
-            <button class="min-h-[48px] rounded-xl bg-primary text-on-primary font-semibold text-sm flex items-center justify-center gap-2 active:bg-primary-container shadow-sm transition-colors" onclick="openModal('fieldModal')" type="button">
+            <button class="min-h-[48px] rounded-xl bg-primary text-on-primary font-semibold text-sm flex items-center justify-center gap-2 active:bg-primary-container shadow-sm transition-colors cursor-pointer" onclick="openModal('satelliteModal')" type="button">
               <span id="btn-check-field">Check My Field</span>
-              <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+              <span class="material-symbols-outlined text-[18px]">satellite_alt</span>
             </button>
             <button class="min-h-[48px] rounded-xl bg-surface-container hover:bg-surface-variant text-primary font-semibold text-sm flex items-center justify-center gap-1.5 transition-colors" onclick="openModal('guideModal')" type="button">
               <span class="material-symbols-outlined text-[18px]">play_circle</span>
@@ -645,6 +645,140 @@
   </nav>
 
   <!-- MODALS -->
+  <!-- Modal: Check My Field (Satellite Multispectral & Data Inspector) -->
+  <div class="fixed inset-0 z-50 bg-inverse-surface/50 backdrop-blur-xs flex flex-col justify-end hidden opacity-0 transition-opacity duration-200" id="satelliteModal">
+    <div class="w-full max-w-[640px] mx-auto bg-surface-container-lowest rounded-t-3xl p-5 flex flex-col gap-4 max-h-[88vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined text-[20px]">satellite_alt</span>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-on-surface">Satellite Multispectral Inspector</h3>
+            <p class="text-[11px] text-secondary">Copernicus Sentinel-2 • Multispectral Earth Observation</p>
+          </div>
+        </div>
+        <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface hover:bg-surface-variant cursor-pointer transition-colors" onclick="closeModal('satelliteModal')" type="button">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Orbital Telemetry & Parcel Header -->
+      <div class="p-3 bg-surface-container-low rounded-xl text-xs space-y-1.5 border border-surface-variant">
+        <div class="flex justify-between items-center">
+          <strong>Field Parcel:</strong>
+          <span class="font-bold text-primary" id="sat-modal-plot">Plot #142/A • Mandya (Karnataka)</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <strong>Sensor &amp; Orbit:</strong>
+          <span class="font-medium text-on-surface" id="sat-modal-sensor">Copernicus Sentinel-2B (MSI Level-2A BOA)</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <strong>Geo Coordinates &amp; Elev:</strong>
+          <span class="font-mono text-[11px] text-secondary" id="sat-modal-coords">12°31'05" N, 76°53'06" E • Elev: 662m</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <strong>Acquisition Orbit Pass:</strong>
+          <span class="text-emerald-700 font-semibold" id="sat-modal-pass">24 Feb 2024 • 10:48 UTC (Cloud: 0.8%)</span>
+        </div>
+      </div>
+
+      <!-- Multispectral Data Section -->
+      <div class="space-y-3">
+        
+        <!-- 1. NDVI Heatmap Analysis -->
+        <div class="p-3.5 bg-surface-container rounded-xl border-l-4 border-emerald-600 flex flex-col gap-1.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5 font-bold text-xs text-on-surface">
+              <span class="material-symbols-outlined text-emerald-600 text-[18px]">grass</span>
+              <span>1. NDVI Heatmap (Vegetation Health Index)</span>
+            </div>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800" id="sat-modal-ndvi">0.58 (Benchmark 0.70 • -17%)</span>
+          </div>
+          <p class="text-xs text-on-surface-variant leading-relaxed" id="sat-modal-ndvi-desc">
+            Multi-spectral vegetation index indicates localized canopy stress in the North-East quarter. Rest of parcel maintains standard canopy vigor.
+          </p>
+          <div class="text-[11px] text-secondary bg-surface-container-lowest p-2 rounded-lg border border-surface-variant">
+            <strong class="text-on-surface">Spectral Signal:</strong> <span id="sat-modal-ndvi-signal">Red light (665 nm) absorption decreased; NIR (842 nm) reflectance reduced due to early moisture stress.</span>
+          </div>
+        </div>
+
+        <!-- 2. Infrared (CIR - Color Infrared) Data -->
+        <div class="p-3.5 bg-surface-container rounded-xl border-l-4 border-rose-500 flex flex-col gap-1.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5 font-bold text-xs text-on-surface">
+              <span class="material-symbols-outlined text-rose-500 text-[18px]">filter_vintage</span>
+              <span>2. Infrared (CIR - Color Infrared) Data</span>
+            </div>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 font-mono" id="sat-modal-cir">NIR (B08): 0.42 • Red (B04): 0.14</span>
+          </div>
+          <p class="text-xs text-on-surface-variant leading-relaxed" id="sat-modal-cir-desc">
+            Color Infrared (CIR) false-color return reveals lowered cellular turgor in the NE zone; western quadrants exhibit dense crimson foliage.
+          </p>
+          <div class="text-[11px] text-secondary bg-surface-container-lowest p-2 rounded-lg border border-surface-variant">
+            <strong class="text-on-surface">Biophysical Meaning:</strong> <span id="sat-modal-cir-signal">Healthy leaf mesophyll reflects 40–50% NIR. Cell dehydration reduces internal scattering, dampening CIR brightness.</span>
+          </div>
+        </div>
+
+        <!-- 3. NDMI / Canopy Moisture Index Data -->
+        <div class="p-3.5 bg-surface-container rounded-xl border-l-4 border-teal-600 flex flex-col gap-1.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5 font-bold text-xs text-on-surface">
+              <span class="material-symbols-outlined text-teal-600 text-[18px]">water_drop</span>
+              <span>3. NDMI (Canopy Moisture &amp; Soil Water)</span>
+            </div>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-teal-800 font-mono" id="sat-modal-moisture">NDMI: +0.20 • SWIR (B11): 0.28</span>
+          </div>
+          <p class="text-xs text-on-surface-variant leading-relaxed" id="sat-modal-moisture-desc">
+            Normalized Difference Moisture Index confirms localized soil percolation deficit along the NE ridge. Top 10 cm root zone drying.
+          </p>
+        </div>
+
+        <!-- 4. Multispectral Band Reflectance Grid -->
+        <div class="p-3 bg-surface-container-low rounded-xl border border-surface-variant flex flex-col gap-2">
+          <span class="text-[11px] font-bold text-on-surface flex items-center gap-1">
+            <span class="material-symbols-outlined text-[15px] text-primary">analytics</span>
+            <span>Raw Spectral Band Readings (Copernicus MSI 10m/20m)</span>
+          </span>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-center font-mono text-[10px]">
+            <div class="bg-surface-container-lowest p-1.5 rounded border border-surface-variant">
+              <span class="text-secondary block">B03 (Green)</span>
+              <span class="font-bold text-on-surface" id="sat-modal-b3">0.08 (Peak)</span>
+            </div>
+            <div class="bg-surface-container-lowest p-1.5 rounded border border-surface-variant">
+              <span class="text-secondary block">B04 (Red)</span>
+              <span class="font-bold text-on-surface" id="sat-modal-b4">0.14 (Absorb)</span>
+            </div>
+            <div class="bg-surface-container-lowest p-1.5 rounded border border-surface-variant">
+              <span class="text-secondary block">B08 (NIR)</span>
+              <span class="font-bold text-emerald-700" id="sat-modal-b8">0.42 (Scatter)</span>
+            </div>
+            <div class="bg-surface-container-lowest p-1.5 rounded border border-surface-variant">
+              <span class="text-secondary block">B11 (SWIR)</span>
+              <span class="font-bold text-teal-700" id="sat-modal-b11">0.28 (Water)</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-2 pt-1">
+        <button class="flex-1 min-h-[44px] rounded-xl bg-primary text-on-primary font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer hover:bg-primary-container transition-colors" onclick="closeModal('satelliteModal')" type="button">
+          <span>Return to Dashboard</span>
+        </button>
+        <button class="min-h-[44px] px-3 rounded-xl bg-surface-container text-primary font-bold text-xs flex items-center justify-center gap-1 cursor-pointer hover:bg-surface-variant transition-colors" onclick="switchSatelliteLayer('ndvi'); closeModal('satelliteModal');" type="button">
+          <span class="material-symbols-outlined text-[16px] text-emerald-600">grass</span>
+          <span>View NDVI</span>
+        </button>
+        <button class="min-h-[44px] px-3 rounded-xl bg-surface-container text-primary font-bold text-xs flex items-center justify-center gap-1 cursor-pointer hover:bg-surface-variant transition-colors" onclick="switchSatelliteLayer('false-color'); closeModal('satelliteModal');" type="button">
+          <span class="material-symbols-outlined text-[16px] text-rose-500">filter_vintage</span>
+          <span>View CIR</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal: Check Field / My Farm -->
   <div class="fixed inset-0 z-50 bg-inverse-surface/50 backdrop-blur-xs flex flex-col justify-end hidden opacity-0 transition-opacity duration-200" id="fieldModal">
     <div class="w-full max-w-[640px] mx-auto bg-surface-container-lowest rounded-t-3xl p-5 flex flex-col gap-4 max-h-[88vh] overflow-y-auto">
@@ -1132,6 +1266,69 @@
     let leafletParcelLayer = null;
     let leafletMarker = null;
 
+    const SPECTRAL_DATA = {
+      mandya: {
+        plot: "Plot #142/A • Mandya (Karnataka)",
+        sensor: "Copernicus Sentinel-2B (MSI Level-2A BOA)",
+        coords: "12°31'05\" N, 76°53'06\" E • Elev: 662m",
+        pass: "24 Feb 2024 • 10:48 UTC (Cloud: 0.8%)",
+        ndviVal: "0.58 (Benchmark 0.70 • -17% Drop)",
+        ndviDesc: "Multi-spectral vegetation index indicates localized canopy stress in the North-East quarter. Rest of parcel maintains standard canopy vigor.",
+        ndviSignal: "Red light (665 nm) absorption decreased; NIR (842 nm) reflectance reduced due to early moisture stress.",
+        cirVal: "NIR (B08): 0.42 • Red (B04): 0.14",
+        cirDesc: "Color Infrared (CIR) false-color return reveals lowered cellular turgor in the NE zone; western quadrants exhibit dense crimson foliage.",
+        cirSignal: "Healthy leaf mesophyll reflects 40–50% NIR. Cell dehydration reduces internal scattering, dampening CIR brightness.",
+        moistureVal: "NDMI: +0.20 • SWIR (B11): 0.28",
+        moistureDesc: "Normalized Difference Moisture Index confirms localized soil percolation deficit along the NE ridge. Top 10 cm root zone drying.",
+        bands: { b3: "0.08 (Peak)", b4: "0.14 (Absorb)", b8: "0.42 (Scatter)", b11: "0.28 (Water)" }
+      },
+      ludhiana: {
+        plot: "Plot #89/C • Ludhiana (Punjab)",
+        sensor: "Copernicus Sentinel-2A (MSI Level-2A BOA)",
+        coords: "30°54'04\" N, 75°51'25\" E • Elev: 244m",
+        pass: "22 Feb 2024 • 11:05 UTC (Cloud: 1.4%)",
+        ndviVal: "0.72 (Benchmark 0.68 • +6% Optimal)",
+        ndviDesc: "High uniform chlorophyll density across entire cadastral parcel. Active tillering in PBW 343 wheat progressing with high leaf vigor.",
+        ndviSignal: "High Red (665 nm) chlorophyll absorption (>90%) with strong NIR (842 nm) canopy scattering.",
+        cirVal: "NIR (B08): 0.62 • Red (B04): 0.06",
+        cirDesc: "Brilliant crimson false-color return throughout parcel. Dense canopy coverage with high Leaf Area Index (LAI ~3.8).",
+        cirSignal: "Optimal cellular hydration and nitrogen assimilation producing maximum Near-Infrared reflectance.",
+        moistureVal: "NDMI: +0.55 • SWIR (B11): 0.18",
+        moistureDesc: "Canopy water absorption optimal. Sub-surface moisture retention steady following canal irrigation.",
+        bands: { b3: "0.07 (Peak)", b4: "0.06 (Absorb)", b8: "0.62 (Scatter)", b11: "0.18 (Water)" }
+      },
+      varanasi: {
+        plot: "Plot #214/B • Varanasi (Uttar Pradesh)",
+        sensor: "Copernicus Sentinel-2B (MSI Level-2A BOA)",
+        coords: "25°19'48\" N, 83°00'07\" E • Elev: 81m",
+        pass: "23 Feb 2024 • 10:32 UTC (Cloud: 2.1%)",
+        ndviVal: "0.64 (Benchmark 0.65 • Stable 0%)",
+        ndviDesc: "Uniform vegetative vigor consistent with flowering stage in Varuna mustard and intercropped vegetables. Balanced canopy development.",
+        ndviSignal: "Moderate yellow blossom signature mixing with green leaf reflectance; healthy physiological progression.",
+        cirVal: "NIR (B08): 0.52 • Red (B04): 0.09",
+        cirDesc: "Consistent moderate crimson response across all ridges. No signs of aphid infestation or moisture wilt.",
+        cirSignal: "Uniform vegetative cellular structure across Gangetic alluvial loam soil bed.",
+        moistureVal: "NDMI: +0.41 • SWIR (B11): 0.22",
+        moistureDesc: "Adequate soil water retention; irrigation can be withheld for the next 4–5 days.",
+        bands: { b3: "0.08 (Peak)", b4: "0.09 (Absorb)", b8: "0.52 (Scatter)", b11: "0.22 (Water)" }
+      },
+      nashik: {
+        plot: "Plot #56/D • Nashik (Maharashtra)",
+        sensor: "Copernicus Sentinel-2A (MSI Level-2A BOA)",
+        coords: "20°00'54\" N, 73°48'54\" E • Elev: 560m",
+        pass: "21 Feb 2024 • 10:52 UTC (Cloud: 0.4%)",
+        ndviVal: "0.61 (Benchmark 0.62 • -2% Nominal)",
+        ndviDesc: "Steady canopy density across Red Pinhead onion field at bulb expansion stage. Healthy cylindrical leaf tops.",
+        ndviSignal: "Characteristic onion erect canopy reflectance with good ground coverage and minimal soil background noise.",
+        cirVal: "NIR (B08): 0.48 • Red (B04): 0.10",
+        cirDesc: "Even false-color infrared distribution. No fungal purple blotch or thrips damage signatures detected.",
+        cirSignal: "Stable turgor pressure maintained through scheduled micro-drip irrigation.",
+        moistureVal: "NDMI: +0.33 • SWIR (B11): 0.24",
+        moistureDesc: "Drip root zone maintaining steady hydration; deficit minimal.",
+        bands: { b3: "0.07 (Peak)", b4: "0.10 (Absorb)", b8: "0.48 (Scatter)", b11: "0.24 (Water)" }
+      }
+    };
+
     const REGION_GEO = {
       mandya: { lat: 12.518, lon: 76.885, zoom: 16, elev: "662m", polygon: [[12.522, 76.881], [12.523, 76.889], [12.515, 76.891], [12.514, 76.883]] },
       ludhiana: { lat: 30.901, lon: 75.857, zoom: 16, elev: "244m", polygon: [[30.905, 75.852], [30.906, 75.862], [30.897, 75.861], [30.896, 75.853]] },
@@ -1483,7 +1680,7 @@
         </div>
       `).join('');
 
-      // Modal Data
+      // Modal Data (My Farm / Advice)
       document.getElementById('modal-plot-id').textContent = data.plotTitle;
       document.getElementById('modal-crop-id').textContent = data.cropTitle;
       document.getElementById('modal-area-id').textContent = data.area || "1.85 Hectares";
@@ -1493,6 +1690,27 @@
       document.getElementById('modal-sms-text').textContent = data.sms;
       document.getElementById('advice-notice-body').textContent = data.notice;
       document.getElementById('advice-meaning-body').textContent = data.meaning;
+
+      // Satellite Spectral Modal Data (Check My Field)
+      const spec = SPECTRAL_DATA[regionKey] || SPECTRAL_DATA.mandya;
+      if (document.getElementById('sat-modal-plot')) {
+        document.getElementById('sat-modal-plot').textContent = spec.plot;
+        document.getElementById('sat-modal-sensor').textContent = spec.sensor;
+        document.getElementById('sat-modal-coords').textContent = spec.coords;
+        document.getElementById('sat-modal-pass').textContent = spec.pass;
+        document.getElementById('sat-modal-ndvi').textContent = spec.ndviVal;
+        document.getElementById('sat-modal-ndvi-desc').textContent = spec.ndviDesc;
+        document.getElementById('sat-modal-ndvi-signal').textContent = spec.ndviSignal;
+        document.getElementById('sat-modal-cir').textContent = spec.cirVal;
+        document.getElementById('sat-modal-cir-desc').textContent = spec.cirDesc;
+        document.getElementById('sat-modal-cir-signal').textContent = spec.cirSignal;
+        document.getElementById('sat-modal-moisture').textContent = spec.moistureVal;
+        document.getElementById('sat-modal-moisture-desc').textContent = spec.moistureDesc;
+        document.getElementById('sat-modal-b3').textContent = spec.bands.b3;
+        document.getElementById('sat-modal-b4').textContent = spec.bands.b4;
+        document.getElementById('sat-modal-b8').textContent = spec.bands.b8;
+        document.getElementById('sat-modal-b11').textContent = spec.bands.b11;
+      }
     }
 
     function changeLanguage(langCode) {
