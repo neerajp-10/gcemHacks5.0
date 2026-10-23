@@ -42,10 +42,13 @@ def get_farm(farm_id: str) -> Farm:
 
 
 @router.get("/farms/{farm_id}/satellite-image", summary="Get Copernicus Sentinel-2 Satellite Image")
-def get_farm_satellite_image(farm_id: str):
-    """Retrieve Copernicus Sentinel-2 true-color satellite imagery for farm parcel."""
+def get_farm_satellite_image(
+    farm_id: str,
+    layer: str = Query("true-color", description="Satellite layer: 'true-color', 'ndvi', 'false-color', 'moisture'")
+):
+    """Retrieve Copernicus Sentinel-2 satellite imagery for farm parcel with layer selection."""
     farm_id_clean = farm_id.lower()
-    img_bytes = sentinel_service.fetch_live_satellite_image(farm_id_clean)
+    img_bytes = sentinel_service.fetch_live_satellite_image(farm_id_clean, layer=layer)
     if not img_bytes:
         raise HTTPException(status_code=404, detail=f"Satellite image not available for farm '{farm_id}'.")
     return Response(
@@ -53,6 +56,15 @@ def get_farm_satellite_image(farm_id: str):
         media_type="image/jpeg",
         headers={"Cache-Control": "public, max-age=3600"},
     )
+
+
+@router.get("/farms/{farm_id}/satellite-metadata", summary="Get Copernicus Sentinel-2 Satellite Pass Metadata")
+def get_farm_satellite_metadata(farm_id: str):
+    """Retrieve detailed Copernicus Sentinel-2 satellite pass telemetry, coordinates, and layer info."""
+    meta = sentinel_service.get_farm_metadata(farm_id)
+    if not meta:
+        raise HTTPException(status_code=404, detail=f"Metadata not found for farm '{farm_id}'.")
+    return meta
 
 
 

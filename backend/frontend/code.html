@@ -41,7 +41,26 @@
       100% { transform: scale(1); opacity: 1; }
     }
     .sprout-anim { animation: sproutBloom 0.8s cubic-bezier(0.17, 0.89, 0.32, 1.28) 0.55s forwards; transform-origin: bottom center; }
+    @keyframes radarSweep {
+      0% { top: 0%; opacity: 0; }
+      15% { opacity: 0.9; }
+      85% { opacity: 0.9; }
+      100% { top: 100%; opacity: 0; }
+    }
+    .radar-sweep-bar {
+      animation: radarSweep 3.2s linear infinite;
+    }
+    .leaflet-container {
+      background: #0f172a !important;
+      font-family: inherit;
+    }
+    .sat-layer-btn.active {
+      background-color: #005230 !important;
+      color: #ffffff !important;
+    }
   </style>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <script id="tailwind-config">
     tailwind.config = {
@@ -214,33 +233,135 @@
         </p>
       </section>
 
-      <!-- 2. SATELLITE PARCEL CANVAS -->
-      <div class="relative w-full rounded-2xl overflow-hidden bg-surface-container-lowest border border-surface-variant shadow-sm" id="satellite-card">
-        <!-- SATELLITE IMAGE CANVAS -->
-        <div class="relative h-60 w-full overflow-hidden bg-surface-container" id="satellite-canvas">
+      <!-- 2. DYNAMIC LIVE SATELLITE VIEWER -->
+      <div class="relative w-full rounded-2xl overflow-hidden bg-surface-container-lowest border border-surface-variant shadow-sm transition-all" id="satellite-card">
+        
+        <!-- SATELLITE TOOLBAR: TELEMETRY & CONTROLS -->
+        <div class="p-2.5 bg-surface-container-low border-b border-surface-variant flex flex-col gap-2">
+          <!-- Top Row: Satellite Beacon & Action Buttons -->
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-1.5">
+              <span class="relative flex h-2.5 w-2.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+              </span>
+              <span class="text-[11px] font-bold text-on-surface uppercase tracking-wider flex items-center gap-1" id="sat-telemetry-badge">
+                <span>Copernicus Sentinel-2</span>
+                <span class="text-secondary font-normal" id="sat-gsd-badge">• 10m GSD</span>
+              </span>
+            </div>
+            
+            <!-- Quick Actions: Radar Scan Toggle + Refresh -->
+            <div class="flex items-center gap-1">
+              <button id="btn-toggle-radar" onclick="toggleRadarScan()" class="text-[10px] font-semibold px-2 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface flex items-center gap-1 transition-all cursor-pointer" title="Toggle Radar Laser Scanline">
+                <span class="material-symbols-outlined text-[13px] text-primary" id="radar-icon">sensors</span>
+                <span id="radar-text">Radar Scan</span>
+              </button>
+              <button id="btn-refresh-sat" onclick="refreshSatellitePass()" class="text-[10px] font-semibold px-2 py-1 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary flex items-center gap-1 transition-all cursor-pointer" title="Fetch Latest Sentinel-2 Pass">
+                <span class="material-symbols-outlined text-[13px] transition-transform duration-500" id="refresh-icon">sync</span>
+                <span>Refresh</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Bottom Row: Multi-Spectral Layer Selector Tabs -->
+          <div class="flex items-center gap-1 overflow-x-auto pb-0.5 no-scrollbar">
+            <button class="sat-layer-btn active text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-primary text-on-primary shadow-sm flex items-center gap-1 shrink-0 transition-all cursor-pointer" onclick="switchSatelliteLayer('true-color')" id="layer-btn-true-color">
+              <span class="material-symbols-outlined text-[13px]">palette</span>
+              <span>Natural RGB</span>
+            </button>
+            <button class="sat-layer-btn text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high flex items-center gap-1 shrink-0 transition-all cursor-pointer" onclick="switchSatelliteLayer('ndvi')" id="layer-btn-ndvi">
+              <span class="material-symbols-outlined text-[13px] text-emerald-600">grass</span>
+              <span>NDVI Heatmap</span>
+            </button>
+            <button class="sat-layer-btn text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high flex items-center gap-1 shrink-0 transition-all cursor-pointer" onclick="switchSatelliteLayer('false-color')" id="layer-btn-false-color">
+              <span class="material-symbols-outlined text-[13px] text-rose-500">filter_vintage</span>
+              <span>Infrared (CIR)</span>
+            </button>
+            <button class="sat-layer-btn text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high flex items-center gap-1 shrink-0 transition-all cursor-pointer" onclick="switchSatelliteLayer('map')" id="layer-btn-map">
+              <span class="material-symbols-outlined text-[13px] text-blue-500">public</span>
+              <span>Interactive Map</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- SATELLITE CANVAS VIEWPORT -->
+        <div class="relative h-64 sm:h-72 w-full overflow-hidden bg-slate-950 select-none group" id="satellite-canvas" onmousemove="handleSatMouseMove(event)" onmouseleave="handleSatMouseLeave()">
+          
+          <!-- Base Satellite Image -->
           <img alt="Copernicus Sentinel-2 agricultural parcel photography" class="w-full h-full object-cover transition-opacity duration-300" id="satellite-img" src="assets/mandya.jpg"/>
-          <!-- Crisp farm parcel boundary overlay -->
-          <svg class="absolute inset-0 w-full h-full pointer-events-none" fill="none" preserveaspectratio="none" viewbox="0 0 400 240">
-            <polygon id="parcel-polygon" fill="rgba(232, 162, 58, 0.15)" points="125,45 285,35 305,135 145,150" stroke="#ffddb5" stroke-dasharray="6 3" stroke-width="2.5"></polygon>
-            <polygon fill="none" points="45,95 125,85 145,190 40,210" stroke="#8dd6a8" stroke-dasharray="4 3" stroke-width="1.8"></polygon>
-            <g id="parcel-alert-marker">
+          
+          <!-- Secondary Split Image (for Compare Slider) -->
+          <div id="split-image-container" class="absolute inset-0 overflow-hidden pointer-events-none" style="width: 50%; display: none;">
+            <img alt="Sentinel NDVI Overlay" class="absolute inset-0 w-full h-full object-cover max-w-none" id="satellite-split-img" src="assets/mandya_ndvi.jpg" style="width: 100%; height: 100%;"/>
+          </div>
+
+          <!-- Interactive Leaflet Map Container -->
+          <div id="satellite-leaflet-map" class="absolute inset-0 w-full h-full z-10" style="display: none;"></div>
+
+          <!-- Radar Laser Scanline Animation -->
+          <div id="radar-scanline" class="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_12px_#34d399] pointer-events-none radar-sweep-bar opacity-80 z-20"></div>
+
+          <!-- Dynamic SVG Cadastral Parcel Overlay -->
+          <svg class="absolute inset-0 w-full h-full pointer-events-none z-20" fill="none" preserveaspectratio="none" viewbox="0 0 400 240" id="sat-svg-overlay">
+            <polygon id="parcel-polygon" fill="rgba(232, 162, 58, 0.18)" points="125,45 285,35 305,135 145,150" stroke="#ffddb5" stroke-dasharray="6 3" stroke-width="2.5"></polygon>
+            <polygon id="parcel-neighbor-polygon" fill="none" points="45,95 125,85 145,190 40,210" stroke="#8dd6a8" stroke-dasharray="4 3" stroke-width="1.8"></polygon>
+            <g id="parcel-alert-marker" class="cursor-pointer pointer-events-auto" onclick="showStressZoneDetail()">
               <circle cx="210" cy="95" fill="#633f00" fill-opacity="0.9" r="14"></circle>
               <circle cx="210" cy="95" fill="#ffddb5" r="6"></circle>
               <text fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle" x="210" y="99">!</text>
             </g>
           </svg>
-          <!-- Source Overlay Badge -->
-          <div class="absolute top-2.5 left-2.5 bg-inverse-surface/85 backdrop-blur-md rounded-lg px-2.5 py-1 text-inverse-on-surface text-[11px] font-medium flex items-center gap-1.5 shadow">
-            <span class="material-symbols-outlined text-primary-fixed text-[14px]">satellite</span>
-            <span id="sat-source-badge">Copernicus Sentinel-2 (ESA) Level-2A</span>
-          </div>
-          <!-- Observation Metadata Bar -->
-          <div class="absolute bottom-2 left-2 right-2 bg-inverse-surface/90 backdrop-blur-md rounded-xl p-2.5 px-3 text-inverse-on-surface flex items-center justify-between text-xs">
-            <div class="flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-primary-fixed-dim text-[16px]">calendar_today</span>
-              <span class="text-surface-container-low text-[11px]" id="sat-date-tag">24 Feb 2024 • Cloud-free Pass</span>
+
+          <!-- Interactive Pixel HUD Crosshair / Probe -->
+          <div id="pixel-probe-hud" class="absolute top-2.5 right-2.5 z-30 bg-black/85 backdrop-blur-md border border-white/20 rounded-lg px-2.5 py-1.5 text-white text-[10px] font-mono shadow-lg transition-opacity duration-200 pointer-events-none opacity-90">
+            <div class="flex items-center gap-1.5 font-bold text-emerald-400">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+              <span id="hud-coords">12°31'05" N, 76°53'06" E</span>
             </div>
-            <span class="text-[11px] font-bold text-primary-fixed bg-primary/40 px-2 py-0.5 rounded" id="parcel-id-tag">Parcel #142/A</span>
+            <div class="text-white/80 text-[9px] mt-0.5 flex items-center justify-between gap-3">
+              <span id="hud-metric">NDVI: 0.58 • Stress</span>
+              <span class="text-emerald-300 font-bold" id="hud-elev">Elev: 662m</span>
+            </div>
+          </div>
+
+          <!-- Loading Spinner Overlay -->
+          <div id="sat-loading-overlay" class="absolute inset-0 bg-slate-950/70 backdrop-blur-sm z-40 flex flex-col items-center justify-center gap-2 text-white transition-opacity duration-300 opacity-0 pointer-events-none">
+            <span class="material-symbols-outlined text-3xl text-primary animate-spin">progress_activity</span>
+            <span class="text-xs font-semibold tracking-wide">Acquiring Sentinel-2 Pass...</span>
+          </div>
+
+          <!-- Bottom Telemetry & Parcel Bar -->
+          <div class="absolute bottom-2 left-2 right-2 z-30 bg-inverse-surface/90 backdrop-blur-md rounded-xl p-2 px-3 text-inverse-on-surface flex items-center justify-between text-xs shadow-md">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary-fixed-dim text-[16px]">satellite_alt</span>
+              <div class="flex flex-col">
+                <span class="text-surface-container-low text-[10px] leading-tight" id="sat-date-tag">24 Feb 2024 • 10:48 UTC (Cloud-free)</span>
+                <span class="text-[9px] text-primary-fixed/80 font-mono" id="sat-orbit-tag">Orbit R019 • Sun Zenith 28.4°</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button onclick="toggleCompareSplit()" id="btn-compare-split" class="text-[9px] font-bold px-2 py-0.5 rounded bg-surface-variant/40 hover:bg-surface-variant/70 text-on-surface flex items-center gap-1 transition-all cursor-pointer">
+                <span class="material-symbols-outlined text-[11px]">compare</span>
+                <span>Split View</span>
+              </button>
+              <span class="text-[11px] font-bold text-primary-fixed bg-primary/40 px-2 py-0.5 rounded" id="parcel-id-tag">Plot #142/A</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- NDVI COLOR GRADIENT LEGEND (Shown when NDVI or Infrared active) -->
+        <div id="ndvi-legend-bar" class="px-3 py-1.5 bg-surface-container-low border-t border-surface-variant text-[9px] text-secondary flex items-center justify-between transition-all" style="display: none;">
+          <span class="font-bold text-on-surface flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>Vigor Index</span>
+          </span>
+          <div class="flex-1 mx-3 h-2 rounded-full bg-gradient-to-r from-red-600 via-yellow-400 via-lime-400 to-emerald-700 shadow-inner"></div>
+          <div class="flex items-center gap-2 font-mono">
+            <span>-0.2 Water</span>
+            <span>0.4 Stress</span>
+            <span class="text-emerald-700 font-bold">0.8+ Dense</span>
           </div>
         </div>
 
@@ -1003,10 +1124,231 @@
       pill.className = "text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-800 flex items-center gap-1";
     }
 
+    // Dynamic Satellite View State & Leaflet Map Cache
+    let currentLayer = 'true-color';
+    let radarScanActive = true;
+    let splitCompareActive = false;
+    let leafletMap = null;
+    let leafletParcelLayer = null;
+    let leafletMarker = null;
+
+    const REGION_GEO = {
+      mandya: { lat: 12.518, lon: 76.885, zoom: 16, elev: "662m", polygon: [[12.522, 76.881], [12.523, 76.889], [12.515, 76.891], [12.514, 76.883]] },
+      ludhiana: { lat: 30.901, lon: 75.857, zoom: 16, elev: "244m", polygon: [[30.905, 75.852], [30.906, 75.862], [30.897, 75.861], [30.896, 75.853]] },
+      varanasi: { lat: 25.330, lon: 83.002, zoom: 16, elev: "81m", polygon: [[25.334, 82.998], [25.335, 83.007], [25.326, 83.006], [25.325, 82.999]] },
+      nashik: { lat: 20.015, lon: 73.815, zoom: 16, elev: "560m", polygon: [[20.019, 73.811], [20.020, 73.820], [20.011, 73.819], [20.010, 73.812]] }
+    };
+
+    function toggleRadarScan() {
+      radarScanActive = !radarScanActive;
+      const scanline = document.getElementById('radar-scanline');
+      const btn = document.getElementById('btn-toggle-radar');
+      const icon = document.getElementById('radar-icon');
+      const txt = document.getElementById('radar-text');
+      if (radarScanActive) {
+        if (scanline) scanline.style.display = 'block';
+        if (btn) btn.className = "text-[10px] font-semibold px-2 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface flex items-center gap-1 transition-all cursor-pointer";
+        if (icon) icon.className = "material-symbols-outlined text-[13px] text-primary";
+        if (txt) txt.textContent = "Radar Scan";
+      } else {
+        if (scanline) scanline.style.display = 'none';
+        if (btn) btn.className = "text-[10px] font-semibold px-2 py-1 rounded-lg bg-surface-container-high text-secondary flex items-center gap-1 transition-all cursor-pointer opacity-70";
+        if (icon) icon.className = "material-symbols-outlined text-[13px] text-secondary";
+        if (txt) txt.textContent = "Scan Paused";
+      }
+    }
+
+    function toggleCompareSplit() {
+      splitCompareActive = !splitCompareActive;
+      const splitCont = document.getElementById('split-image-container');
+      const splitImg = document.getElementById('satellite-split-img');
+      const btn = document.getElementById('btn-compare-split');
+      const apiBase = getApiBase();
+
+      if (splitCompareActive) {
+        if (splitCont) {
+          splitCont.style.display = 'block';
+          splitCont.style.width = '50%';
+        }
+        if (splitImg) {
+          splitImg.src = backendAvailable ? `${apiBase}/api/farms/${currentRegionKey}/satellite-image?layer=ndvi` : `assets/${currentRegionKey}_ndvi.jpg`;
+        }
+        if (btn) btn.classList.add('bg-primary/20', 'text-primary', 'border', 'border-primary/40');
+      } else {
+        if (splitCont) splitCont.style.display = 'none';
+        if (btn) btn.classList.remove('bg-primary/20', 'text-primary', 'border', 'border-primary/40');
+      }
+    }
+
+    function handleSatMouseMove(e) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const xPct = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+      const yPct = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
+
+      if (splitCompareActive) {
+        const splitCont = document.getElementById('split-image-container');
+        if (splitCont) splitCont.style.width = `${xPct}%`;
+      }
+
+      const geo = REGION_GEO[currentRegionKey] || REGION_GEO.mandya;
+      const latEst = (geo.lat + (0.5 - yPct / 100) * 0.008).toFixed(4);
+      const lonEst = (geo.lon + (xPct / 100 - 0.5) * 0.008).toFixed(4);
+
+      const hudCoords = document.getElementById('hud-coords');
+      if (hudCoords) hudCoords.textContent = `${latEst}° N, ${lonEst}° E`;
+
+      const hudMetric = document.getElementById('hud-metric');
+      if (hudMetric) {
+        const ndviVal = (0.42 + (xPct * 0.003) + (Math.sin(yPct) * 0.04)).toFixed(2);
+        hudMetric.textContent = `NDVI: ${ndviVal} • ${ndviVal < 0.6 ? 'Stress' : 'Healthy'}`;
+      }
+    }
+
+    function handleSatMouseLeave() {
+      if (splitCompareActive) {
+        const splitCont = document.getElementById('split-image-container');
+        if (splitCont) splitCont.style.width = '50%';
+      }
+    }
+
+    async function switchSatelliteLayer(layerName) {
+      currentLayer = layerName;
+      document.querySelectorAll('.sat-layer-btn').forEach(btn => {
+        btn.classList.remove('active', 'bg-primary', 'text-on-primary', 'shadow-sm');
+        btn.classList.add('bg-surface-container', 'text-on-surface');
+      });
+      const activeBtn = document.getElementById(`layer-btn-${layerName}`);
+      if (activeBtn) {
+        activeBtn.classList.add('active', 'bg-primary', 'text-on-primary', 'shadow-sm');
+        activeBtn.classList.remove('bg-surface-container', 'text-on-surface');
+      }
+
+      const satImg = document.getElementById('satellite-img');
+      const leafletCont = document.getElementById('satellite-leaflet-map');
+      const svgOverlay = document.getElementById('sat-svg-overlay');
+      const legend = document.getElementById('ndvi-legend-bar');
+      const apiBase = getApiBase();
+
+      if (layerName === 'map') {
+        if (satImg) satImg.style.display = 'none';
+        if (svgOverlay) svgOverlay.style.display = 'none';
+        if (leafletCont) leafletCont.style.display = 'block';
+        if (legend) legend.style.display = 'none';
+        initOrUpdateLeafletMap(currentRegionKey);
+      } else {
+        if (leafletCont) leafletCont.style.display = 'none';
+        if (satImg) satImg.style.display = 'block';
+        if (svgOverlay) svgOverlay.style.display = 'block';
+        if (legend) legend.style.display = (layerName === 'ndvi' || layerName === 'false-color') ? 'flex' : 'none';
+
+        // Load layer imagery
+        const targetSrc = backendAvailable
+          ? `${apiBase}/api/farms/${currentRegionKey}/satellite-image?layer=${layerName}&t=${Date.now()}`
+          : `assets/${currentRegionKey}_${layerName}.jpg`;
+
+        satImg.src = targetSrc;
+      }
+    }
+
+    function initOrUpdateLeafletMap(regionKey) {
+      const geo = REGION_GEO[regionKey] || REGION_GEO.mandya;
+      const mapEl = document.getElementById('satellite-leaflet-map');
+      if (!mapEl) return;
+
+      if (!leafletMap && typeof L !== 'undefined') {
+        leafletMap = L.map('satellite-leaflet-map', {
+          zoomControl: false,
+          attributionControl: false
+        }).setView([geo.lat, geo.lon], geo.zoom);
+
+        // High-resolution Esri World Imagery Satellite Tiles
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+          maxZoom: 18
+        }).addTo(leafletMap);
+
+        // Minimal Zoom Control
+        L.control.zoom({ position: 'topright' }).addTo(leafletMap);
+      }
+
+      if (leafletMap) {
+        leafletMap.invalidateSize();
+        leafletMap.flyTo([geo.lat, geo.lon], geo.zoom, { duration: 1.2 });
+
+        if (leafletParcelLayer) leafletMap.removeLayer(leafletParcelLayer);
+        if (leafletMarker) leafletMap.removeLayer(leafletMarker);
+
+        leafletParcelLayer = L.polygon(geo.polygon, {
+          color: '#ffddb5',
+          weight: 2.5,
+          dashArray: '6, 4',
+          fillColor: '#e8a23a',
+          fillOpacity: 0.22
+        }).addTo(leafletMap);
+
+        const customIcon = L.divIcon({
+          className: 'custom-sat-pin',
+          html: '<div style="background:#005230; color:#fff; border:2px solid #a8f3c2; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold; box-shadow:0 0 10px rgba(0,82,48,0.8);">!</div>',
+          iconSize: [24, 24],
+          iconAnchor: [12, 12]
+        });
+
+        leafletMarker = L.marker([geo.lat, geo.lon], { icon: customIcon }).addTo(leafletMap);
+        leafletMarker.bindPopup(`<strong>${REGIONS_DATA[regionKey].parcel}</strong><br/>Crop: ${REGIONS_DATA[regionKey].cropName}<br/>NDVI: ${REGIONS_DATA[regionKey].metric}`);
+      }
+    }
+
+    async function refreshSatellitePass() {
+      const spinIcon = document.getElementById('refresh-icon');
+      const overlay = document.getElementById('sat-loading-overlay');
+      const satImg = document.getElementById('satellite-img');
+      const apiBase = getApiBase();
+
+      if (spinIcon) spinIcon.classList.add('animate-spin');
+      if (overlay) {
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
+        overlay.classList.add('opacity-100');
+      }
+
+      const timestamp = Date.now();
+      if (currentLayer !== 'map' && satImg) {
+        satImg.src = backendAvailable
+          ? `${apiBase}/api/farms/${currentRegionKey}/satellite-image?layer=${currentLayer}&t=${timestamp}`
+          : `assets/${currentRegionKey}.jpg`;
+      }
+
+      if (backendAvailable) {
+        try {
+          const metaRes = await fetch(`${apiBase}/api/farms/${currentRegionKey}/satellite-metadata`);
+          if (metaRes.ok) {
+            const meta = await metaRes.json();
+            const dateTag = document.getElementById('sat-date-tag');
+            if (dateTag) dateTag.textContent = `${meta.latest_pass} (Refreshed Live)`;
+            const orbitTag = document.getElementById('sat-orbit-tag');
+            if (orbitTag) orbitTag.textContent = `${meta.orbit} • Solar Zenith ${meta.solar_zenith}`;
+          }
+        } catch (e) {}
+      }
+
+      setTimeout(() => {
+        if (spinIcon) spinIcon.classList.remove('animate-spin');
+        if (overlay) {
+          overlay.classList.remove('opacity-100');
+          overlay.classList.add('opacity-0', 'pointer-events-none');
+        }
+      }, 750);
+    }
+
+    function showStressZoneDetail() {
+      const data = REGIONS_DATA[currentRegionKey];
+      if (!data) return;
+      alert(`🛰️ Sentinel-2 Cadastral Anomaly Detected:\n\nParcel: ${data.parcel}\nObservation: ${data.notice}\nAgronomic Meaning: ${data.meaning}\nRecommended Action: ${data.action}`);
+    }
+
     async function selectRegion(regionKey) {
       currentRegionKey = regionKey;
       let data = REGIONS_DATA[regionKey];
       if (!data) return;
+      const apiBase = getApiBase();
 
       // Update active pill button
       document.querySelectorAll('.region-pill').forEach(btn => {
@@ -1019,13 +1361,15 @@
         activeBtn.classList.remove('bg-surface-container-lowest', 'text-on-surface', 'border-surface-variant');
       }
 
-      // If backend available, try fetching live advisory from FastAPI
+      // If backend available, fetch live advisory & satellite metadata
       if (backendAvailable) {
         try {
-          const apiBase = getApiBase();
-          const res = await fetch(`${apiBase}/api/farms/${regionKey}/advisory?language=${currentLang}`);
-          if (res.ok) {
-            const adv = await res.json();
+          const [advRes, metaRes] = await Promise.all([
+            fetch(`${apiBase}/api/farms/${regionKey}/advisory?language=${currentLang}`),
+            fetch(`${apiBase}/api/farms/${regionKey}/satellite-metadata`)
+          ]);
+          if (advRes.ok) {
+            const adv = await advRes.json();
             data.advisoryTitle = adv.headline;
             data.advisoryDesc = adv.description;
             data.notice = adv.notice;
@@ -1034,8 +1378,19 @@
             data.sms = adv.sms_preview;
             data.voiceTranscript = adv.voice_transcript;
           }
+          if (metaRes.ok) {
+            const meta = await metaRes.json();
+            const dateTag = document.getElementById('sat-date-tag');
+            if (dateTag && meta.latest_pass) dateTag.textContent = meta.latest_pass;
+            const orbitTag = document.getElementById('sat-orbit-tag');
+            if (orbitTag && meta.orbit) orbitTag.textContent = `${meta.orbit} • Sun Zenith ${meta.solar_zenith}`;
+            const hudCoords = document.getElementById('hud-coords');
+            if (hudCoords && meta.coordinates) hudCoords.textContent = meta.coordinates.formatted;
+            const elevTag = document.getElementById('hud-elev');
+            if (elevTag && REGION_GEO[regionKey]) elevTag.textContent = `Elev: ${REGION_GEO[regionKey].elev}`;
+          }
         } catch (e) {
-          console.warn("Backend fetch failed, using fixture fallback:", e);
+          console.warn("Backend fetch failed, using fallback:", e);
         }
       }
 
@@ -1054,24 +1409,31 @@
       document.getElementById('card-meaning').textContent = data.meaning;
       document.getElementById('card-action').textContent = data.action;
 
-      // Update Satellite Image & Parcel Boundary Overlay
-      const satImg = document.getElementById('satellite-img');
-      if (satImg) {
-        const targetSrc = backendAvailable ? `${apiBase}/api/farms/${regionKey}/satellite-image` : data.satImage;
-        const fallbackSrc = data.satImage || "assets/mandya.jpg";
+      // Update Satellite Image / Leaflet Map
+      if (currentLayer === 'map') {
+        initOrUpdateLeafletMap(regionKey);
+      } else {
+        const satImg = document.getElementById('satellite-img');
+        if (satImg) {
+          const targetSrc = backendAvailable
+            ? `${apiBase}/api/farms/${regionKey}/satellite-image?layer=${currentLayer}&t=${Date.now()}`
+            : (data.satImage || `assets/${regionKey}.jpg`);
 
-        satImg.onerror = function() {
-          if (this.src !== fallbackSrc && !this.src.endsWith(fallbackSrc)) {
-            this.src = fallbackSrc;
-          }
-        };
-        satImg.src = targetSrc;
-      }
+          const fallbackSrc = data.satImage || "assets/mandya.jpg";
+          satImg.onerror = function() {
+            if (this.src !== fallbackSrc && !this.src.endsWith(fallbackSrc)) {
+              this.src = fallbackSrc;
+            }
+          };
+          satImg.src = targetSrc;
+        }
 
-
-      const satDate = document.getElementById('sat-date-tag');
-      if (satDate && data.satPass) {
-        satDate.textContent = data.satPass;
+        const splitImg = document.getElementById('satellite-split-img');
+        if (splitImg && splitCompareActive) {
+          splitImg.src = backendAvailable
+            ? `${apiBase}/api/farms/${regionKey}/satellite-image?layer=ndvi`
+            : `assets/${regionKey}_ndvi.jpg`;
+        }
       }
 
       const poly = document.getElementById('parcel-polygon');
@@ -1083,7 +1445,6 @@
       if (alertMarker && data.alertMarker) {
         alertMarker.setAttribute('transform', `translate(${data.alertMarker.cx - 210}, ${data.alertMarker.cy - 95})`);
       }
-
 
       // Time series bars
       const tsContainer = document.getElementById('ndvi-history-bars');
@@ -1331,9 +1692,9 @@
     }
 
     // Startup Initialization
-    window.addEventListener('DOMContentLoaded', () => {
-      checkBackendHealth();
-      selectRegion('mandya');
+    window.addEventListener('DOMContentLoaded', async () => {
+      await checkBackendHealth();
+      await selectRegion('mandya');
 
       try {
         if (sessionStorage.getItem('earthworm_splash_shown') === 'true') {
