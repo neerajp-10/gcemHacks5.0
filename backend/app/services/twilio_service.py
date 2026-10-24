@@ -79,6 +79,17 @@ def generate_twiml(script_text: str, language: str = "en") -> str:
     )
 
 
+def generate_twiml_sms(message_body: str) -> str:
+    """Generate standard TwiML response XML for automated farmer SMS reply."""
+    safe_text = saxutils.escape(message_body)
+    return (
+        f'<?xml version="1.0" encoding="UTF-8"?>\n'
+        f'<Response>\n'
+        f'    <Message>{safe_text}</Message>\n'
+        f'</Response>'
+    )
+
+
 def send_sms(to_number: str, message_body: str, language: str = "en") -> Dict[str, Any]:
     """Send an SMS advisory via Twilio API or simulate dispatch if unconfigured."""
     clean_to = to_number.strip()

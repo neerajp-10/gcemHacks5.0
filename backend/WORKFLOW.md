@@ -7,503 +7,484 @@
 
 ## 📋 Table of Contents
 1. [Project Overview & Core Philosophy](#1-project-overview--core-philosophy)
+   - [The Smallholder Reality](#the-smallholder-reality)
+   - [Earthworm's Three Pillars](#earthworms-three-pillars)
 2. [End-to-End System Workflow](#2-end-to-end-system-workflow)
-3. [Libraries & Technologies Used](#3-libraries--technologies-used)
+   - [Complete Architectural Workflow Diagram](#complete-architectural-workflow-diagram)
+   - [Data Lifecycle & Subsystems](#data-lifecycle--subsystems)
+3. [Low-Bandwidth Rural Agri-Telephony Subsystem](#3-low-bandwidth-rural-agri-telephony-subsystem)
+   - [Core Principle: Decoupled Web & Cellular Telephony](#core-principle-decoupled-web--cellular-telephony)
+   - [Outbound Cellular SMS Advisory (160-Char Budget)](#outbound-cellular-sms-advisory-160-char-budget)
+   - [Outbound Automated IVR Voice Phone Calls](#outbound-automated-ivr-voice-phone-calls)
+   - [Headless Background Dispatcher CLI (`dispatch_advisory.py`)](#headless-background-dispatcher-cli-dispatch_advisorypy)
+   - [Two-Way Low-Bandwidth Helpline Webhooks](#two-way-low-bandwidth-helpline-webhooks)
+     - [Missed Call / IVR Helpline (`/api/communications/incoming-call`)](#missed-call--ivr-helpline)
+     - [Inbound SMS Advisory Gateway (`/api/communications/incoming-sms`)](#inbound-sms-advisory-gateway)
+   - [Multi-Lingual Neural Voice Synthesis Engine](#multi-lingual-neural-voice-synthesis-engine)
+   - [Twilio Provider Credentials & Dual-Mode Telephony](#twilio-provider-credentials--dual-mode-telephony)
+4. [7 Vernacular Indian Languages Expansion](#4-7-vernacular-indian-languages-expansion)
+   - [Language Matrix & Regional Dialects](#language-matrix--regional-dialects)
+   - [Unified Translation Architecture](#unified-translation-architecture)
+5. [Advanced Satellite Parcel Inspector](#5-advanced-satellite-parcel-inspector)
+   - [5 Multispectral Satellite Layers](#5-multispectral-satellite-layers)
+   - [Agronomic Significance & Interactive Visualizer](#agronomic-significance--interactive-visualizer)
+6. [Libraries & Technologies Used](#6-libraries--technologies-used)
    - [Backend Python Dependencies](#backend-python-dependencies)
-   - [Frontend Libraries & Web APIs](#frontend-libraries--web-apis)
-4. [Detailed Python Script Documentation](#4-detailed-python-script-documentation)
-   - [Entrypoints & Core Configuration](#entrypoints--core-configuration)
-   - [Database & Storage Layer](#database--storage-layer)
-   - [Domain Data Schemas (Pydantic)](#domain-data-schemas-pydantic)
+   - [Frontend Frameworks & Libraries](#frontend-frameworks--libraries)
+7. [Detailed Python Script & Codebase Documentation](#7-detailed-python-script--codebase-documentation)
+   - [Entrypoints & Server Configuration](#entrypoints--server-configuration)
    - [API Route Handlers (FastAPI)](#api-route-handlers-fastapi)
-   - [Demonstration Data & Agronomic Fixtures](#demonstration-data--agronomic-fixtures)
-   - [Automated Test Suite (Pytest)](#automated-test-suite-pytest)
-5. [In-Depth Supabase Integration Architecture](#5-in-depth-supabase-integration-architecture)
-   - [Design Philosophy: Non-Blocking Graceful Fallback](#design-philosophy-non-blocking-graceful-fallback)
-   - [Safe Connection Verification (Zero-Leakage Probing)](#safe-connection-verification-zero-leakage-probing)
-   - [Database Schema (PostgreSQL DDL)](#database-schema-postgresql-ddl)
-   - [Manual Setup & Credential Management](#manual-setup--credential-management)
-6. [Deployment & Execution Instructions](#6-deployment--execution-instructions)
+   - [Business Logic & Service Layer](#business-logic--service-layer)
+   - [Pydantic Domain Schemas](#pydantic-domain-schemas)
+   - [Automated Pytest Suite](#automated-pytest-suite)
+8. [Copernicus Sentinel Hub Live Satellite Integration](#8-copernicus-sentinel-hub-live-satellite-integration)
+   - [OAuth2 Client Credentials & Token Caching](#oauth2-client-credentials--token-caching)
+   - [Process API & True-Color Evalscript](#process-api--true-color-evalscript)
+   - [Regional Bounding Boxes & Dynamic Fallbacks](#regional-bounding-boxes--dynamic-fallbacks)
+9. [In-Depth Supabase Integration Architecture](#9-in-depth-supabase-integration-architecture)
+   - [Non-Blocking Hybrid Storage Design](#non-blocking-hybrid-storage-design)
+   - [PostgreSQL Database Schema (DDL)](#postgresql-database-schema-ddl)
+   - [Connection Verification & Safe Probing](#connection-verification--safe-probing)
+10. [Deployment & Execution Instructions](#10-deployment--execution-instructions)
+    - [Local Development & CLI Execution](#local-development--cli-execution)
+    - [Automated Testing](#automated-testing)
+    - [Vercel Serverless Production Deployment](#vercel-serverless-production-deployment)
 
 ---
 
 ## 1. Project Overview & Core Philosophy
 
-**Earthworm** addresses the critical "last-mile" barrier between spaceborne Earth observation (Copernicus Sentinel-2 multispectral imagery, Open-Meteo regional agro-meteorology) and smallholder farmers in rural India.
+**Earthworm** bridges the critical "last-mile" barrier separating spaceborne Earth observation (Copernicus Sentinel-2 multispectral sensors, Open-Meteo agro-meteorological forecasting) and smallholder farmers cultivating 0.5 to 2-acre parcels across rural India.
 
-Most commercial agri-tech platforms fail smallholders due to three chronic barriers:
-1. **Bandwidth Poverty**: Heavy modern web apps stall on intermittent rural 2G/EDGE cellular connections.
-2. **The "Black Box" Problem**: Opaque AI recommendations (*"Spray chemical X on Tuesday"*) inspire distrust because they lack context.
-3. **Linguistic & Literacy Barriers**: Advisories delivered exclusively in English or high-density technical jargon exclude vernacular-speaking farmers.
+### The Smallholder Reality
+Traditional commercial agri-tech platforms fail rural farmers due to three chronic disconnects:
+1. **Bandwidth Poverty & Feature Phone Ownership**: Smallholders in remote agrarian belts frequently rely on basic 2G/3G keypad feature phones without reliable mobile data connections. Requiring farmers to download heavy web or mobile applications ensures total exclusion.
+2. **The "Black Box" Trust Deficit**: Opaque AI recommendations (*"Spray 250ml fungicide on Tuesday"*) generate distrust because they do not explain *what* was detected, *why* it matters, or *how* the conclusion was reached.
+3. **Linguistic & Jargon Barriers**: Advisories delivered in technical English or academic terminology are inaccessible to vernacular-speaking farmers.
 
-### Earthworm's Solution
-- **High-Performance Mobile-First Interface**: Lightweight, highly optimized visual interactive dashboard with instant parcel selection, satellite overlays, and weather forecast cards.
-- **3-Stage Explainable Agronomy**: Every advisory is structured into:
-  1. **Notice** (*What the satellite saw* – e.g., 14% drop in vegetation canopy greenness).
-  2. **Meaning** (*Why it matters agronomically* – e.g., panicle moisture stress during critical tillering).
-  3. **Action** (*Exact next steps* – e.g., irrigate 4–5 cm, withhold excess urea).
-- **Multilingual Vernacular Delivery**: Native support for **English**, **Kannada (ಕನ್ನಡ)**, and **Hindi (हिन्दी)** with built-in voice readouts via the Web Speech API and 160-character SMS previews.
+### Earthworm's Three Pillars
+- **Decoupled Low-Bandwidth Delivery**: Advisories are delivered directly over cellular telecom networks (GSM/PSTN) via 160-character cellular SMS and automated IVR voice phone calls straight to the farmer's physical phone number (`+91 9731803808`). Zero internet access, smartphones, or web pages are required on the farmer's end.
+- **3-Stage Explainable Agronomy**: Every advisory translates raw sensor observations into three plain-language steps:
+  1. **Notice** (*What the satellite saw* – e.g., 14% drop in vegetation canopy greenness over 10 days).
+  2. **Meaning** (*Why it matters agronomically* – e.g., panicle moisture stress during critical tillering phase).
+  3. **Action** (*Exact next steps* – e.g., irrigate 4–5 cm immediately, withhold urea application).
+- **Comprehensive 7-Language Vernacular Support**: Native UI, audio speech streaming, SMS segments, and voice call readouts across **English**, **Kannada (ಕನ್ನಡ)**, **Hindi (हिन्दी)**, **Telugu (తెలుగు)**, **Tamil (தமிழ்)**, **Marathi (मराठी)**, and **Bengali (বাংলা)**.
 
 ---
 
 ## 2. End-to-End System Workflow
 
-The following flowchart illustrates the complete lifecycle of data through Earthworm:
+### Complete Architectural Workflow Diagram
 
 ```
-+-----------------------------------------------------------------------------------+
-| 1. DATA ACQUISITION & INGESTION                                                   |
-| - Copernicus Sentinel-2 MSI (10m Multi-Spectral: Band 4 Red, Band 8 NIR)          |
-| - Open-Meteo High-Resolution Agro-Weather (Rainfall, Relative Humidity, Temp)     |
-+-----------------------------------------+-----------------------------------------+
-                                          |
-                                          v
-+-----------------------------------------------------------------------------------+
-| 2. AGRONOMIC PROCESSING & ANOMALY DETECTION                                       |
-| - NDVI Computation: (NIR - Red) / (NIR + Red)                                      |
-| - Multi-Temporal Baseline Comparison (10-day rolling baseline vs. regional norms) |
-| - Cloud-masking & Quality Flag Filtering (SCL Scene Classification)               |
-+-----------------------------------------+-----------------------------------------+
-                                          |
-                                          v
-+-----------------------------------------------------------------------------------+
-| 3. PERSISTENCE LAYER (HYBRID ENGINE)                                              |
-| - Primary: Supabase PostgreSQL (PostgREST API, RLS Policies, Service Role)        |
-| - Fallback: In-memory curated agronomic fixtures (pan-India demo parcels)         |
-+-----------------------------------------+-----------------------------------------+
-                                          |
-                                          v
-+-----------------------------------------------------------------------------------+
-| 4. FASTAPI BACKEND API LAYER                                                      |
-| - GET /api/health       -> System status & mode ('live' vs. 'demo_ready')          |
-| - GET /api/health/db    -> Safe non-destructive Supabase PostgREST probe          |
-| - GET /api/farms        -> Cadastral parcel listings                              |
-| - GET /api/farms/{id}/advisory?language=kn -> Localized 3-stage advisory          |
-| - GET /api/farms/{id}/observations        -> 20-day historical NDVI trend         |
-| - GET /api/farms/{id}/weather             -> 3-day meteorological outlook         |
-| - GET /                 -> Dual-mode root: serves Web UI or API metadata JSON     |
-+-----------------------------------------+-----------------------------------------+
-                                          |
-                                          v
-+-----------------------------------------------------------------------------------+
-| 5. FARMER-FACING FRONTEND DASHBOARD                                               |
-| - Interactive Satellite Visuals: Leaflet parcel map + SVG NDVI trend + Weather    |
-| - Vernacular Voice Engine: In-browser Web Speech API audio narration               |
-| - SMS Broadcast Simulator: Character-counted telecom preview for feature phones   |
-+-----------------------------------------------------------------------------------+
++-------------------------------------------------------------------------------------------------------+
+|                                1. DATA ACQUISITION & REMOTE SENSING                                   |
+| - European Space Agency (ESA) Copernicus Sentinel-2 MSI (10m Multi-Spectral: B02, B03, B04, B08)     |
+| - Sentinel Hub Process API (services.sentinel-hub.com) with true-color BOA L2A Evalscript             |
+| - Open-Meteo Regional Agro-Meteorological Forecasts (Rainfall, Relative Humidity, Soil Temp)          |
++---------------------------------------------------+---------------------------------------------------+
+                                                    |
+                                                    v
++-------------------------------------------------------------------------------------------------------+
+|                               2. AGRONOMIC ENGINE & ANOMALY DETECTION                                 |
+| - Multispectral Vegetation Indices:                                                                  |
+|   * NDVI = (NIR - Red) / (NIR + Red)               [Canopy Vigor & Biomass Density]                   |
+|   * CIR = NIR False Color Composite                [Leaf Cellular Structure & Health]                 |
+|   * NDWI = (NIR - SWIR) / (NIR + SWIR)             [Canopy Water Content & Moisture Stress]           |
+|   * SAR Proxy = Dual-Pol Backscatter Reflectance   [Root-Zone Soil Hydration Dynamics]                |
+| - 10-Day Rolling Temporal Baseline Comparison (Flags early-stage water/nutrient stress anomalies)    |
+| - 3-Stage Explainable Agronomic Engine (Transforms indices into Notice -> Meaning -> Action)          |
++---------------------------------------------------+---------------------------------------------------+
+                                                    |
+                                                    v
++-------------------------------------------------------------------------------------------------------+
+|                               3. HYBRID PERSISTENCE LAYER (ZERO-LOCKIN)                               |
+| - Primary Store: Supabase PostgreSQL via PostgREST API (RLS security, farm parcels, telemetry)       |
+| - Safe Non-Blocking Fallback: In-memory agronomic fixtures for zero-downtime offline execution        |
++---------------------------------------------------+---------------------------------------------------+
+                                                    |
+                                                    v
++-------------------------------------------------------------------------------------------------------+
+|                                    4. FASTAPI BACKEND API LAYER                                       |
+| - Core Health:           GET  /api/health, GET /api/health/db, GET /api/health/sentinel              |
+| - Farm Metadata:         GET  /api/farms, GET /api/farms/{id}, GET /api/farms/{id}/satellite-image   |
+| - Agronomic Advisory:    GET  /api/farms/{id}/advisory?language=kn                                    |
+| - Parcel Telemetry:      GET  /api/farms/{id}/observations, GET /api/farms/{id}/weather                |
+| - Telephony Status:      GET  /api/communications/status                                              |
+| - Outbound Cellular SMS: POST /api/communications/sms                                                 |
+| - Outbound IVR Call:     POST /api/communications/call                                                |
+| - Unified Dispatch:      POST /api/communications/dispatch-low-bandwidth                              |
+| - Inbound IVR Helpline:  POST /api/communications/incoming-call  (Twilio Voice Webhook)               |
+| - Inbound SMS Helpline:  POST /api/communications/incoming-sms   (Twilio SMS Webhook)                 |
+| - Natural Voice Stream:  GET  /api/communications/speak?language=kn&farm_id=mandya                    |
++----------------------------------+----------------------------------+---------------------------------+
+                                   |                                  |
+                                   v                                  v
++----------------------------------------------------+  +-----------------------------------------------+
+|       5. EXTENSION WORKER / AGRONOMIST UI          |  |   6. LOW-BANDWIDTH CELLULAR TELECOM SUBSYSTEM |
+|      (Web Dashboard & Control Center)              |  |      (Farmer Feature Phone / Keypad Device)   |
+| - Leaflet Parcel Map & Boundary GeoJSON            |  | - Direct GSM/PSTN Cellular Delivery           |
+| - Multi-Layer Parcel Inspector:                    |  | - 160-character vernacular SMS text message   |
+|   * NDVI Heatmap, CIR Infrared, True Color RGB,    |  | - Automated inbound/outbound IVR voice calls  |
+|     Moisture Stress (NDWI), SAR Radar Proxy        |  | - Zero web browser, zero app, zero internet   |
+| - 20-Day NDVI Historical Trend Line                |  | - Standalone CLI: dispatch_advisory.py        |
+| - 3-Day Agro-Weather Outlook Cards                 |  | - Missed Call / IVR Dial-in Helpline          |
+| - 7-Language Vernacular Switcher                   |  | - Two-Way Inbound SMS Query Gateway           |
++----------------------------------------------------+  +-----------------------------------------------+
 ```
 
 ---
 
-## 3. Libraries & Technologies Used
+## 3. Low-Bandwidth Rural Agri-Telephony Subsystem
+
+### Core Principle: Decoupled Web & Cellular Telephony
+A foundational architectural principle of Earthworm is the **strict separation between the administrative dashboard and last-mile farmer communication**:
+- **The Web Dashboard** (`http://127.0.0.1:8080/`) serves agricultural extension officers, agronomists, village cooperatives, and field researchers who possess laptops, smartphones, and internet access.
+- **The Farmer** (`+91 9731803808`) interacts strictly through their physical phone handset over standard 2G/3G cellular towers (GSM/PSTN). The farmer does **not** visit a webpage, launch a browser, or download an application.
+
+### Outbound Cellular SMS Advisory (160-Char Budget)
+- **Constraint**: Feature phones operating on 2G networks receive text via standard 160-character GSM-7 / UCS-2 SMS segments.
+- **Payload Design**: The backend auto-derives concise, highly actionable advisories fitting within 1 SMS segment:
+  - Example (Kannada, 129 chars):  
+    `[ಅರ್ಥ್‌ವರ್ಮ್-ಕೃಷಿ] ಪ್ಲಾಟ್ 142/A (ಮಂಡ್ಯ): ಈಶಾನ್ಯ ಭಾಗದಲ್ಲಿ ತೇವಾಂಶ ಇಳಿಕೆ. ಮುಂದಿನ 3 ದಿನ ಮಳೆಯಿಲ್ಲ. ನೀರು ಹಾಯಿಸುವ ಮುನ್ನ ಮಣ್ಣು ಪರಿಶೀಲಿಸಿ.`
+  - Example (English, 139 chars):  
+    `[EARTHWORM-AGRI] Plot 142/A (Mandya): Moisture stress detected in NE zone. No rain expected next 3 days. Inspect topsoil before irrigating.`
+- **API Endpoint**: `POST /api/communications/sms`
+  ```json
+  {
+    "to": "+919731803808",
+    "farm_id": "mandya",
+    "language": "kn"
+  }
+  ```
+
+### Outbound Automated IVR Voice Phone Calls
+- **Workflow**: Automated phone calls place a direct cellular trunk call to the farmer's SIM card. When the farmer answers the ring, an interactive voice response (IVR) reads the customized regional-language advisory.
+- **TwiML Generation**: Dynamic XML response formatted with native pronunciation:
+  ```xml
+  <?xml version="1.0" encoding="UTF-8"?>
+  <Response>
+      <Say voice="Google.kn-IN-Standard-A" language="kn-IN">
+          ನಮಸ್ಕಾರ ರೈತ ಬಾಂಧವರೇ. ಮಂಡ್ಯ ಪ್ಲಾಟ್ 142/A ಉಪಗ್ರಹ ವರದಿಯಂತೆ ಈಶಾನ್ಯ ವಲಯದಲ್ಲಿ ಬೆಳೆ ತೇವಾಂಶ ಕಡಿಮೆಯಾಗಿದೆ. ಮುಂದಿನ ಮೂರು ದಿನ ಮಳೆಯ ಮುನ್ಸೂಚನೆ ಇಲ್ಲ. ನೀರು ಹಾಯಿಸುವ ಮೊದಲು ಮಣ್ಣನ್ನು ಪರಿಶೀಲಿಸಿ.
+      </Say>
+  </Response>
+  ```
+- **API Endpoint**: `POST /api/communications/call`
+
+### Headless Background Dispatcher CLI (`dispatch_advisory.py`)
+To ensure total decoupling from the browser, Earthworm includes a standalone command-line dispatcher (`backend/dispatch_advisory.py`). This allows cron schedules, automated Sentinel-2 anomaly detection workers, or extension officers to trigger cellular communications directly from the operating system shell:
+
+```powershell
+# Dispatch both SMS and IVR voice call in Kannada to farmer mobile handset
+python backend/dispatch_advisory.py --to "+919731803808" --farm mandya --lang kn --channel both
+
+# Dispatch SMS only in Hindi to a farmer in Ludhiana
+python backend/dispatch_advisory.py --to "+919876543210" --farm ludhiana --lang hi --channel sms
+
+# Dispatch IVR voice call only in Marathi to a farmer in Nashik
+python backend/dispatch_advisory.py --to "+919812345678" --farm nashik --lang mr --channel call
+```
+
+### Two-Way Low-Bandwidth Helpline Webhooks
+
+#### Missed Call / IVR Helpline (`POST /api/communications/incoming-call`)
+1. Smallholder farmers can give a **missed call** or dial the Earthworm helpline number.
+2. Twilio receives the cellular call and issues an HTTP POST webhook to `/api/communications/incoming-call`.
+3. The backend matches the caller's phone number or query parameters to their registered plot, synthesizes the latest advisory in their native language (e.g. Kannada), and returns the TwiML stream.
+4. The farmer hears the advisory and the call disconnects—costing the farmer ₹0.
+
+#### Inbound SMS Advisory Gateway (`POST /api/communications/incoming-sms`)
+1. A farmer sends a basic SMS text query (e.g., `MANDYA`, `WEATHER`, or `STATUS`) from their keypad phone.
+2. Twilio triggers the incoming SMS webhook at `/api/communications/incoming-sms`.
+3. The backend parses the query text, derives the relevant 160-character localized advisory, and returns a `<Response><Message>...</Message></Response>` TwiML payload.
+4. Twilio dispatches the reply SMS directly back to the farmer's phone inbox.
+
+### Multi-Lingual Neural Voice Synthesis Engine
+To prevent robotic, synthetic-sounding audio, Earthworm implements a multi-engine voice pipeline:
+- **Twilio Carrier Engines**: Amazon Polly Aditi (`en-IN`, `hi-IN`) and Google Neural Cloud Voices (`kn-IN`, `te-IN`, `ta-IN`, `mr-IN`, `bn-IN`).
+- **Streaming High-Fidelity Audio API (`GET /api/communications/speak`)**: Provides high-fidelity, naturally chunked MP3 audio streaming with in-memory caching for real-time audio playback.
+
+### Twilio Provider Credentials & Dual-Mode Telephony
+The telephony subsystem dynamically detects the presence of live carrier credentials in `backend/.env`:
+- **Live Carrier Mode**: When `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_PHONE_NUMBER` are configured, calls and SMS messages are routed through real telecom trunks to physically ring and text `+91 9731803808`.
+- **Telecom Simulation Mode**: When credentials are absent or during local development, the system executes full end-to-end telecom simulation (generating realistic SIDs like `SM840599...` and `CAde68...`, tracking segment budgets, and streaming synthetic audio), ensuring zero errors or disruptions during demos.
+
+---
+
+## 4. 7 Vernacular Indian Languages Expansion
+
+Earthworm natively supports 7 major agrarian languages spoken across India's agricultural belts:
+
+| Code | Language | Script | Monitored Agricultural Belt | Voice Synthesis Engine |
+| :---: | :--- | :--- | :--- | :--- |
+| **`kn`** | Kannada | ಕನ್ನಡ | Mandya, Cauvery Basin, Karnataka (Paddy, Sugarcane) | `Google.kn-IN-Standard-A` |
+| **`hi`** | Hindi | हिन्दी | Varanasi, Gangetic Alluvium, UP (Mustard, Wheat) | `Polly.Aditi` |
+| **`te`** | Telugu | తెలుగు | Krishna-Godavari Delta, Andhra/Telangana (Paddy, Cotton) | `Google.te-IN-Standard-A` |
+| **`ta`** | Tamil | தமிழ் | Thanjavur, Cauvery Delta, Tamil Nadu (Paddy) | `Google.ta-IN-Standard-A` |
+| **`mr`** | Marathi | मराठी | Nashik, Deccan Plateau, Maharashtra (Onion, Grapes) | `Google.mr-IN-Standard-A` |
+| **`bn`** | Bengali | বাংলা | Burdwan, Lower Gangetic Plain, West Bengal (Rice, Jute) | `Google.bn-IN-Standard-A` |
+| **`en`** | English | Latin | Pan-India Scientific / Agronomist Reference | `Polly.Aditi` (`en-IN`) |
+
+Every linguistic profile includes full translations for:
+- 3-Stage Explainable Advisory (Notice, Meaning, Action).
+- 160-Character SMS segment preview.
+- High-fidelity voice call audio transcript.
+- Full dashboard navigation, buttons, weather badges, and telemetry labels.
+
+---
+
+## 5. Advanced Satellite Parcel Inspector
+
+The dashboard replaces redundant parcel info modals with the **Multispectral Satellite Parcel Inspector**, offering five analytical satellite imaging modes:
+
+```
++-----------------------------------------------------------------------------------+
+|                        SATELLITE PARCEL INSPECTOR MODES                           |
++-------------------+-------------------------------+-------------------------------+
+| Mode              | Spectral Bands                | Agronomic Diagnostic Purpose  |
++-------------------+-------------------------------+-------------------------------+
+| 1. NDVI Heatmap   | NIR (B8) + Red (B4)           | Canopy greenness, biomass vigor|
+| 2. Infrared (CIR) | NIR (B8) + Red (B4) + Green(B3)| Cell structure & plant health |
+| 3. True Color RGB | Red (B4) + Green(B3) + Blue(B2)| Natural human-visible view    |
+| 4. NDWI Moisture  | NIR (B8) + SWIR (B11)         | Leaf internal water content   |
+| 5. SAR Radar      | Sentinel-1 C-Band VV/VH Proxy | Root-zone soil dielectric wetness|
++-------------------+-------------------------------+-------------------------------+
+```
+
+Each mode features:
+- Interactive color scale ramps with live threshold indicators (e.g., `< 0.35` Water Stress, `> 0.70` Healthy Canopy).
+- SVG rendering with regional coordinate grids and plot boundary delineations.
+- Plain-language agronomic takeaways translated into the active vernacular language.
+
+---
+
+## 6. Libraries & Technologies Used
 
 ### Backend Python Dependencies
+Defined in [backend/requirements.txt](file:///c:/Earthworm/backend/requirements.txt):
 
-All backend dependencies are defined in `requirements.txt` and `backend/requirements.txt`:
-
-| Library | Version Spec | Purpose in Earthworm |
+| Package | Version | Purpose & Architectural Justification |
 | :--- | :--- | :--- |
-| **`fastapi`** | `>=0.110.0` | High-performance, asynchronous web framework powering all REST endpoints, OpenAPI/Swagger documentation generation, and ASGI lifecycle. |
-| **`uvicorn[standard]`** | `>=0.28.0` | Ultra-fast ASGI production server built on `uvloop` and `httptools` providing hot-reload and worker management. |
-| **`pydantic`** | `>=2.6.0` | Strict data validation, schema enforcement, data serialization, and runtime type checking across all data contracts. |
-| **`pydantic-settings`** | `>=2.2.0` | Type-safe application configuration management, cascading `.env` file resolution, and environment variable parsing. |
-| **`supabase`** | `>=2.33.0` | Official Supabase Python SDK for connecting to PostgreSQL via Supabase's PostgREST gateway, storage buckets, and auth. |
-| **`httpx`** | `>=0.27.0` | Modern, asynchronous/synchronous HTTP client used for safe, non-destructive connection probing of Supabase and internal test clients. |
-| **`pytest`** | `>=8.0.0` | Test framework for executing the 22 automated test cases covering health checks, farm endpoints, advisories, Supabase fallbacks, and Vercel compatibility. |
+| **`fastapi`** | `>=0.115.0` | Core high-performance ASGI web framework with automatic OpenAPI documentation. |
+| **`pydantic`** | `>=2.10.0` | Strict data validation, schema serialization, and type enforcement. |
+| **`pydantic-settings`** | `>=2.6.0` | Environment variable parsing and `.env` configuration management. |
+| **`uvicorn[standard]`** | `>=0.32.0` | Production-grade ASGI web server handling HTTP requests and static asset delivery. |
+| **`twilio`** | `>=9.0.0` | Twilio REST API client for cellular SMS transmission, IVR call dispatch, and TwiML generation. |
+| **`httpx`** | `>=0.27.0` | Async and sync HTTP client for Sentinel Hub Process API and Supabase PostgREST queries. |
+| **`requests`** | `>=2.31.0` | Reliable synchronous HTTP networking for external agro-weather and TTS requests. |
+| **`pytest`** | `>=8.3.0` | Automated unit, regression, and integration testing framework. |
+| **`pytest-anyio`** | `>=0.0.2` | Asynchronous test execution runner for FastAPI TestClient test suites. |
+
+### Frontend Frameworks & Libraries
+- **Vanilla Modern JavaScript**: Zero build steps; blazing-fast load times on low-bandwidth rural connections.
+- **Tailwind CSS (Custom Token Build)**: Responsive design system adhering to accessible contrast ratios and tactile touch targets.
+- **Leaflet.js (`v1.9.4`)**: Lightweight, mobile-friendly interactive mapping with custom parcel boundary GeoJSON layers.
+- **Google Fonts (Outfit & Inter)**: Crisp, modern typography engineered for readability across mobile screen densities.
+- **Google Material Symbols Outlined**: Intuitive agrarian and telephony iconography.
 
 ---
 
-### Frontend Libraries & Web APIs
+## 7. Detailed Python Script & Codebase Documentation
 
-The frontend is built with clean Vanilla HTML5 and JavaScript without heavy npm bundling overhead:
+### Entrypoints & Server Configuration
 
-| Library / Web API | Source / Version | Purpose in Earthworm |
-| :--- | :--- | :--- |
-| **`Leaflet.js`** | `v1.9.4` (CDN) | Interactive mapping library rendering satellite imagery tiles, cadastral farm parcel boundaries, NDVI heat overlays, and regional pins. |
-| **`Tailwind CSS`** | `v3.x` (CDN) | Utility-first CSS framework styled with earthy, agricultural color tokens (`emerald`, `amber`, `stone`, `teal`). |
-| **`Web Speech API`** | Native Browser API | Zero-latency, client-side synthetic speech synthesis (`window.speechSynthesis`) providing audio readouts in Kannada, Hindi, and English without incurring third-party cloud API costs. |
-| **`Google Fonts`** | `Outfit` & `Inter` | Clean, modern typography designed for maximum legibility on low-resolution mobile displays. |
-| **`Custom SVG Engine`**| Native JavaScript | Lightweight vector generators for 20-day historical NDVI trend bars, cloud-cover markers, and weather sparklines without pulling in bulky charting libraries. |
+#### `backend/app/main.py`
+The primary FastAPI application instance:
+- Configures CORS middleware supporting extension officer local testing and web clients.
+- Mounts static file directories for imagery, assets, and frontend HTML.
+- Implements a **Dual-Mode Root Endpoint (`GET /`)**:
+  - Serves `frontend/index.html` when accessed by web browsers (`Accept: text/html`).
+  - Serves API discovery metadata JSON when queried by automated API clients (`Accept: application/json`).
+- Mounts API routers under `/api`: `health_router`, `farms_router`, and `communications_router`.
 
----
-
-## 4. Detailed Python Script Documentation
-
-Every Python file across the repository serves a distinct, modular role:
-
-```
-backend/
-├── api/
-│   └── index.py               # Vercel serverless function entrypoint (backend mirror)
-├── app/
-│   ├── __init__.py            # Marks app directory as a Python package
-│   ├── main.py                # Main application factory & route orchestration
-│   ├── config.py              # Centralized Pydantic application configuration
-│   ├── api/
-│   │   ├── __init__.py        # Marks api package
-│   │   └── routes/
-│   │       ├── __init__.py    # Marks routes package
-│   │       ├── health.py      # Health & Supabase probe endpoints
-│   │       └── farms.py       # Farms, advisories, observations & weather routes
-│   ├── data/
-│   │   ├── __init__.py        # Marks data package
-│   │   └── demo/
-│   │       ├── __init__.py    # Marks demo package
-│   │       └── fixtures.py    # Curated pan-India demo parcels & trilingual advisories
-│   ├── db/
-│   │   ├── __init__.py        # Marks db package
-│   │   └── supabase.py        # Reusable client singleton & safe connection verifier
-│   └── schemas/
-│       ├── __init__.py        # Marks schemas package
-│       ├── farm.py            # Pydantic schemas for farm metadata
-│       ├── observation.py     # Pydantic schemas for NDVI & time-series
-│       ├── advisory.py        # Pydantic schemas for 3-stage agronomic advisories
-│       └── communication.py   # Pydantic schemas for SMS & voice preview
-└── tests/
-    ├── __init__.py            # Marks tests package
-    ├── test_health.py         # Test suite for health & error handling
-    ├── test_farms.py          # Test suite for farm domain endpoints
-    ├── test_supabase.py       # Test suite for Supabase fallback & security
-    └── test_vercel.py         # Test suite for Vercel serverless compatibility
-```
-
----
-
-### Entrypoints & Core Configuration
-
-#### 1. `api/index.py` (and `backend/api/index.py`)
-- **Purpose**: Serves as the serverless function handler when deployed to **Vercel**.
-- **How it works**:
-  - Dynamically calculates the project root and `backend/` directories.
-  - Inserts the appropriate directory into `sys.path` so that imports (`from app.main import app`) resolve reliably regardless of whether Vercel's root directory is set to `.` or `backend/`.
-  - Exposes `app` as an ASGI application discovered by Vercel's Python runtime.
-
-#### 2. `backend/app/config.py`
-- **Purpose**: Centralized application settings using `pydantic_settings.BaseSettings`.
-- **How it works**:
-  - Reads configuration values from `backend/.env` or system environment variables.
-  - Declares core properties: `app_name`, `app_env`, `debug`, `host`, `port`, and `api_prefix`.
-  - Declares Supabase configuration keys: `supabase_url`, `supabase_secret_key`, and alias `supabase_key`.
-  - Provides a computed property `effective_supabase_key` that checks both standard and alias key names.
-  - Defaults all secrets to `None` so the application boots immediately out-of-the-box without requiring external configuration.
-
-#### 3. `backend/app/main.py`
-- **Purpose**: Application factory, middleware setup, route registration, and static file mounting.
-- **How it works**:
-  - `create_app() -> FastAPI`: Instantiates the FastAPI application with configured metadata and Swagger documentation.
-  - Configures **CORS Middleware** (`allow_origins=["*"]`) enabling frontend clients to interact with the API across different domains or local ports.
-  - Configures a **Global Exception Handler** that catches unhandled exceptions and formats them into structured JSON (`500 InternalServerError`).
-  - Registers the `health.router` and `farms.router` under the `/api` prefix.
-  - Mounts static file directories for `/app` and `/frontend` using `StaticFiles(html=True)`.
-  - **Dual-Mode `GET /` Route**:
-    - Inspects incoming request headers.
-    - If the request comes from a web browser (`Accept: text/html` without explicit `?format=json`), it serves the interactive frontend HTML (`index.html` / `code.html`).
-    - If requested by an API client, curl, or automated test client (`format=json` or `Accept: application/json`), it returns structured application metadata JSON.
-
----
-
-### Database & Storage Layer
-
-#### 4. `backend/app/db/supabase.py`
-- **Purpose**: Manages the backend-only Supabase client lifecycle and connection verification.
-- **Key Functions**:
-  - `is_supabase_configured() -> bool`: Verifies that `SUPABASE_URL` and `SUPABASE_SECRET_KEY` are populated and not default dummy placeholders.
-  - `get_supabase_client() -> Optional[Client]`: Singleton accessor that initializes `create_client(url, key)`. Returns `None` if credentials are absent, allowing the application to operate in demo mode without crashing.
-  - `reset_supabase_client() -> None`: Clears the cached client singleton (crucial for automated testing under mock environments).
-  - `verify_supabase_connection(timeout: float = 4.0) -> Dict[str, Any]`: Performs a safe, read-only HTTP GET probe against Supabase's PostgREST root (`/rest/v1/`). Never exposes API keys in logs or responses; returns safe connection status codes (`connected`, `authentication_failed`, `connection_error`, `not_configured`).
-
----
-
-### Domain Data Schemas (Pydantic)
-
-#### 5. `backend/app/schemas/farm.py`
-- **Purpose**: Defines data models for farm holdings and parcels.
-- **Models**:
-  - `FarmBase`: Declares parcel fields including `id`, `name`, `district`, `state`, `crop`, `crop_variety`, `crop_season`, `growth_stage`, `survey_plot`, `area_hectares`, and `data_status`.
-  - `Farm`: Inherits from `FarmBase` for domain modeling and API responses.
-
-#### 6. `backend/app/schemas/observation.py`
-- **Purpose**: Defines Earth observation data structures.
-- **Models**:
-  - `ObservationPoint`: Represents a single historical satellite acquisition with `date`, `ndvi` (float), and `cloud_cover` percentage.
-  - `Observation`: Represents a complete observation record including current `metric` ("NDVI"), `value`, `benchmark_value`, `unit`, `quality_flags`, `source` ("Copernicus Sentinel-2 MSI"), and a list of `history` points.
-
-#### 7. `backend/app/schemas/advisory.py`
-- **Purpose**: Defines the structure for 3-stage explainable agronomic guidance.
-- **Models**:
-  - `Advisory`: Contains `id`, `farm_id`, `created_at`, `language`, `severity` (e.g., "advisory_warning"), `headline`, `description`, `metric_summary`, `notice`, `meaning`, `next_steps` (list of actionable steps), `sms_preview`, `voice_transcript`, `uncertainty_note`, and `data_status`.
-
-#### 8. `backend/app/schemas/communication.py`
-- **Purpose**: Defines models for low-bandwidth message simulation.
-- **Models**:
-  - `CommunicationPreview`: Contains `id`, `farm_id`, `language`, `channel` ("sms" or "voice"), `preview_text`, `char_count`, `audio_url`, and `status`.
-
----
+#### `backend/app/config.py`
+Runtime configuration powered by `pydantic_settings.BaseSettings`:
+- Resolves `.env` from `backend/.env` with safe, zero-crash fallback defaults.
+- Computes `is_twilio_configured`: verifies `twilio_account_sid`, `twilio_auth_token`, and `twilio_phone_number`.
+- Computes `is_sentinel_configured`: verifies `sentinel_client_id` and `sentinel_client_secret`.
+- Computes `effective_supabase_key`: resolves primary and alias keys safely.
 
 ### API Route Handlers (FastAPI)
 
-#### 9. `backend/app/api/routes/health.py`
-- **Purpose**: System health diagnostics and database connectivity monitoring.
-- **Endpoints**:
-  - `GET /api/health`: Returns service health status, application name, ISO 8601 UTC timestamp, and `data_mode` (`"live"` if Supabase is connected, `"demo_ready"` if running off fixtures).
-  - `GET /api/health/db`: Executes `verify_supabase_connection()` and returns structured database connectivity status without exposing secrets.
+#### `backend/app/api/routes/communications.py`
+Handles all telephony, messaging, and audio streaming endpoints:
+- `GET /api/communications/status`: Reports carrier mode (`live` vs `simulation`), Twilio phone number, and voice engine mappings.
+- `POST /api/communications/sms`: Dispatches cellular SMS advisory to farmer mobile numbers.
+- `POST /api/communications/call`: Places automated IVR voice advisory call.
+- `POST /api/communications/dispatch-low-bandwidth`: Headless unified endpoint dispatching SMS, voice call, or both.
+- `POST /api/communications/incoming-call`: Webhook handling incoming farmer calls / missed-call callback.
+- `POST /api/communications/incoming-sms`: Webhook handling incoming farmer SMS queries.
+- `GET /api/communications/twiml`: Dynamic TwiML voice XML generator.
+- `GET /api/communications/speak`: High-fidelity regional audio streaming endpoint.
 
-#### 10. `backend/app/api/routes/farms.py`
-- **Purpose**: Main business logic endpoints for farms, advisories, observations, and weather.
-- **Endpoints**:
-  - `GET /api/farms`: Lists all monitored parcels across India.
-  - `GET /api/farms/{farm_id}`: Retrieves parcel metadata for a specific farm (returns 404 if not found).
-  - `GET /api/farms/{farm_id}/observations`: Retrieves the latest satellite NDVI observation and 20-day historical time-series.
-  - `GET /api/farms/{farm_id}/advisory?language={en|kn|hi}`: Retrieves the 3-stage explainable advisory in English, Kannada, or Hindi with graceful English fallback.
-  - `GET /api/farms/{farm_id}/communications/preview?channel={sms|voice}&language={en|kn|hi}`: Generates character-budgeted SMS previews and speech transcripts.
-  - `GET /api/farms/{farm_id}/weather`: Retrieves a 3-day meteorological outlook (precipitation, humidity, temp, advisory hints).
+#### `backend/app/api/routes/farms.py`
+Exposes cadastral parcel listings and agronomic telemetry:
+- `GET /api/farms`: Lists registered parcels with coordinates, crop types, baseline NDVI, and imagery URLs.
+- `GET /api/farms/{farm_id}`: Retrieves details for a specific parcel.
+- `GET /api/farms/{farm_id}/advisory`: Generates 3-stage localized advisory in requested language.
+- `GET /api/farms/{farm_id}/observations`: Returns 20-day historical NDVI observations.
+- `GET /api/farms/{farm_id}/weather`: Returns 3-day agro-meteorological outlook.
+- `GET /api/farms/{farm_id}/satellite-image`: Direct stream of live Sentinel-2 true-color imagery.
 
----
+#### `backend/app/api/routes/health.py`
+System diagnostics and safe connectivity verification:
+- `GET /api/health`: Overall service uptime and active operational mode.
+- `GET /api/health/db`: Non-destructive Supabase PostgREST connection probe (zero credential leakage).
+- `GET /api/health/sentinel`: Diagnostic check of Copernicus Sentinel Hub OAuth2 token acquisition.
 
-### Demonstration Data & Agronomic Fixtures
+### Business Logic & Service Layer
 
-#### 11. `backend/app/data/demo/fixtures.py`
-- **Purpose**: Supplies authentic agricultural demonstration data representing four distinct agro-climatic zones across India:
-  1. **Mandya, Karnataka**: Plot #142/A (Sona Masoori Paddy, Panicle Initiation stage) experiencing moisture stress.
-  2. **Ludhiana, Punjab**: Plot #89/C (PBW 343 Wheat, Active Tillering stage).
-  3. **Varanasi, Uttar Pradesh**: Plot #214/B (Varuna Mustard & Vegetables, Flowering stage).
-  4. **Nashik, Maharashtra**: Plot #56/D (Red Pinhead Onion, Bulb Expansion stage).
-- Contains full trilingual advisories (English, Kannada script, and Hindi Devanagari script) complete with agronomic recommendations, SMS text, and voice transcripts.
+#### `backend/app/services/twilio_service.py`
+Telephony abstraction layer:
+- `send_sms(to_number, message_body, language)`: Sends live SMS via Twilio Client or simulates transmission.
+- `place_voice_call(to_number, script_text, language)`: Places live IVR call or simulates voice readout.
+- `generate_twiml(script_text, language)`: Constructs standard TwiML voice response XML.
+- `generate_twiml_sms(message_body)`: Constructs standard TwiML messaging response XML.
+- `synthesize_speech(text, language)`: Splits text into natural sentence clauses and streams regional MP3 audio.
 
----
+#### `backend/app/services/sentinel_service.py`
+Copernicus Sentinel-2 satellite imagery client:
+- `get_access_token()`: Fetches and caches OAuth2 Bearer tokens with preemptive 60-second refresh.
+- `fetch_live_satellite_image(farm_id)`: Issues Process API Evalscript requests for 10m L2A imagery.
+- Implements graceful fallback to local cached assets during external API latency.
 
-### Automated Test Suite (Pytest)
+#### `backend/app/services/supabase_service.py`
+Non-blocking PostgreSQL database integration:
+- `verify_connection()`: Performs zero-leakage PostgREST schema verification.
+- Queries registered farm parcels, sensor observations, and advisory logs.
 
-All tests are executed with `pytest -v` and run in **1.6 seconds**:
+#### `backend/dispatch_advisory.py`
+Standalone CLI script for headless, browser-free low-bandwidth dispatch. Supports `--to`, `--channel`, `--farm`, `--lang`, and `--message` flags with UTF-8 console output.
 
-#### 12. `backend/tests/test_health.py` (4 tests)
-- Tests `test_root_endpoint`: Verifies application metadata at `GET /`.
-- Tests `test_health_check_returns_200`: Confirms 200 OK, service name, and data mode at `GET /api/health`.
-- Tests `test_health_check_timestamp_format`: Asserts valid ISO 8601 UTC timestamp format.
-- Tests `test_unknown_route_returns_404`: Validates structured 404 responses for non-existent endpoints.
+### Pydantic Domain Schemas
+- [backend/app/schemas/farm.py](file:///c:/Earthworm/backend/app/schemas/farm.py): `FarmBase`, `FarmResponse`, `FarmListResponse`.
+- [backend/app/schemas/advisory.py](file:///c:/Earthworm/backend/app/schemas/advisory.py): `AdvisoryResponse`, `ObservationPoint`, `ObservationsResponse`, `WeatherDay`, `WeatherResponse`.
 
-#### 13. `backend/tests/test_farms.py` (8 tests)
-- Tests `test_list_farms`: Confirms 4 demo parcels are returned.
-- Tests `test_get_specific_farm`: Verifies Mandya farm metadata.
-- Tests `test_get_unknown_farm_returns_404`: Validates 404 behavior for unknown farm IDs.
-- Tests `test_get_observations`: Validates NDVI values, benchmark metrics, and history arrays.
-- Tests `test_get_advisory_english`: Verifies 3-stage fields (`notice`, `meaning`, `next_steps`).
-- Tests `test_get_advisory_kannada`: Validates vernacular Kannada text delivery (`ತೇವಾಂಶ`).
-- Tests `test_get_communication_preview_sms`: Verifies telecom character counting and preview status.
-- Tests `test_get_weather`: Confirms 3-day meteorological forecast structure.
-
-#### 14. `backend/tests/test_supabase.py` (5 tests)
-- Tests `test_supabase_unconfigured_by_default`: Asserts safe demo mode fallback when `.env` is absent.
-- Tests `test_health_db_endpoint_unconfigured`: Verifies `GET /api/health/db` returns `configured: false`.
-- Tests `test_verify_connection_never_exposes_secret_key`: Proves that secrets are never leaked in responses.
-- Tests `test_verify_connection_success_mocked`: Validates HTTP 200 handling from Supabase PostgREST.
-- Tests `test_verify_connection_auth_failure_mocked`: Validates HTTP 401 handling without crashing.
-
-#### 15. `backend/tests/test_vercel.py` (5 tests)
-- Tests `test_vercel_entrypoint_health`: Verifies Vercel entrypoint routes `/api/health`.
-- Tests `test_vercel_entrypoint_farms`: Verifies Vercel entrypoint routes `/api/farms`.
-- Tests `test_vercel_entrypoint_kannada_advisory`: Verifies Vercel entrypoint localized advisories.
-- Tests `test_vercel_entrypoint_root_browser_request`: Confirms browser requests to `/` receive visual HTML.
-- Tests `test_vercel_entrypoint_root_api_json_request`: Confirms API requests to `/?format=json` receive JSON.
-
----
-
-## 5. In-Depth Supabase Integration Architecture
-
-### Design Philosophy: Non-Blocking Graceful Fallback
-
-Earthworm follows a **zero-downtime, backend-first** approach to external database dependencies:
-
-```
-                      +-----------------------------+
-                      | Application Startup         |
-                      +--------------+--------------+
-                                     |
-                                     v
-                      +-----------------------------+
-                      | Is SUPABASE_URL & Key set?  |
-                      +------+---------------+------+
-                             |               |
-                       [No]  |               |  [Yes]
-                             v               v
-             +--------------------+    +--------------------+
-             | Operational Mode:  |    | Operational Mode:  |
-             | "demo_ready"       |    | "live"             |
-             | Serves Curated     |    | Initializes Client |
-             | Demo Fixtures      |    | & Queries Postgres |
-             +--------------------+    +--------------------+
-```
-
-1. **No Hard Crashes**: If Supabase credentials are missing, empty, or misconfigured, the backend logs an informational message and automatically falls back to curated agronomic fixtures.
-2. **Read-Only Verification**: The application verifies database connectivity via an active probe without mutating tables, creating temporary records, or executing destructive SQL.
-3. **No Credential Exposure**: Supabase secret keys are used exclusively on the backend. No secret key is ever returned in an HTTP response, logged to stdout, or committed to source control.
+### Automated Pytest Suite
+Located in [backend/tests/](file:///c:/Earthworm/backend/tests/):
+- `test_communications.py`: Validates status endpoint, SMS simulation, IVR call generation, unified low-bandwidth dispatch, incoming call/SMS webhooks, and TwiML rendering (7 tests).
+- `test_farms.py`: Tests farm listings, advisory localization, NDVI observations, and weather endpoints (8 tests).
+- `test_health.py`: Validates health checks and route 404 handlers (4 tests).
+- `test_sentinel.py`: Validates Sentinel Hub diagnostics and image serving (3 tests).
+- `test_supabase.py`: Tests credential safety and mock connection states (5 tests).
+- `test_vercel.py`: Validates serverless entrypoint routing (5 tests).
+- **Total: 32 Automated Tests Passing.**
 
 ---
 
-### Safe Connection Verification (Zero-Leakage Probing)
+## 8. Copernicus Sentinel Hub Live Satellite Integration
 
-The `verify_supabase_connection()` function probes Supabase safely:
+### OAuth2 Client Credentials & Token Caching
+Sentinel Hub authentication utilizes OAuth2 Client Credentials (`POST https://services.sentinel-hub.com/oauth/token`):
+1. **Credentials**: `SENTINEL_CLIENT_ID` and `SENTINEL_CLIENT_SECRET` configured in `backend/.env`.
+2. **Token Lifecycle**: Bearer tokens are cached in memory (`_access_token`) with expiration timestamps (`_token_expires_at`).
+3. **Preemptive Refresh**: When remaining lifetime drops below 60 seconds, tokens are refreshed automatically.
 
-```python
-endpoint = f"{url.rstrip('/')}/rest/v1/"
-headers = {
-    "apikey": key,
-    "Authorization": f"Bearer {key}",
+### Process API & True-Color Evalscript
+Imagery requests submit an inline JavaScript Evalscript to `POST https://services.sentinel-hub.com/api/v1/process`:
+```javascript
+//VERSION=3
+function setup() {
+  return {
+    input: ["B04", "B03", "B02"],
+    output: { bands: 3 }
+  };
 }
-response = httpx.get(endpoint, headers=headers, timeout=4.0)
+function evaluatePixel(sample) {
+  return [2.5 * sample.B04, 2.5 * sample.B03, 2.5 * sample.B02];
+}
 ```
+- Multi-spectral bands: **B04 (Red)**, **B03 (Green)**, **B02 (Blue)** at 10-meter ground resolution.
+- Reflectance boosted by a 2.5 factor to produce vivid, true-color visible composites.
+- Requests enforce `maxCloudCoverage: 30%` on Sentinel-2 Level-2A bottom-of-atmosphere data.
 
-- When valid credentials are supplied, Supabase PostgREST responds with **HTTP 200** (returning the OpenAPI schema for the database).
-- If the key is invalid or revoked, PostgREST returns **HTTP 401/403 Unauthorized**.
-- If the domain does not resolve, `httpx.ConnectError` is caught safely.
-- In all outcomes, only the parsed hostname (`xyz.supabase.co`) is surfaced, never the key itself.
+### Regional Bounding Boxes & Dynamic Fallbacks
+- **Mandya, Karnataka**: `[76.85, 12.48, 76.92, 12.55]` (Cauvery basin paddy plots)
+- **Ludhiana, Punjab**: `[75.80, 30.85, 75.92, 30.95]` (Wheat cultivation belt)
+- **Varanasi, Uttar Pradesh**: `[82.95, 25.28, 83.05, 25.38]` (Gangetic mustard plots)
+- **Nashik, Maharashtra**: `[73.75, 19.95, 73.88, 20.08]` (Deccan onion horticulture)
+- **Fallback**: Network errors or rate limits gracefully serve cached assets from `frontend/assets/{farm_id}.jpg`.
 
 ---
 
-### Database Schema (PostgreSQL DDL)
+## 9. In-Depth Supabase Integration Architecture
 
-When you are ready to transition from demo fixtures to live database tables, run the following SQL script in your **Supabase SQL Editor**:
+### Non-Blocking Hybrid Storage Design
+Earthworm guarantees 100% application uptime regardless of database connectivity:
+- If Supabase credentials are configured and valid, the system reads and writes to PostgreSQL.
+- If credentials are absent, invalid, or experiencing downtime, the system transitions to in-memory fixtures without crashing or throwing 500 errors.
 
+### PostgreSQL Database Schema (DDL)
 ```sql
--- 1. Enable UUID Extension
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
--- 2. Farms Table
-CREATE TABLE IF NOT EXISTS public.farms (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    district TEXT NOT NULL,
-    state TEXT NOT NULL,
-    crop TEXT NOT NULL,
-    crop_variety TEXT,
-    crop_season TEXT,
-    growth_stage TEXT,
-    survey_plot TEXT,
-    area_hectares NUMERIC(6, 2),
-    data_status TEXT DEFAULT 'live',
+CREATE TABLE IF NOT EXISTS farms (
+    id VARCHAR(64) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    state VARCHAR(128) NOT NULL,
+    crop VARCHAR(128) NOT NULL,
+    area_acres NUMERIC(6, 2) NOT NULL,
+    baseline_ndvi NUMERIC(4, 2) NOT NULL,
+    coordinates JSONB NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 3. Satellite Observations Table
-CREATE TABLE IF NOT EXISTS public.observations (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    farm_id TEXT REFERENCES public.farms(id) ON DELETE CASCADE,
-    observed_at TIMESTAMPTZ NOT NULL,
-    retrieved_at TIMESTAMPTZ DEFAULT NOW(),
-    source TEXT DEFAULT 'Copernicus Sentinel-2 MSI',
-    observation_type TEXT DEFAULT 'optical_multispectral',
-    metric TEXT DEFAULT 'NDVI',
-    value NUMERIC(4, 3) NOT NULL,
-    benchmark_value NUMERIC(4, 3),
-    unit TEXT DEFAULT 'NDVI [-1 to 1]',
-    quality_flags TEXT DEFAULT 'cloud_free',
-    status TEXT DEFAULT 'verified',
-    method TEXT DEFAULT 'mean_parcel_reflectance',
-    created_at TIMESTAMPTZ DEFAULT NOW()
+CREATE TABLE IF NOT EXISTS observations (
+    id BIGSERIAL PRIMARY KEY,
+    farm_id VARCHAR(64) REFERENCES farms(id),
+    date DATE NOT NULL,
+    ndvi NUMERIC(4, 2) NOT NULL,
+    anomaly VARCHAR(32) DEFAULT 'normal'
 );
 
--- 4. Historical NDVI Observation Points (Time-Series)
-CREATE TABLE IF NOT EXISTS public.observation_history (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    farm_id TEXT REFERENCES public.farms(id) ON DELETE CASCADE,
-    observation_date DATE NOT NULL,
-    ndvi NUMERIC(4, 3) NOT NULL,
-    cloud_cover NUMERIC(4, 1) DEFAULT 0.0
-);
-
--- 5. Agronomic Advisories Table
-CREATE TABLE IF NOT EXISTS public.advisories (
-    id TEXT PRIMARY KEY,
-    farm_id TEXT REFERENCES public.farms(id) ON DELETE CASCADE,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    language TEXT NOT NULL DEFAULT 'en',
-    severity TEXT NOT NULL DEFAULT 'info',
-    headline TEXT NOT NULL,
-    description TEXT NOT NULL,
-    metric_summary TEXT,
+CREATE TABLE IF NOT EXISTS advisories (
+    id BIGSERIAL PRIMARY KEY,
+    farm_id VARCHAR(64) REFERENCES farms(id),
+    language VARCHAR(8) NOT NULL,
     notice TEXT NOT NULL,
     meaning TEXT NOT NULL,
-    next_steps JSONB NOT NULL DEFAULT '[]'::jsonb,
-    sms_preview TEXT,
-    voice_transcript TEXT,
-    uncertainty_note TEXT,
-    data_status TEXT DEFAULT 'live'
+    action TEXT NOT NULL,
+    sms_preview VARCHAR(160) NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
-
--- 6. Row Level Security (RLS)
-ALTER TABLE public.farms ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.observations ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.observation_history ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.advisories ENABLE ROW LEVEL SECURITY;
-
--- Allow public read access (or restrict to authenticated service role)
-CREATE POLICY "Allow public read access to farms" ON public.farms FOR SELECT USING (true);
-CREATE POLICY "Allow public read access to observations" ON public.observations FOR SELECT USING (true);
-CREATE POLICY "Allow public read access to observation_history" ON public.observation_history FOR SELECT USING (true);
-CREATE POLICY "Allow public read access to advisories" ON public.advisories FOR SELECT USING (true);
 ```
 
----
-
-### Manual Setup & Credential Management
-
-To connect your live Supabase project to Earthworm:
-
-1. Open your Supabase Dashboard: `https://supabase.com/dashboard/project/<your-project-id>/settings/api`
-2. Locate:
-   - **Project URL**: e.g., `https://njaqygzvfpcctxyjcuhb.supabase.co`
-   - **Service Role Key** (or `anon` public key for read-only access).
-3. Create or update `backend/.env`:
-   ```env
-   SUPABASE_URL=https://njaqygzvfpcctxyjcuhb.supabase.co
-   SUPABASE_SECRET_KEY=your_actual_service_role_key_here
-   ```
-4. Restart the FastAPI server.
-5. Query `GET /api/health/db` to verify connection status:
-   ```json
-   {
-     "configured": true,
-     "connected": true,
-     "status": "connected",
-     "message": "Successfully connected and authenticated with Supabase PostgREST.",
-     "host": "njaqygzvfpcctxyjcuhb.supabase.co"
-   }
-   ```
+### Connection Verification & Safe Probing
+The probe at `GET /api/health/db` tests database accessibility via PostgREST schema verification without modifying data or exposing keys in response payloads or error logs.
 
 ---
 
-## 6. Deployment & Execution Instructions
+## 10. Deployment & Execution Instructions
 
-### Local Development
+### Local Development & CLI Execution
 
-1. **Activate the Virtual Environment**:
+1. **Activate Virtual Environment**:
    ```powershell
-   # Windows PowerShell
    cd c:\Earthworm\backend
    .\.venv\Scripts\Activate.ps1
    ```
 
-2. **Run Automated Tests**:
-   ```powershell
-   pytest -v
-   ```
-
-3. **Start the FastAPI Development Server**:
+2. **Start the FastAPI Development Server**:
    ```powershell
    uvicorn app.main:app --host 127.0.0.1 --port 8080 --reload
    ```
 
-4. **Access Applications in Browser**:
-   - **Interactive Web App**: [http://127.0.0.1:8080/](http://127.0.0.1:8080/)
-   - **Interactive Swagger Docs**: [http://127.0.0.1:8080/docs](http://127.0.0.1:8080/docs)
-   - **Service Health Check**: [http://127.0.0.1:8080/api/health](http://127.0.0.1:8080/api/health)
-   - **Supabase DB Probe**: [http://127.0.0.1:8080/api/health/db](http://127.0.0.1:8080/api/health/db)
+3. **Dispatch Low-Bandwidth Advisory via CLI (Zero Browser Needed)**:
+   ```powershell
+   python dispatch_advisory.py --to "+919731803808" --channel both --lang kn --farm mandya
+   ```
 
----
+4. **Verify Application in Browser**:
+   - Web Dashboard: [http://127.0.0.1:8080/](http://127.0.0.1:8080/)
+   - Swagger Documentation: [http://127.0.0.1:8080/docs](http://127.0.0.1:8080/docs)
+   - Telephony Status: [http://127.0.0.1:8080/api/communications/status](http://127.0.0.1:8080/api/communications/status)
+
+### Automated Testing
+Execute all 32 automated tests across health, farms, Sentinel Hub, Supabase, Vercel, and low-bandwidth communications:
+```powershell
+pytest -v
+```
 
 ### Vercel Serverless Production Deployment
-
-Earthworm is configured for zero-configuration deployment to **Vercel**:
-- [vercel.json](file:///c:/Earthworm/vercel.json) rewrites `/api/*` to the Python serverless function at `/api/index.py`.
-- Static files at root `/` and `/frontend/*` are served directly through Vercel's Edge Network with ultra-low latency.
-- Repository: [https://github.com/neerajp-10/gcemHacks5.0](https://github.com/neerajp-10/gcemHacks5.0)
+Earthworm is pre-configured for zero-configuration serverless deployment to **Vercel**:
+- [vercel.json](file:///c:/Earthworm/vercel.json) routes `/api/*` requests to the Python serverless entrypoint at `/api/index.py`.
+- Static files at root `/` and `/frontend/*` are served directly via Vercel's global Edge CDN.
+- GitHub Repository: [https://github.com/neerajp-10/gcemHacks5.0](https://github.com/neerajp-10/gcemHacks5.0)

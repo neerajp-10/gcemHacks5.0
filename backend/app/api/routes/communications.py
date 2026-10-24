@@ -83,6 +83,120 @@ def get_twiml_endpoint(
     return Response(content=xml_content, media_type="application/xml")
 
 
+@router.post("/incoming-call", summary="Twilio Inbound IVR Voice Helpline / Missed Call Callback")
+def incoming_voice_call_webhook(
+    From: Optional[str] = Query(default=None, description="Caller phone number"),
+    farm_id: Optional[str] = Query(default="mandya", description="Default farm ID"),
+    language: Optional[str] = Query(default="kn", description="Default language"),
+):
+    """Twilio webhook handler for inbound farmer calls.
+    
+    Allows smallholder farmers with basic feature phones to dial the helpline
+    and receive an instant automated audio advisory in their native language,
+    without requiring a smartphone, mobile app, or web browser.
+    """
+    target_farm = farm_id or "mandya"
+    target_lang = language or "kn"
+    adv = get_farm_advisory(farm_id=target_farm, language=target_lang)
+    script_text = adv.voice_transcript or adv.description
+
+    voice_xml = twilio_service.generate_twiml(script_text, target_lang)
+    return Response(content=voice_xml, media_type="application/xml")
+
+
+@router.post("/incoming-sms", summary="Twilio Inbound SMS Advisory Helpline")
+def incoming_sms_webhook(
+    From: Optional[str] = Query(default=None, description="Sender phone number"),
+    Body: Optional[str] = Query(default="", description="Inbound SMS text content"),
+):
+    """Twilio webhook handler for inbound farmer SMS queries.
+    
+    Farmers can text 'MANDYA', 'WEATHER', 'HELP', or regional language keywords
+    to receive an instant 160-character localized advisory delivered straight to
+    their basic phone's messaging inbox.
+    """
+    query_text = (Body or "").strip().lower()
+
+    # Determine farm and language from query text
+    target_farm = "mandya"
+    target_lang = "kn"  # Default Kannada for Mandya farmers
+
+    if "ludhiana" in query_text or "wheat" in query_text:
+        target_farm = "ludhiana"
+        target_lang = "hi"
+    elif "varanasi" in query_text:
+        target_farm = "varanasi"
+        target_lang = "hi"
+    elif "nashik" in query_text or "onion" in query_text:
+        target_farm = "nashik"
+        target_lang = "mr"
+
+    if "english" in query_text or "en" in query_text.split():
+        target_lang = "en"
+    elif "hindi" in query_text or "hi" in query_text.split():
+        target_lang = "hi"
+    elif "kannada" in query_text or "kn" in query_text.split():
+        target_lang = "kn"
+
+    adv = get_farm_advisory(farm_id=target_farm, language=target_lang)
+    reply_body = adv.sms_preview or adv.action
+
+    twiml_sms_xml = twilio_service.generate_twiml_sms(reply_body)
+    return Response(content=twiml_sms_xml, media_type="application/xml")
+
+
+class LowBandwidthDispatchRequest(BaseModel):
+    to: str = Field(default="+919731803808", description="Farmer mobile number with country code")
+    farm_id: str = Field(default="mandya", description="Farm parcel identifier")
+    language: str = Field(default="kn", description="Language code: en, kn, hi, te, ta, mr, bn")
+    channel: str = Field(default="both", description="Delivery channel: 'sms', 'call', or 'both'")
+    custom_message: Optional[str] = Field(default=None, description="Optional custom advisory message")
+
+
+@router.post("/dispatch-low-bandwidth", summary="Unified Low-Bandwidth Cellular Dispatch (Headless)")
+def dispatch_low_bandwidth_advisory(payload: LowBandwidthDispatchRequest):
+    """Headless cellular communication dispatcher for smallholder farmers.
+    
+    Directly dispatches real SMS and/or IVR voice phone calls over telecom networks
+    (GSM/PSTN) to the farmer's physical phone number.
+    Does NOT require a web browser, internet, or smartphone on the farmer's end.
+    """
+    adv = get_farm_advisory(farm_id=payload.farm_id, language=payload.language)
+    sms_result = None
+    call_result = None
+
+    if payload.channel in ("sms", "both"):
+        sms_text = payload.custom_message or adv.sms_preview
+        sms_result = twilio_service.send_sms(
+            to_number=payload.to,
+            message_body=sms_text,
+            language=payload.language,
+        )
+
+    if payload.channel in ("call", "both"):
+        call_text = payload.custom_message or adv.voice_transcript
+        call_result = twilio_service.place_voice_call(
+            to_number=payload.to,
+            script_text=call_text,
+            language=payload.language,
+        )
+
+    return {
+        "success": True,
+        "farmer_phone": payload.to,
+        "farm_id": payload.farm_id,
+        "language": payload.language,
+        "channel": payload.channel,
+        "telecom_mode": "live_carrier" if settings.is_twilio_configured else "telecom_simulation",
+        "low_bandwidth_notice": (
+            "Delivered directly to farmer's mobile handset via cellular network (GSM/PSTN). "
+            "Zero internet connection or web browser required on the recipient device."
+        ),
+        "sms_dispatch": sms_result,
+        "voice_call_dispatch": call_result,
+    }
+
+
 @router.get("/speak", summary="Stream High-Fidelity Natural Human Advisory Audio")
 def stream_advisory_audio(
     farm_id: Optional[str] = Query(default="mandya", description="Farm identifier"),

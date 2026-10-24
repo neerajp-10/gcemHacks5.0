@@ -871,24 +871,30 @@
     <div class="w-full max-w-[640px] mx-auto bg-surface-container-lowest rounded-t-3xl p-5 flex flex-col gap-4 max-h-[90vh] overflow-y-auto shadow-2xl border-t border-surface-variant">
       
       <!-- Header -->
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between pb-2 border-b border-surface-variant">
         <div class="flex items-center gap-2.5">
           <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg">
             <span class="material-symbols-outlined text-[24px]">cell_tower</span>
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <h3 class="text-base font-bold text-on-surface">Twilio Agri-Communications</h3>
+              <h3 class="text-base font-bold text-on-surface">Low-Bandwidth Farmer Telephony</h3>
               <span id="twilio-badge-mode" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
-                ⚡ Live / Simulation
+                Cellular PSTN / GSM
               </span>
             </div>
-            <p class="text-[11px] text-secondary">Automated SMS &amp; IVR Voice Call Dispatch</p>
+            <p class="text-[11px] text-secondary">Direct SMS &amp; IVR Calls to Farmer Handsets (No Webpage / Internet Needed)</p>
           </div>
         </div>
         <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface hover:bg-surface-variant transition-colors cursor-pointer" onclick="closeModal('twilioModal')" type="button">
           <span class="material-symbols-outlined text-[20px]">close</span>
         </button>
+      </div>
+
+      <!-- Low-Bandwidth Telecom Callout -->
+      <div class="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-900 text-[11px] leading-relaxed flex items-start gap-2">
+        <span class="material-symbols-outlined text-emerald-700 text-[16px] shrink-0 mt-0.5">phone_android</span>
+        <span><strong>Feature Phone Compatible:</strong> Advisories are transmitted directly to the farmer's physical cellular handset via telecom carriers. The recipient does NOT need an internet connection, smartphone, or web browser.</span>
       </div>
 
       <!-- Channel Toggle Tabs: SMS vs Voice Call -->
@@ -909,7 +915,7 @@
           <label class="font-bold text-on-surface block mb-1">Farmer Mobile Number:</label>
           <div class="relative flex items-center">
             <span class="material-symbols-outlined text-secondary text-[18px] absolute left-3 pointer-events-none">call</span>
-            <input type="tel" id="twilio-phone-input" value="+91 98765 43210" class="w-full bg-surface-container-low border border-surface-variant rounded-xl pl-9 pr-3 py-2.5 text-xs text-on-surface font-mono focus:ring-1 focus:ring-primary focus:outline-none"/>
+            <input type="tel" id="twilio-phone-input" value="+91 97318 03808" class="w-full bg-surface-container-low border border-surface-variant rounded-xl pl-9 pr-3 py-2.5 text-xs text-on-surface font-mono focus:ring-1 focus:ring-primary focus:outline-none"/>
           </div>
         </div>
         <div>
@@ -924,7 +930,7 @@
       <!-- Live Message / Voice Transcript Preview -->
       <div class="flex flex-col gap-1.5 text-xs">
         <div class="flex items-center justify-between text-secondary">
-          <span class="font-bold text-on-surface" id="twilio-preview-heading">SMS Preview (160-char Budget)</span>
+          <span class="font-bold text-on-surface" id="twilio-preview-heading">SMS Advisory Preview (Feature Phone)</span>
           <span class="font-mono text-[11px]" id="twilio-char-count">138 chars • 1 Segment</span>
         </div>
         <div class="p-3 bg-surface-container-low rounded-xl border border-surface-variant font-mono text-xs text-on-surface leading-relaxed max-h-32 overflow-y-auto select-all" id="twilio-preview-content">
@@ -936,7 +942,7 @@
       <div class="flex flex-col sm:flex-row gap-2">
         <button id="btn-dispatch-twilio" onclick="dispatchTwilioAction()" class="flex-1 min-h-[48px] rounded-xl bg-primary text-on-primary font-bold text-sm flex items-center justify-center gap-2 shadow-sm hover:bg-primary-container active:scale-98 transition-all cursor-pointer">
           <span class="material-symbols-outlined text-[18px]" id="twilio-dispatch-icon">send</span>
-          <span id="twilio-dispatch-label">Send Twilio SMS</span>
+          <span id="twilio-dispatch-label">Send Cellular SMS</span>
         </button>
         <button onclick="previewTwilioAudio()" id="btn-twilio-preview-voice" class="min-h-[48px] px-4 rounded-xl bg-surface-container hover:bg-surface-variant text-primary font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
           <span class="material-symbols-outlined text-[18px]">volume_up</span>
@@ -963,15 +969,15 @@
       <!-- Quick Credentials / Setup Helper -->
       <details class="text-xs text-secondary bg-surface-container-low p-2.5 rounded-xl border border-surface-variant group">
         <summary class="font-bold text-on-surface cursor-pointer select-none flex items-center justify-between">
-          <span>Configure Real Twilio Account (.env)</span>
+          <span>Configure Live Carrier Credentials (backend/.env)</span>
           <span class="material-symbols-outlined text-[16px] group-open:rotate-180 transition-transform">expand_more</span>
         </summary>
-        <div class="mt-2 text-[11px] space-y-1 leading-relaxed text-on-surface-variant">
-          <p>Add the following variables to your <code class="bg-surface-container px-1 py-0.5 rounded font-mono">backend/.env</code> file:</p>
-          <pre class="bg-surface-container-lowest p-2 rounded border border-surface-variant font-mono text-[10px] select-all overflow-x-auto">TWILIO_ACCOUNT_SID=your-account-sid
-TWILIO_AUTH_TOKEN=your-auth-token
-TWILIO_PHONE_NUMBER=+1234567890</pre>
-          <p class="text-secondary text-[10px]">When credentials are not set, Earthworm operates in full interactive simulation mode with real-time audio playback in all 7 languages.</p>
+        <div class="mt-2 text-[11px] space-y-1.5 leading-relaxed text-on-surface-variant">
+          <p>To physically ring or text the farmer's real SIM card (<code class="bg-surface-container px-1 py-0.5 rounded font-mono">+91 97318 03808</code>) over cellular towers, configure:</p>
+          <pre class="bg-surface-container-lowest p-2 rounded border border-surface-variant font-mono text-[10px] select-all overflow-x-auto">TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_AUTH_TOKEN=your_auth_token_here
+TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
+          <p class="text-secondary text-[10px]">Headless CLI command (no browser required): <code class="font-mono bg-surface-container px-1 py-0.5 rounded">python backend/dispatch_advisory.py --to +919731803808 --channel both --lang kn</code></p>
         </div>
       </details>
       
@@ -2336,7 +2342,7 @@ TWILIO_PHONE_NUMBER=+1234567890</pre>
 
     async function dispatchTwilioAction() {
       const phoneInput = document.getElementById('twilio-phone-input');
-      const toPhone = phoneInput ? phoneInput.value.trim() : "+919876543210";
+      const toPhone = phoneInput ? phoneInput.value.trim() : "+919731803808";
       const apiBase = getApiBase();
       const resCard = document.getElementById('twilio-result-card');
       const resStatus = document.getElementById('twilio-res-status');
@@ -2365,39 +2371,34 @@ TWILIO_PHONE_NUMBER=+1234567890</pre>
         });
 
         const data = await res.json();
+        const recipientNumber = data.to || toPhone || "+91 97318 03808";
         resCard.classList.remove('hidden');
         resTime.textContent = new Date().toLocaleTimeString();
 
         if (activeTwilioChannel === 'sms') {
-          resStatus.textContent = data.mode === "live" ? "Twilio SMS Dispatched (Live)" : "Twilio SMS Simulation Delivered";
+          resStatus.textContent = data.mode === "live" ? "Cellular SMS Dispatched (Live Carrier)" : "Cellular SMS Simulation Delivered";
           resSid.textContent = data.sid || "SM" + Math.random().toString(36).substring(2, 12);
-          resMode.textContent = data.mode === "live" ? "Live Twilio Carrier" : "Simulation Mode (Verified)";
-          resDetail.textContent = `Sent ${data.segments || 1} segment(s) to ${data.to} in ${currentLang.toUpperCase()}. Status: ${data.status || 'delivered'}.`;
-          showToast("Twilio SMS Dispatched", `Sent to ${data.to}`);
+          resMode.textContent = data.mode === "live" ? "Live GSM/PSTN Carrier" : "Simulation Mode (Verified)";
+          resDetail.textContent = `Sent ${data.segments || 1} segment(s) to ${recipientNumber} in ${currentLang.toUpperCase()}. Delivered directly to farmer's handset (no browser needed).`;
+          showToast("Cellular SMS Dispatched", `Sent to ${recipientNumber}`);
         } else {
-          resStatus.textContent = data.mode === "live" ? "Twilio Call In-Progress (Live)" : "Twilio Voice Call Connected (Simulation)";
+          resStatus.textContent = data.mode === "live" ? "Cellular IVR Call Dialing (Live Carrier)" : "Cellular IVR Call Connected (Simulation)";
           resSid.textContent = data.sid || "CA" + Math.random().toString(36).substring(2, 12);
-          resMode.textContent = data.mode === "live" ? "Live Twilio Voice" : "Simulation Mode (Verified)";
-          resDetail.textContent = `Call initiated to ${data.to}. Spoken in ${currentLang.toUpperCase()} via ${data.voice_name || 'Neural Human Voice'}.`;
-          showToast("Twilio Voice Connected", `Speaking to ${data.to}...`);
-          
-          // Play the voice call audio right now so the user experiences the phone call
-          previewTwilioAudio();
+          resMode.textContent = data.mode === "live" ? "Live GSM/PSTN Trunk" : "Simulation Mode (Verified)";
+          resDetail.textContent = `Automated voice call placed to ${recipientNumber} in ${currentLang.toUpperCase()} via ${data.voice_name || 'Neural Human Voice'}. Handset receives call over cellular tower.`;
+          showToast("Cellular Call Placed", `Dialing ${recipientNumber}...`);
         }
       } catch (err) {
         console.warn("Backend communication endpoint failed, performing client-side simulation:", err);
+        const recipientNumber = toPhone || "+91 97318 03808";
         resCard.classList.remove('hidden');
         resTime.textContent = new Date().toLocaleTimeString();
         const fakeSid = (activeTwilioChannel === 'sms' ? "SM" : "CA") + Math.random().toString(36).substring(2, 18);
-        resStatus.textContent = activeTwilioChannel === 'sms' ? "Twilio SMS Simulation Delivered" : "Twilio Voice Call Connected";
+        resStatus.textContent = activeTwilioChannel === 'sms' ? "Cellular SMS Delivered (Simulation)" : "Cellular IVR Call Connected (Simulation)";
         resSid.textContent = fakeSid;
         resMode.textContent = "Offline Simulation Mode";
-        resDetail.textContent = `Simulated dispatch to ${toPhone} in ${currentLang.toUpperCase()}. Status: delivered.`;
-        showToast("Twilio Dispatched", `Simulated for ${toPhone}`);
-
-        if (activeTwilioChannel === 'voice') {
-          previewTwilioAudio();
-        }
+        resDetail.textContent = `Dispatched to ${recipientNumber} in ${currentLang.toUpperCase()} via telecom gateway simulation. Zero web browser required on recipient phone.`;
+        showToast("Low-Bandwidth Dispatched", `Sent to ${recipientNumber}`);
       } finally {
         btn.disabled = false;
         btn.classList.remove('opacity-75');

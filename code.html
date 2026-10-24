@@ -1,0 +1,2546 @@
+<!DOCTYPE html>
+<html class="h-full" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <meta content="mobile_tab" name="shell-type"/>
+  <title>Earthworm | Satellite Crop Advisory for Smallholder Farmers</title>
+  <meta name="description" content="Satellite-based early warning and explainable crop health advisory for smallholder paddy farmers in Mandya, Karnataka and across India."/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&family=Noto+Sans+Kannada:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    @layer base {
+      html, body {
+        width: 100vw;
+        min-height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        overscroll-behavior-y: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+      .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+    }
+    ::-webkit-scrollbar { display: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .motion-animated, #splash-worm, .sprout-anim { animation: none !important; transition: none !important; }
+    }
+    @keyframes crawlWorm {
+      0% { transform: translate(-20px, 34px) scale(0.85); opacity: 0; }
+      15% { opacity: 1; }
+      50% { transform: translate(52px, 25px) scale(1.02); }
+      100% { transform: translate(114px, 18px) scale(0.96); opacity: 1; }
+    }
+    @keyframes sproutBloom {
+      0% { transform: scale(0); opacity: 0; }
+      55% { transform: scale(1.22); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .sprout-anim { animation: sproutBloom 0.8s cubic-bezier(0.17, 0.89, 0.32, 1.28) 0.55s forwards; transform-origin: bottom center; }
+    @keyframes radarSweep {
+      0% { top: 0%; opacity: 0; }
+      15% { opacity: 0.9; }
+      85% { opacity: 0.9; }
+      100% { top: 100%; opacity: 0; }
+    }
+    .radar-sweep-bar {
+      animation: radarSweep 3.2s linear infinite;
+    }
+    .leaflet-container {
+      background: #0f172a !important;
+      font-family: inherit;
+    }
+    .sat-layer-btn.active {
+      background-color: #005230 !important;
+      color: #ffffff !important;
+    }
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#005230",
+            "primary-container": "#216b45",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#9fe9b9",
+            "primary-fixed": "#a8f3c2",
+            "primary-fixed-dim": "#8dd6a8",
+            "surface": "#FAFAF6",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#EAF4EC",
+            "surface-container": "#e1f2e5",
+            "surface-container-high": "#dbeddf",
+            "surface-container-highest": "#d5e7da",
+            "surface-variant": "#d5e7da",
+            "on-surface": "#26352C",
+            "on-surface-variant": "#404942",
+            "secondary": "#57615b",
+            "secondary-container": "#dbe5dd",
+            "on-secondary": "#ffffff",
+            "on-secondary-container": "#5d6761",
+            "tertiary": "#633f00",
+            "tertiary-container": "#E8A23A",
+            "on-tertiary": "#ffffff",
+            "on-tertiary-container": "#332002",
+            "tertiary-fixed": "#ffddb5",
+            "tertiary-fixed-dim": "#ffb957",
+            "inverse-surface": "#25342b",
+            "inverse-on-surface": "#e3f5e8",
+            "outline": "#707a71",
+            "outline-variant": "#bfc9bf",
+            "error": "#ba1a1a"
+          },
+          fontFamily: {
+            "body-md": ["Noto Sans", "Noto Sans Kannada", "sans-serif"],
+            "headline-sm": ["Noto Sans", "Noto Sans Kannada", "sans-serif"],
+            "headline-md": ["Noto Sans", "Noto Sans Kannada", "sans-serif"],
+            "headline-lg": ["Noto Sans", "Noto Sans Kannada", "sans-serif"],
+            "headline-xl": ["Noto Sans", "Noto Sans Kannada", "sans-serif"],
+            "label-sm": ["Noto Sans", "Noto Sans Kannada", "sans-serif"],
+            "label-md": ["Noto Sans", "Noto Sans Kannada", "sans-serif"],
+            "label-lg": ["Noto Sans", "Noto Sans Kannada", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen selection:bg-primary-container selection:text-on-primary antialiased">
+
+  <!-- 1. MEMORABLE LIGHTWEIGHT OPENING ANIMATION OVERLAY -->
+  <div class="fixed inset-0 z-[100] bg-surface flex flex-col items-center justify-center p-6 text-center transition-opacity duration-500 pointer-events-auto" id="intro-splash">
+    <div class="relative w-64 h-32 mb-2 flex items-center justify-center">
+      <svg class="w-full h-full overflow-visible" fill="none" viewbox="0 0 160 80" xmlns="http://www.w3.org/2000/svg">
+        <!-- Deep rich soil furrow wave -->
+        <path d="M10 58 C 45 36, 75 70, 114 42 C 132 30, 146 38, 154 36" stroke="#d5e7da" stroke-linecap="round" stroke-width="8"></path>
+        <path d="M10 58 C 45 36, 75 70, 114 42 C 132 30, 146 38, 154 36" stroke="#216b45" stroke-dasharray="5 7" stroke-linecap="round" stroke-width="3"></path>
+        <!-- Friendly realistic earthworm traversing soil furrow -->
+        <g id="splash-worm" style="animation: crawlWorm 1.4s ease-in-out forwards;">
+          <ellipse cx="0" cy="0" fill="#a45d22" rx="9" ry="5.8" transform="rotate(-15)"></ellipse>
+          <ellipse cx="-6" cy="3" fill="#8d4a15" rx="7" ry="5" transform="rotate(-8)"></ellipse>
+          <ellipse cx="-13" cy="5" fill="#783c0f" rx="5.5" ry="4"></ellipse>
+          <circle cx="5.5" cy="-1.5" fill="#ffffff" r="1.8"></circle>
+          <circle cx="6.2" cy="-1.5" fill="#25342b" r="0.9"></circle>
+          <path d="M5.5 2 Q 7 3.5 8 1" stroke="#ffddb5" stroke-linecap="round" stroke-width="1.2"></path>
+        </g>
+        <!-- Fresh vibrant sprout emerging at top right furrow -->
+        <g class="sprout-anim" style="opacity: 0;" transform="translate(116, 22)">
+          <path d="M0 16 Q 2 6 0 0" stroke="#005230" stroke-linecap="round" stroke-width="2.5"></path>
+          <path d="M0 5 Q 7 1 8 -5 Q 2 -4 0 4" fill="#216b45"></path>
+          <path d="M-1 9 Q -8 5 -7 -1 Q -2 -1 -1 7" fill="#8dd6a8"></path>
+        </g>
+      </svg>
+    </div>
+    <div class="flex flex-col items-center">
+      <div class="flex items-center gap-2">
+        <span class="text-3xl font-extrabold tracking-tight text-primary font-headline-xl">EARTHWORM</span>
+      </div>
+      <p class="text-[12px] font-bold text-secondary tracking-wider uppercase mt-0.5">National Agri-Sat Prototype</p>
+      <p class="text-sm font-semibold text-on-surface-variant mt-2 max-w-xs">See Your Fields. Understand Your Crops.</p>
+    </div>
+    <div class="mt-4 flex items-center gap-1.5 px-3 py-1 bg-surface-container rounded-full text-on-surface-variant text-xs">
+      <span class="w-2 h-2 rounded-full bg-primary"></span>
+      <span>Reference Space Agromet Data • ISRO &amp; ESA</span>
+    </div>
+    <div class="mt-6 flex items-center gap-3">
+      <button class="px-5 py-2.5 rounded-full bg-primary-container text-on-primary font-semibold text-sm shadow-sm active:scale-95 transition-all" onclick="dismissSplash()" type="button">
+        Enter Advisory Dashboard →
+      </button>
+      <button class="px-3.5 py-2 text-on-surface-variant text-xs underline decoration-dotted" onclick="dismissSplash()" type="button">
+        Skip intro
+      </button>
+    </div>
+  </div>
+
+  <!-- FIXED APP HEADER -->
+  <header class="fixed top-0 inset-x-0 z-50 bg-surface/90 backdrop-blur-xl border-b border-surface-variant/60 shadow-[0_1px_6px_rgba(0,0,0,0.03)] pt-safe">
+    <div class="h-16 px-4 flex items-center justify-between gap-2 max-w-[640px] mx-auto">
+      <!-- Brand Identity -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shrink-0 shadow-sm relative overflow-hidden">
+          <svg class="w-7 h-7" fill="none" viewbox="0 0 24 24">
+            <path d="M3 18 C 7 15, 12 21, 16 16 C 18 14, 20 15, 21 14" stroke="#a8f3c2" stroke-linecap="round" stroke-width="2.2"></path>
+            <path d="M12 17 C 12 11, 15 8, 18 6" stroke="#ffffff" stroke-linecap="round" stroke-width="2"></path>
+            <path d="M18 6 Q 21 7 20 10 Q 16 9 17 6" fill="#8dd6a8"></path>
+            <circle cx="8" cy="16.5" fill="#ffddb5" r="2.2"></circle>
+          </svg>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xl font-extrabold tracking-tight text-primary leading-none">EARTHWORM</span>
+          <div class="flex items-center gap-1.5 mt-0.5">
+            <span class="text-[10px] font-semibold text-on-surface-variant tracking-wider uppercase leading-tight">Agri-Sat</span>
+            <span id="api-status-pill" class="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-surface-container text-secondary flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary" id="api-status-dot"></span>
+              <span id="api-status-text">Checking API...</span>
+            </span>
+          </div>
+        </div>
+      </div>
+      <!-- Controls: Multi-language selector + Replay -->
+      <div class="flex items-center gap-1.5">
+        <div class="relative flex items-center">
+          <select class="appearance-none bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold pl-2.5 pr-6 py-2 rounded-full border border-surface-variant focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px] cursor-pointer" id="lang-selector" onchange="changeLanguage(this.value)">
+            <option selected="" value="en">English</option>
+            <option value="kn">ಕನ್ನಡ (Kannada)</option>
+            <option value="hi">हिन्दी (Hindi)</option>
+            <option value="te">తెలుగు (Telugu)</option>
+            <option value="ta">தமிழ் (Tamil)</option>
+            <option value="mr">मराठी (Marathi)</option>
+            <option value="bn">বাংলা (Bengali)</option>
+          </select>
+          <span class="material-symbols-outlined text-on-surface-variant text-[16px] absolute right-2 pointer-events-none">expand_more</span>
+        </div>
+        <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors min-h-[44px] min-w-[36px]" onclick="replaySplash()" title="Replay Brand Intro" type="button">
+          <span class="material-symbols-outlined text-[18px]">replay</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN SCROLLABLE CONTENT -->
+  <main class="flex-1 flex flex-col relative w-full px-4 pt-20 pb-28 bg-surface max-w-[640px] mx-auto">
+    <div class="flex flex-col gap-4 w-full">
+
+      <!-- TOP BANNER: HONEST PROTOTYPE DISCLOSURE -->
+      <div class="bg-surface-container-high border-l-4 border-primary rounded-r-xl p-2.5 flex items-start gap-2 shadow-sm text-xs text-on-surface-variant">
+        <span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">verified_user</span>
+        <div>
+          <span class="font-bold text-on-surface" id="banner-title">Prototype Demonstration Data</span>:
+          <span id="banner-text">Satellite reflectance & agromet observations. Always verify ground conditions before applying treatments.</span>
+        </div>
+      </div>
+
+      <!-- HERO HEADLINE & VALUE INTRO -->
+      <section class="flex flex-col gap-1 pt-1">
+        <div class="inline-flex items-center gap-1.5 self-start px-2.5 py-0.5 rounded-full bg-surface-container text-primary text-[11px] font-semibold">
+          <span class="material-symbols-outlined text-[14px]">satellite_alt</span>
+          <span id="hero-tag">Space &amp; Weather Observations</span>
+        </div>
+        <h1 class="text-[22px] sm:text-[24px] font-extrabold text-on-surface leading-tight" id="hero-title">
+          Understand Your Crops Before Problems Grow.
+        </h1>
+        <p class="text-sm text-on-surface-variant leading-relaxed" id="hero-subtitle">
+          Free space-based vegetative index and agrometeorological insights for Indian farmers.
+        </p>
+      </section>
+
+      <!-- 2. DYNAMIC LIVE SATELLITE VIEWER -->
+      <div class="relative w-full rounded-2xl overflow-hidden bg-surface-container-lowest border border-surface-variant shadow-sm transition-all" id="satellite-card">
+        
+        <!-- SATELLITE TOOLBAR: TELEMETRY & CONTROLS -->
+        <div class="p-2.5 bg-surface-container-low border-b border-surface-variant flex flex-col gap-2">
+          <!-- Top Row: Satellite Beacon & Action Buttons -->
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-1.5">
+              <span class="relative flex h-2.5 w-2.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+              </span>
+              <span class="text-[11px] font-bold text-on-surface uppercase tracking-wider flex items-center gap-1" id="sat-telemetry-badge">
+                <span>Copernicus Sentinel-2</span>
+                <span class="text-secondary font-normal" id="sat-gsd-badge">• 10m GSD</span>
+              </span>
+            </div>
+            
+            <!-- Quick Actions: Radar Scan Toggle + Refresh -->
+            <div class="flex items-center gap-1">
+              <button id="btn-toggle-radar" onclick="toggleRadarScan()" class="text-[10px] font-semibold px-2 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface flex items-center gap-1 transition-all cursor-pointer" title="Toggle Radar Laser Scanline">
+                <span class="material-symbols-outlined text-[13px] text-primary" id="radar-icon">sensors</span>
+                <span id="radar-text">Radar Scan</span>
+              </button>
+              <button id="btn-refresh-sat" onclick="refreshSatellitePass()" class="text-[10px] font-semibold px-2 py-1 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary flex items-center gap-1 transition-all cursor-pointer" title="Fetch Latest Sentinel-2 Pass">
+                <span class="material-symbols-outlined text-[13px] transition-transform duration-500" id="refresh-icon">sync</span>
+                <span>Refresh</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Bottom Row: Multi-Spectral Layer Selector Tabs -->
+          <div class="flex items-center gap-1 overflow-x-auto pb-0.5 no-scrollbar">
+            <button class="sat-layer-btn active text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-primary text-on-primary shadow-sm flex items-center gap-1 shrink-0 transition-all cursor-pointer" onclick="switchSatelliteLayer('true-color')" id="layer-btn-true-color">
+              <span class="material-symbols-outlined text-[13px]">palette</span>
+              <span>Natural RGB</span>
+            </button>
+            <button class="sat-layer-btn text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high flex items-center gap-1 shrink-0 transition-all cursor-pointer" onclick="switchSatelliteLayer('ndvi')" id="layer-btn-ndvi">
+              <span class="material-symbols-outlined text-[13px] text-emerald-600">grass</span>
+              <span>NDVI Heatmap</span>
+            </button>
+            <button class="sat-layer-btn text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high flex items-center gap-1 shrink-0 transition-all cursor-pointer" onclick="switchSatelliteLayer('false-color')" id="layer-btn-false-color">
+              <span class="material-symbols-outlined text-[13px] text-rose-500">filter_vintage</span>
+              <span>Infrared (CIR)</span>
+            </button>
+            <button class="sat-layer-btn text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high flex items-center gap-1 shrink-0 transition-all cursor-pointer" onclick="switchSatelliteLayer('map')" id="layer-btn-map">
+              <span class="material-symbols-outlined text-[13px] text-blue-500">public</span>
+              <span>Interactive Map</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- SATELLITE CANVAS VIEWPORT -->
+        <div class="relative h-64 sm:h-72 w-full overflow-hidden bg-slate-950 select-none group" id="satellite-canvas" onmousemove="handleSatMouseMove(event)" onmouseleave="handleSatMouseLeave()">
+          
+          <!-- Base Satellite Image -->
+          <img alt="Copernicus Sentinel-2 agricultural parcel photography" class="w-full h-full object-cover transition-opacity duration-300" id="satellite-img" src="assets/mandya.jpg"/>
+          
+          <!-- Secondary Split Image (for Compare Slider) -->
+          <div id="split-image-container" class="absolute inset-0 overflow-hidden pointer-events-none" style="width: 50%; display: none;">
+            <img alt="Sentinel NDVI Overlay" class="absolute inset-0 w-full h-full object-cover max-w-none" id="satellite-split-img" src="assets/mandya_ndvi.jpg" style="width: 100%; height: 100%;"/>
+          </div>
+
+          <!-- Interactive Leaflet Map Container -->
+          <div id="satellite-leaflet-map" class="absolute inset-0 w-full h-full z-10" style="display: none;"></div>
+
+          <!-- Radar Laser Scanline Animation -->
+          <div id="radar-scanline" class="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_12px_#34d399] pointer-events-none radar-sweep-bar opacity-80 z-20"></div>
+
+          <!-- Dynamic SVG Cadastral Parcel Overlay -->
+          <svg class="absolute inset-0 w-full h-full pointer-events-none z-20" fill="none" preserveaspectratio="none" viewbox="0 0 400 240" id="sat-svg-overlay">
+            <polygon id="parcel-polygon" fill="rgba(232, 162, 58, 0.18)" points="125,45 285,35 305,135 145,150" stroke="#ffddb5" stroke-dasharray="6 3" stroke-width="2.5"></polygon>
+            <polygon id="parcel-neighbor-polygon" fill="none" points="45,95 125,85 145,190 40,210" stroke="#8dd6a8" stroke-dasharray="4 3" stroke-width="1.8"></polygon>
+            <g id="parcel-alert-marker" class="cursor-pointer pointer-events-auto" onclick="showStressZoneDetail()">
+              <circle cx="210" cy="95" fill="#633f00" fill-opacity="0.9" r="14"></circle>
+              <circle cx="210" cy="95" fill="#ffddb5" r="6"></circle>
+              <text fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle" x="210" y="99">!</text>
+            </g>
+          </svg>
+
+          <!-- Interactive Pixel HUD Crosshair / Probe -->
+          <div id="pixel-probe-hud" class="absolute top-2.5 right-2.5 z-30 bg-black/85 backdrop-blur-md border border-white/20 rounded-lg px-2.5 py-1.5 text-white text-[10px] font-mono shadow-lg transition-opacity duration-200 pointer-events-none opacity-90">
+            <div class="flex items-center gap-1.5 font-bold text-emerald-400">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+              <span id="hud-coords">12°31'05" N, 76°53'06" E</span>
+            </div>
+            <div class="text-white/80 text-[9px] mt-0.5 flex items-center justify-between gap-3">
+              <span id="hud-metric">NDVI: 0.58 • Stress</span>
+              <span class="text-emerald-300 font-bold" id="hud-elev">Elev: 662m</span>
+            </div>
+          </div>
+
+          <!-- Loading Spinner Overlay -->
+          <div id="sat-loading-overlay" class="absolute inset-0 bg-slate-950/70 backdrop-blur-sm z-40 flex flex-col items-center justify-center gap-2 text-white transition-opacity duration-300 opacity-0 pointer-events-none">
+            <span class="material-symbols-outlined text-3xl text-primary animate-spin">progress_activity</span>
+            <span class="text-xs font-semibold tracking-wide">Acquiring Sentinel-2 Pass...</span>
+          </div>
+
+          <!-- Bottom Telemetry & Parcel Bar -->
+          <div class="absolute bottom-2 left-2 right-2 z-30 bg-inverse-surface/90 backdrop-blur-md rounded-xl p-2 px-3 text-inverse-on-surface flex items-center justify-between text-xs shadow-md">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary-fixed-dim text-[16px]">satellite_alt</span>
+              <div class="flex flex-col">
+                <span class="text-surface-container-low text-[10px] leading-tight" id="sat-date-tag">24 Feb 2024 • 10:48 UTC (Cloud-free)</span>
+                <span class="text-[9px] text-primary-fixed/80 font-mono" id="sat-orbit-tag">Orbit R019 • Sun Zenith 28.4°</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button onclick="toggleCompareSplit()" id="btn-compare-split" class="text-[9px] font-bold px-2 py-0.5 rounded bg-surface-variant/40 hover:bg-surface-variant/70 text-on-surface flex items-center gap-1 transition-all cursor-pointer">
+                <span class="material-symbols-outlined text-[11px]">compare</span>
+                <span>Split View</span>
+              </button>
+              <span class="text-[11px] font-bold text-primary-fixed bg-primary/40 px-2 py-0.5 rounded" id="parcel-id-tag">Plot #142/A</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- NDVI COLOR GRADIENT LEGEND (Shown when NDVI or Infrared active) -->
+        <div id="ndvi-legend-bar" class="px-3 py-1.5 bg-surface-container-low border-t border-surface-variant text-[9px] text-secondary flex items-center justify-between transition-all" style="display: none;">
+          <span class="font-bold text-on-surface flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>Vigor Index</span>
+          </span>
+          <div class="flex-1 mx-3 h-2 rounded-full bg-gradient-to-r from-red-600 via-yellow-400 via-lime-400 to-emerald-700 shadow-inner"></div>
+          <div class="flex items-center gap-2 font-mono">
+            <span>-0.2 Water</span>
+            <span>0.4 Stress</span>
+            <span class="text-emerald-700 font-bold">0.8+ Dense</span>
+          </div>
+        </div>
+
+        <!-- HISTORICAL NDVI TIME-SERIES BAR (FEATURE B) -->
+        <div class="px-3 pt-2.5 pb-2 bg-surface-container-low border-t border-surface-variant">
+          <div class="flex items-center justify-between text-xs mb-1.5">
+            <span class="font-bold text-on-surface flex items-center gap-1">
+              <span class="material-symbols-outlined text-[16px] text-primary">show_chart</span>
+              <span id="ts-title">NDVI 20-Day Trend (Sentinel-2)</span>
+            </span>
+            <span class="text-[10px] text-secondary font-semibold" id="ts-benchmark">Seasonal Benchmark: 0.70</span>
+          </div>
+          <div class="grid grid-cols-5 gap-1.5 text-center" id="ndvi-history-bars">
+            <div class="bg-surface-container-lowest p-1 rounded-lg border border-surface-variant flex flex-col items-center">
+              <span class="text-[9px] text-secondary">04 Feb</span>
+              <div class="w-full bg-primary/20 h-7 rounded-sm flex items-end justify-center my-0.5">
+                <div class="w-full bg-primary rounded-sm" style="height: 97%;"></div>
+              </div>
+              <span class="text-[10px] font-bold text-primary">0.68</span>
+            </div>
+            <div class="bg-surface-container-lowest p-1 rounded-lg border border-surface-variant flex flex-col items-center">
+              <span class="text-[9px] text-secondary">09 Feb</span>
+              <div class="w-full bg-primary/20 h-7 rounded-sm flex items-end justify-center my-0.5">
+                <div class="w-full bg-primary rounded-sm" style="height: 94%;"></div>
+              </div>
+              <span class="text-[10px] font-bold text-primary">0.66</span>
+            </div>
+            <div class="bg-surface-container-lowest p-1 rounded-lg border border-surface-variant flex flex-col items-center">
+              <span class="text-[9px] text-secondary">14 Feb</span>
+              <div class="w-full bg-primary/20 h-7 rounded-sm flex items-end justify-center my-0.5">
+                <div class="w-full bg-primary rounded-sm" style="height: 90%;"></div>
+              </div>
+              <span class="text-[10px] font-bold text-primary">0.63</span>
+            </div>
+            <div class="bg-surface-container-lowest p-1 rounded-lg border border-surface-variant flex flex-col items-center">
+              <span class="text-[9px] text-secondary">19 Feb</span>
+              <div class="w-full bg-primary/20 h-7 rounded-sm flex items-end justify-center my-0.5">
+                <div class="w-full bg-primary rounded-sm" style="height: 87%;"></div>
+              </div>
+              <span class="text-[10px] font-bold text-primary">0.61</span>
+            </div>
+            <div class="bg-surface-container-lowest p-1 rounded-lg border-2 border-tertiary-container flex flex-col items-center">
+              <span class="text-[9px] font-bold text-tertiary">24 Feb</span>
+              <div class="w-full bg-tertiary-container/30 h-7 rounded-sm flex items-end justify-center my-0.5">
+                <div class="w-full bg-tertiary-container rounded-sm" style="height: 82%;"></div>
+              </div>
+              <span class="text-[10px] font-bold text-tertiary">0.58</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="p-3 bg-surface-container-lowest border-t border-surface-variant flex flex-col gap-2.5">
+          <div class="grid grid-cols-2 gap-2">
+            <button class="min-h-[48px] rounded-xl bg-primary text-on-primary font-semibold text-sm flex items-center justify-center gap-2 active:bg-primary-container shadow-sm transition-colors cursor-pointer" onclick="openModal('satelliteModal')" type="button">
+              <span id="btn-check-field">Check My Field</span>
+              <span class="material-symbols-outlined text-[18px]">satellite_alt</span>
+            </button>
+            <button class="min-h-[48px] rounded-xl bg-surface-container hover:bg-surface-variant text-primary font-semibold text-sm flex items-center justify-center gap-1.5 transition-colors" onclick="openModal('guideModal')" type="button">
+              <span class="material-symbols-outlined text-[18px]">play_circle</span>
+              <span id="btn-guide">How It Works</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. PAN-INDIA REACH & INTERACTIVE FARM SELECTOR -->
+      <section class="flex flex-col gap-2 bg-surface-container-low p-3.5 rounded-2xl border border-surface-variant/80">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-[20px]">pin_drop</span>
+            <span class="text-xs font-bold uppercase tracking-wider text-on-surface" id="region-selector-header">Select Demo Field (Pan-India)</span>
+          </div>
+          <span class="text-[11px] text-secondary font-medium">No login required</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1" id="farm-pills-container">
+          <button class="region-pill active-pill p-2.5 rounded-xl border text-left flex items-start gap-2.5 transition-all bg-primary-container text-on-primary border-primary min-h-[48px]" id="pill-mandya" onclick="selectRegion('mandya')" type="button">
+            <span class="material-symbols-outlined text-[20px] shrink-0 mt-0.5">rice_bowl</span>
+            <div class="flex flex-col min-w-0">
+              <span class="text-xs font-bold leading-tight truncate">Mandya (Karnataka)</span>
+              <span class="text-[11px] opacity-90 truncate">Paddy (Sona Masoori) • Demo Field A</span>
+            </div>
+          </button>
+          <button class="region-pill p-2.5 rounded-xl border text-left flex items-start gap-2.5 transition-all bg-surface-container-lowest text-on-surface border-surface-variant hover:bg-surface-container min-h-[48px]" id="pill-ludhiana" onclick="selectRegion('ludhiana')" type="button">
+            <span class="material-symbols-outlined text-[20px] text-tertiary-container shrink-0 mt-0.5">grass</span>
+            <div class="flex flex-col min-w-0">
+              <span class="text-xs font-bold leading-tight truncate">Ludhiana (Punjab)</span>
+              <span class="text-[11px] text-on-surface-variant truncate">Wheat (PBW 343) • Demo Field B</span>
+            </div>
+          </button>
+          <button class="region-pill p-2.5 rounded-xl border text-left flex items-start gap-2.5 transition-all bg-surface-container-lowest text-on-surface border-surface-variant hover:bg-surface-container min-h-[48px]" id="pill-varanasi" onclick="selectRegion('varanasi')" type="button">
+            <span class="material-symbols-outlined text-[20px] text-primary shrink-0 mt-0.5">psychiatry</span>
+            <div class="flex flex-col min-w-0">
+              <span class="text-xs font-bold leading-tight truncate">Varanasi (Uttar Pradesh)</span>
+              <span class="text-[11px] text-on-surface-variant truncate">Mustard &amp; Vegetables • Demo Field C</span>
+            </div>
+          </button>
+          <button class="region-pill p-2.5 rounded-xl border text-left flex items-start gap-2.5 transition-all bg-surface-container-lowest text-on-surface border-surface-variant hover:bg-surface-container min-h-[48px]" id="pill-nashik" onclick="selectRegion('nashik')" type="button">
+            <span class="material-symbols-outlined text-[20px] text-tertiary-container shrink-0 mt-0.5">nutrition</span>
+            <div class="flex flex-col min-w-0">
+              <span class="text-xs font-bold leading-tight truncate">Nashik (Maharashtra)</span>
+              <span class="text-[11px] text-on-surface-variant truncate">Onion / Grapes • Demo Field D</span>
+            </div>
+          </button>
+        </div>
+      </section>
+
+      <!-- 4. 3-STAGE EXPLAINABLE ADVISORY CARD -->
+      <section class="rounded-2xl bg-surface-container-lowest p-4 border border-tertiary-fixed shadow-sm flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary-container text-on-tertiary-container text-xs font-bold" id="alert-badge-wrap">
+            <span class="material-symbols-outlined text-[16px]">warning</span>
+            <span id="alert-badge">ATTENTION • ACTION RECOMMENDED</span>
+          </div>
+          <span class="text-[10px] font-semibold text-secondary bg-surface-container px-2 py-0.5 rounded">Reference Agromet</span>
+        </div>
+        <div class="flex flex-col gap-1">
+          <h2 class="text-lg font-bold text-on-surface" id="advisory-title">Field Needs Inspection: Canopy Moisture Change</h2>
+          <p class="text-sm text-on-surface-variant leading-relaxed" id="advisory-desc">
+            Status: Possible change in vegetative reflectance detected in the North-East zone. Requires physical ground verification before scheduling irrigation or chemical treatments.
+          </p>
+        </div>
+
+        <!-- 3-STAGE BREAKDOWN RIGHT ON THE CARD -->
+        <div class="space-y-2 bg-surface-container-low p-3 rounded-xl border border-surface-variant text-xs">
+          <div>
+            <span class="font-bold text-primary block" id="card-stage1-header">1. What did we notice? (Observation)</span>
+            <span class="text-on-surface-variant" id="card-notice">Vegetation index (NDVI) shows a localized drop of 12% in the North-East quarter.</span>
+          </div>
+          <div>
+            <span class="font-bold text-secondary block" id="card-stage2-header">2. What could it mean? (Interpretation)</span>
+            <span class="text-on-surface-variant" id="card-meaning">Possible uneven subsoil water percolation or clogged drip line.</span>
+          </div>
+          <div>
+            <span class="font-bold text-tertiary block" id="card-stage3-header">3. What should I do next? (Action Steps)</span>
+            <span class="text-on-surface-variant" id="card-action">Walk along NE boundary and press soil by hand to check moisture depth.</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 p-2.5 rounded-xl bg-surface-container text-xs text-on-surface">
+          <span class="material-symbols-outlined text-primary text-[20px]">analytics</span>
+          <div class="flex flex-col">
+            <span class="text-on-surface-variant text-[11px]">Vegetative Health Index (NDVI Reference)</span>
+            <span class="font-bold text-primary" id="advisory-metric">0.58 (Dip of 12% vs. healthy benchmark 0.70)</span>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-2 pt-1">
+          <button class="flex-1 min-h-[48px] rounded-xl bg-primary text-on-primary font-semibold text-sm flex items-center justify-center gap-2 active:bg-primary-container shadow-sm transition-colors" onclick="openModal('adviceModal')" type="button">
+            <span class="material-symbols-outlined text-[18px]">fact_check</span>
+            <span id="btn-view-advice">View Full Advice</span>
+          </button>
+          <button class="min-h-[48px] px-4 rounded-xl bg-surface-container hover:bg-surface-variant text-primary font-semibold text-sm flex items-center justify-center gap-1.5 transition-colors" id="btn-audio-voice" onclick="toggleAudioAdvice()" type="button">
+            <span class="material-symbols-outlined text-[18px]" id="audio-icon">volume_up</span>
+            <span id="btn-audio-listen">Listen Voice Advice</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- 5. THREE PRACTICAL ACTION TILES -->
+      <section class="flex flex-col gap-2.5">
+        <div class="flex items-center justify-between">
+          <h3 class="text-base font-bold text-on-surface" id="tiles-header">Three Practical Field Actions</h3>
+          <span class="text-xs text-secondary">Tap tile to inspect</span>
+        </div>
+        <button class="w-full p-3.5 rounded-2xl bg-surface-container-lowest border border-surface-variant shadow-sm flex items-start gap-3.5 text-left hover:bg-surface-container-low active:bg-surface-container transition-all min-h-[48px]" onclick="openModal('healthModal')" type="button">
+          <div class="w-11 h-11 rounded-xl bg-primary-fixed flex items-center justify-center shrink-0 text-on-primary-fixed">
+            <span class="material-symbols-outlined text-[24px]">eco</span>
+          </div>
+          <div class="flex flex-col flex-1 min-w-0">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-bold text-on-surface" id="tile1-title">1. Check Crop Health</span>
+              <span class="material-symbols-outlined text-secondary text-[20px]">chevron_right</span>
+            </div>
+            <p class="text-xs text-on-surface-variant mt-0.5 leading-normal" id="action-health-desc">Inspect vigor map with clear green, yellow, and dry soil alert parcels.</p>
+          </div>
+        </button>
+        <button class="w-full p-3.5 rounded-2xl bg-surface-container-lowest border border-surface-variant shadow-sm flex items-start gap-3.5 text-left hover:bg-surface-container-low active:bg-surface-container transition-all min-h-[48px]" onclick="openModal('waterModal')" type="button">
+          <div class="w-11 h-11 rounded-xl bg-secondary-container flex items-center justify-center shrink-0 text-on-secondary-container">
+            <span class="material-symbols-outlined text-[24px]">water_drop</span>
+          </div>
+          <div class="flex flex-col flex-1 min-w-0">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-bold text-on-surface" id="tile2-title">2. Should I Water?</span>
+              <span class="material-symbols-outlined text-secondary text-[20px]">chevron_right</span>
+            </div>
+            <p class="text-xs text-on-surface-variant mt-0.5 leading-normal" id="action-water-desc">Check root-zone moisture estimate &amp; evaporation window before turning pumps on.</p>
+          </div>
+        </button>
+        <button class="w-full p-3.5 rounded-2xl bg-surface-container-lowest border border-surface-variant shadow-sm flex items-start gap-3.5 text-left hover:bg-surface-container-low active:bg-surface-container transition-all min-h-[48px]" onclick="openModal('weatherModal')" type="button">
+          <div class="w-11 h-11 rounded-xl bg-tertiary-fixed flex items-center justify-center shrink-0 text-tertiary">
+            <span class="material-symbols-outlined text-[24px]">partly_cloudy_day</span>
+          </div>
+          <div class="flex flex-col flex-1 min-w-0">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-bold text-on-surface" id="tile3-title">3. View Weather Forecast</span>
+              <span class="material-symbols-outlined text-secondary text-[20px]">chevron_right</span>
+            </div>
+            <p class="text-xs text-on-surface-variant mt-0.5 leading-normal" id="action-weather-desc">Regional 3-Day Outlook: Mandya (31°C, 0mm rain expected).</p>
+          </div>
+        </button>
+      </section>
+
+      <!-- 6. 3-DAY WEATHER OUTLOOK -->
+      <section class="rounded-2xl bg-surface-container p-4 border border-surface-variant flex flex-col gap-3 shadow-sm">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-primary text-[18px]">wb_sunny</span>
+            <span class="text-xs font-bold text-primary uppercase tracking-wide" id="weather-source-tag">Regional 3-Day Outlook (Open-Meteo Demonstration)</span>
+          </div>
+          <span class="text-[11px] text-secondary">Demonstration</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-center" id="forecast-grid">
+          <div class="bg-surface-container-lowest p-2.5 rounded-xl border border-surface-variant flex flex-col items-center">
+            <span class="text-[11px] font-semibold text-secondary">Day 1</span>
+            <span class="material-symbols-outlined text-tertiary-container my-1 text-[22px]">sunny</span>
+            <span class="text-sm font-bold text-on-surface">31° / 21°</span>
+            <span class="text-[10px] text-primary font-medium">0 mm rain</span>
+          </div>
+          <div class="bg-surface-container-lowest p-2.5 rounded-xl border border-surface-variant flex flex-col items-center">
+            <span class="text-[11px] font-semibold text-secondary">Day 2</span>
+            <span class="material-symbols-outlined text-tertiary-container my-1 text-[22px]">partly_cloudy_day</span>
+            <span class="text-sm font-bold text-on-surface">32° / 20°</span>
+            <span class="text-[10px] text-primary font-medium">0 mm rain</span>
+          </div>
+          <div class="bg-surface-container-lowest p-2.5 rounded-xl border border-surface-variant flex flex-col items-center">
+            <span class="text-[11px] font-semibold text-secondary">Day 3</span>
+            <span class="material-symbols-outlined text-secondary my-1 text-[22px]">cloud</span>
+            <span class="text-sm font-bold text-on-surface">30° / 22°</span>
+            <span class="text-[10px] text-secondary font-medium">&lt;1 mm rain</span>
+          </div>
+        </div>
+        <div class="bg-surface-container-high px-3 py-2 rounded-xl text-on-surface text-xs flex items-center gap-2" id="weather-recommendation">
+          <span class="material-symbols-outlined text-primary text-[18px] shrink-0">check_circle</span>
+          <span class="leading-tight">Stable dry weather next 3 days. Suitable for weed clearing and ground parcel inspection.</span>
+        </div>
+      </section>
+
+      <!-- 7. FARMER CALL CENTRE SUPPORT & AUDIO ACCESS -->
+      <section class="rounded-2xl bg-surface-container-lowest p-4 border border-surface-variant shadow-sm flex flex-col gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container shrink-0">
+            <span class="material-symbols-outlined text-[22px]">support_agent</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-sm font-bold text-on-surface">Kisan Call Centre (Toll-Free)</span>
+            <span class="text-xs text-on-surface-variant">Free government agronomist consultation in your regional tongue</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 pt-1">
+          <a class="flex-1 min-h-[48px] rounded-xl bg-primary text-on-primary flex items-center justify-center gap-2 text-sm font-bold active:bg-primary-container shadow-sm transition-colors" href="tel:18001801551">
+            <span class="material-symbols-outlined text-[20px]">call</span>
+            <span>1800-180-1551</span>
+          </a>
+          <button class="min-h-[48px] px-4 rounded-xl bg-surface-container text-on-surface font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-surface-variant transition-colors cursor-pointer" onclick="openTwilioModal('voice')" type="button" id="btn-voice-help" title="Twilio Voice Call & SMS Simulation">
+            <span class="material-symbols-outlined text-primary text-[20px]">record_voice_over</span>
+            <span id="label-voice-help">Twilio Voice &amp; SMS</span>
+          </button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- 8. FIXED 3-ITEM BOTTOM NAVIGATION BAR -->
+  <nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface/90 backdrop-blur-xl border-t border-surface-variant shadow-[0_-2px_10px_rgba(0,0,0,0.04)]">
+    <div class="flex justify-around items-center h-18 max-w-[480px] mx-auto px-2 py-1">
+      <button class="flex flex-col items-center justify-center gap-0.5 min-w-[80px] h-14 rounded-xl font-bold text-primary bg-surface-container transition-all" id="tab-home" onclick="switchTab('home')">
+        <span class="material-symbols-outlined text-[24px]">home</span>
+        <span class="text-[12px]">Home</span>
+      </button>
+      <button class="flex flex-col items-center justify-center gap-0.5 min-w-[80px] h-14 rounded-xl font-medium text-secondary hover:text-primary transition-all" id="tab-myfarm" onclick="switchTab('myfarm')">
+        <span class="material-symbols-outlined text-[24px]">agriculture</span>
+        <span class="text-[12px]">My Farm</span>
+      </button>
+      <button class="flex flex-col items-center justify-center gap-0.5 min-w-[80px] h-14 rounded-xl font-medium text-secondary hover:text-primary transition-all" id="tab-advice" onclick="switchTab('advice')">
+        <span class="material-symbols-outlined text-[24px]">wb_incandescent</span>
+        <span class="text-[12px]">Advice</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- MODALS -->
+  <!-- Modal: Check My Field (Satellite Multispectral & Data Inspector) -->
+  <div class="fixed inset-0 z-50 bg-inverse-surface/50 backdrop-blur-xs flex flex-col justify-end hidden opacity-0 transition-opacity duration-200" id="satelliteModal">
+    <div class="w-full max-w-[640px] mx-auto bg-surface-container-lowest rounded-t-3xl p-5 flex flex-col gap-4 max-h-[88vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined text-[20px]">satellite_alt</span>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-on-surface">Satellite Multispectral Inspector</h3>
+            <p class="text-[11px] text-secondary">Copernicus Sentinel-2 • Multispectral Earth Observation</p>
+          </div>
+        </div>
+        <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface hover:bg-surface-variant cursor-pointer transition-colors" onclick="closeModal('satelliteModal')" type="button">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Orbital Telemetry & Parcel Header -->
+      <div class="p-3 bg-surface-container-low rounded-xl text-xs space-y-1.5 border border-surface-variant">
+        <div class="flex justify-between items-center">
+          <strong>Field Parcel:</strong>
+          <span class="font-bold text-primary" id="sat-modal-plot">Plot #142/A • Mandya (Karnataka)</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <strong>Sensor &amp; Orbit:</strong>
+          <span class="font-medium text-on-surface" id="sat-modal-sensor">Copernicus Sentinel-2B (MSI Level-2A BOA)</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <strong>Geo Coordinates &amp; Elev:</strong>
+          <span class="font-mono text-[11px] text-secondary" id="sat-modal-coords">12°31'05" N, 76°53'06" E • Elev: 662m</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <strong>Acquisition Orbit Pass:</strong>
+          <span class="text-emerald-700 font-semibold" id="sat-modal-pass">24 Feb 2024 • 10:48 UTC (Cloud: 0.8%)</span>
+        </div>
+      </div>
+
+      <!-- Multispectral Data Section -->
+      <div class="space-y-3">
+        
+        <!-- 1. NDVI Heatmap Analysis -->
+        <div class="p-3.5 bg-surface-container rounded-xl border-l-4 border-emerald-600 flex flex-col gap-1.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5 font-bold text-xs text-on-surface">
+              <span class="material-symbols-outlined text-emerald-600 text-[18px]">grass</span>
+              <span>1. NDVI Heatmap (Vegetation Health Index)</span>
+            </div>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800" id="sat-modal-ndvi">0.58 (Benchmark 0.70 • -17%)</span>
+          </div>
+          <p class="text-xs text-on-surface-variant leading-relaxed" id="sat-modal-ndvi-desc">
+            Multi-spectral vegetation index indicates localized canopy stress in the North-East quarter. Rest of parcel maintains standard canopy vigor.
+          </p>
+          <div class="text-[11px] text-secondary bg-surface-container-lowest p-2 rounded-lg border border-surface-variant">
+            <strong class="text-on-surface">Spectral Signal:</strong> <span id="sat-modal-ndvi-signal">Red light (665 nm) absorption decreased; NIR (842 nm) reflectance reduced due to early moisture stress.</span>
+          </div>
+        </div>
+
+        <!-- 2. Infrared (CIR - Color Infrared) Data -->
+        <div class="p-3.5 bg-surface-container rounded-xl border-l-4 border-rose-500 flex flex-col gap-1.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5 font-bold text-xs text-on-surface">
+              <span class="material-symbols-outlined text-rose-500 text-[18px]">filter_vintage</span>
+              <span>2. Infrared (CIR - Color Infrared) Data</span>
+            </div>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 font-mono" id="sat-modal-cir">NIR (B08): 0.42 • Red (B04): 0.14</span>
+          </div>
+          <p class="text-xs text-on-surface-variant leading-relaxed" id="sat-modal-cir-desc">
+            Color Infrared (CIR) false-color return reveals lowered cellular turgor in the NE zone; western quadrants exhibit dense crimson foliage.
+          </p>
+          <div class="text-[11px] text-secondary bg-surface-container-lowest p-2 rounded-lg border border-surface-variant">
+            <strong class="text-on-surface">Biophysical Meaning:</strong> <span id="sat-modal-cir-signal">Healthy leaf mesophyll reflects 40–50% NIR. Cell dehydration reduces internal scattering, dampening CIR brightness.</span>
+          </div>
+        </div>
+
+        <!-- 3. NDMI / Canopy Moisture Index Data -->
+        <div class="p-3.5 bg-surface-container rounded-xl border-l-4 border-teal-600 flex flex-col gap-1.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5 font-bold text-xs text-on-surface">
+              <span class="material-symbols-outlined text-teal-600 text-[18px]">water_drop</span>
+              <span>3. NDMI (Canopy Moisture &amp; Soil Water)</span>
+            </div>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-teal-800 font-mono" id="sat-modal-moisture">NDMI: +0.20 • SWIR (B11): 0.28</span>
+          </div>
+          <p class="text-xs text-on-surface-variant leading-relaxed" id="sat-modal-moisture-desc">
+            Normalized Difference Moisture Index confirms localized soil percolation deficit along the NE ridge. Top 10 cm root zone drying.
+          </p>
+        </div>
+
+        <!-- 4. Multispectral Band Reflectance Grid -->
+        <div class="p-3 bg-surface-container-low rounded-xl border border-surface-variant flex flex-col gap-2">
+          <span class="text-[11px] font-bold text-on-surface flex items-center gap-1">
+            <span class="material-symbols-outlined text-[15px] text-primary">analytics</span>
+            <span>Raw Spectral Band Readings (Copernicus MSI 10m/20m)</span>
+          </span>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-center font-mono text-[10px]">
+            <div class="bg-surface-container-lowest p-1.5 rounded border border-surface-variant">
+              <span class="text-secondary block">B03 (Green)</span>
+              <span class="font-bold text-on-surface" id="sat-modal-b3">0.08 (Peak)</span>
+            </div>
+            <div class="bg-surface-container-lowest p-1.5 rounded border border-surface-variant">
+              <span class="text-secondary block">B04 (Red)</span>
+              <span class="font-bold text-on-surface" id="sat-modal-b4">0.14 (Absorb)</span>
+            </div>
+            <div class="bg-surface-container-lowest p-1.5 rounded border border-surface-variant">
+              <span class="text-secondary block">B08 (NIR)</span>
+              <span class="font-bold text-emerald-700" id="sat-modal-b8">0.42 (Scatter)</span>
+            </div>
+            <div class="bg-surface-container-lowest p-1.5 rounded border border-surface-variant">
+              <span class="text-secondary block">B11 (SWIR)</span>
+              <span class="font-bold text-teal-700" id="sat-modal-b11">0.28 (Water)</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-2 pt-1">
+        <button class="flex-1 min-h-[44px] rounded-xl bg-primary text-on-primary font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer hover:bg-primary-container transition-colors" onclick="closeModal('satelliteModal')" type="button">
+          <span>Return to Dashboard</span>
+        </button>
+        <button class="min-h-[44px] px-3 rounded-xl bg-surface-container text-primary font-bold text-xs flex items-center justify-center gap-1 cursor-pointer hover:bg-surface-variant transition-colors" onclick="switchSatelliteLayer('ndvi'); closeModal('satelliteModal');" type="button">
+          <span class="material-symbols-outlined text-[16px] text-emerald-600">grass</span>
+          <span>View NDVI</span>
+        </button>
+        <button class="min-h-[44px] px-3 rounded-xl bg-surface-container text-primary font-bold text-xs flex items-center justify-center gap-1 cursor-pointer hover:bg-surface-variant transition-colors" onclick="switchSatelliteLayer('false-color'); closeModal('satelliteModal');" type="button">
+          <span class="material-symbols-outlined text-[16px] text-rose-500">filter_vintage</span>
+          <span>View CIR</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Check Field / My Farm -->
+  <div class="fixed inset-0 z-50 bg-inverse-surface/50 backdrop-blur-xs flex flex-col justify-end hidden opacity-0 transition-opacity duration-200" id="fieldModal">
+    <div class="w-full max-w-[640px] mx-auto bg-surface-container-lowest rounded-t-3xl p-5 flex flex-col gap-4 max-h-[88vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-[24px]">map</span>
+          <div>
+            <h3 class="text-base font-bold text-on-surface">My Farm • Parcel Inspector</h3>
+            <p class="text-[11px] text-secondary">Demonstration Field Diagnostic View</p>
+          </div>
+        </div>
+        <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface" onclick="closeModal('fieldModal')" type="button">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Farm Metadata Card -->
+      <div class="p-3 bg-surface-container-low rounded-xl text-xs space-y-1.5 border border-surface-variant">
+        <div class="flex justify-between"><strong>Survey Plot:</strong> <span class="font-semibold text-primary" id="modal-plot-id">142/A (Mandya)</span></div>
+        <div class="flex justify-between"><strong>Crop &amp; Variety:</strong> <span class="font-semibold" id="modal-crop-id">Paddy (Sona Masoori)</span></div>
+        <div class="flex justify-between"><strong>Total Area:</strong> <span id="modal-area-id">1.85 Hectares (~4.5 Acres)</span></div>
+        <div class="flex justify-between"><strong>Satellite pass:</strong> <span>Copernicus Sentinel-2 (ESA) Level-2A</span></div>
+      </div>
+
+      <!-- Structured 3-Stage Agronomic Diagnostic Framework -->
+      <div class="space-y-3">
+        <div class="p-3 bg-surface-container rounded-xl border-l-4 border-tertiary-container">
+          <div class="flex items-center gap-1.5 font-bold text-xs text-on-surface mb-1">
+            <span class="material-symbols-outlined text-tertiary-container text-[18px]">search</span>
+            <span id="modal-stage1-header">1. What did we notice? (Observation)</span>
+          </div>
+          <p class="text-xs text-on-surface-variant" id="modal-notice-text">
+            Multi-spectral vegetation index (NDVI) shows a localized drop of 12% in the North-East quarter. Rest of parcel maintains standard canopy vigor.
+          </p>
+        </div>
+        <div class="p-3 bg-surface-container rounded-xl border-l-4 border-secondary">
+          <div class="flex items-center gap-1.5 font-bold text-xs text-on-surface mb-1">
+            <span class="material-symbols-outlined text-secondary text-[18px]">help_outline</span>
+            <span id="modal-stage2-header">2. What could it mean? (Interpretation)</span>
+          </div>
+          <p class="text-xs text-on-surface-variant" id="modal-meaning-text">
+            Possible uneven subsoil water percolation, clogged drip emitter line, or early localized blast/spotting on lower stems.
+          </p>
+        </div>
+        <div class="p-3 bg-surface-container rounded-xl border-l-4 border-primary">
+          <div class="flex items-center gap-1.5 font-bold text-xs text-on-surface mb-1">
+            <span class="material-symbols-outlined text-primary text-[18px]">task_alt</span>
+            <span id="modal-stage3-header">3. What should I do next? (Action Steps)</span>
+          </div>
+          <p class="text-xs text-on-surface-variant" id="modal-action-text">
+            Conduct perimeter walk along NE ridge. Check top 10 cm root zone moisture before activating pump. If stems show rust lesions, consult Kisan helpline.
+          </p>
+        </div>
+      </div>
+
+      <!-- SMS Preview Box with Copy Button -->
+      <div class="p-3 bg-surface-container-low rounded-xl border border-dashed border-surface-variant flex flex-col gap-2">
+        <div class="flex items-center justify-between text-[11px] font-bold text-secondary">
+          <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">sms</span> SMS Advisory Preview (Feature Phone)</span>
+          <div class="flex items-center gap-1.5">
+            <button class="px-2 py-0.5 rounded bg-surface-container text-primary font-bold hover:bg-surface-variant transition-colors flex items-center gap-1 cursor-pointer" onclick="openTwilioModal('sms')" type="button" title="Dispatch SMS via Twilio">
+              <span class="material-symbols-outlined text-[14px]">send_to_mobile</span>
+              <span>Send SMS</span>
+            </button>
+            <button class="px-2 py-0.5 rounded bg-surface-container text-primary font-bold hover:bg-surface-variant transition-colors flex items-center gap-1 cursor-pointer" onclick="copySmsText()" type="button">
+              <span class="material-symbols-outlined text-[14px]">content_copy</span>
+              <span id="copy-sms-label">Copy</span>
+            </button>
+          </div>
+        </div>
+        <p class="text-xs text-on-surface font-mono bg-surface-container-lowest p-2 rounded border border-surface-variant select-all" id="modal-sms-text">
+          [EARTHWORM-AGRI] Plot 142/A: Moisture stress detected in NE zone. No rain expected next 3 days. Inspect topsoil before irrigating.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button class="flex-1 min-h-[48px] rounded-xl bg-primary text-on-primary font-bold text-sm flex items-center justify-center gap-1.5" onclick="closeModal('fieldModal')" type="button">
+          Return to Dashboard
+        </button>
+        <button class="min-h-[48px] px-3 rounded-xl bg-surface-container text-primary font-semibold text-xs flex items-center justify-center gap-1" onclick="toggleAudioAdvice()" type="button">
+          <span class="material-symbols-outlined text-[18px]">volume_up</span>
+          <span>Listen</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+    <!-- Modal: Twilio SMS & Voice Communication Dispatcher -->
+  <div class="fixed inset-0 z-50 bg-inverse-surface/60 backdrop-blur-xs flex flex-col justify-end hidden opacity-0 transition-opacity duration-200" id="twilioModal">
+    <div class="w-full max-w-[640px] mx-auto bg-surface-container-lowest rounded-t-3xl p-5 flex flex-col gap-4 max-h-[90vh] overflow-y-auto shadow-2xl border-t border-surface-variant">
+      
+      <!-- Header -->
+      <div class="flex items-center justify-between pb-2 border-b border-surface-variant">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg">
+            <span class="material-symbols-outlined text-[24px]">cell_tower</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="text-base font-bold text-on-surface">Low-Bandwidth Farmer Telephony</h3>
+              <span id="twilio-badge-mode" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                Cellular PSTN / GSM
+              </span>
+            </div>
+            <p class="text-[11px] text-secondary">Direct SMS &amp; IVR Calls to Farmer Handsets (No Webpage / Internet Needed)</p>
+          </div>
+        </div>
+        <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface hover:bg-surface-variant transition-colors cursor-pointer" onclick="closeModal('twilioModal')" type="button">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Low-Bandwidth Telecom Callout -->
+      <div class="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-900 text-[11px] leading-relaxed flex items-start gap-2">
+        <span class="material-symbols-outlined text-emerald-700 text-[16px] shrink-0 mt-0.5">phone_android</span>
+        <span><strong>Feature Phone Compatible:</strong> Advisories are transmitted directly to the farmer's physical cellular handset via telecom carriers. The recipient does NOT need an internet connection, smartphone, or web browser.</span>
+      </div>
+
+      <!-- Channel Toggle Tabs: SMS vs Voice Call -->
+      <div class="grid grid-cols-2 p-1 bg-surface-container rounded-xl gap-1 text-xs font-bold">
+        <button id="twilio-tab-sms" onclick="switchTwilioChannel('sms')" class="py-2.5 px-3 rounded-lg bg-surface-container-lowest text-primary shadow-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]">sms</span>
+          <span>SMS Advisory</span>
+        </button>
+        <button id="twilio-tab-voice" onclick="switchTwilioChannel('voice')" class="py-2.5 px-3 rounded-lg text-secondary hover:text-on-surface flex items-center justify-center gap-1.5 transition-all cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]">phone_in_talk</span>
+          <span>Voice Call (IVR)</span>
+        </button>
+      </div>
+
+      <!-- Recipient Phone Number & Farm Info -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+        <div>
+          <label class="font-bold text-on-surface block mb-1">Farmer Mobile Number:</label>
+          <div class="relative flex items-center">
+            <span class="material-symbols-outlined text-secondary text-[18px] absolute left-3 pointer-events-none">call</span>
+            <input type="tel" id="twilio-phone-input" value="+91 97318 03808" class="w-full bg-surface-container-low border border-surface-variant rounded-xl pl-9 pr-3 py-2.5 text-xs text-on-surface font-mono focus:ring-1 focus:ring-primary focus:outline-none"/>
+          </div>
+        </div>
+        <div>
+          <label class="font-bold text-on-surface block mb-1">Active Field &amp; Language:</label>
+          <div class="p-2 rounded-xl bg-surface-container-low border border-surface-variant flex items-center justify-between min-h-[42px]">
+            <span class="font-semibold text-primary truncate mr-1" id="twilio-target-plot">Plot 142/A (Mandya)</span>
+            <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-primary/10 text-primary shrink-0" id="twilio-target-lang">English</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Message / Voice Transcript Preview -->
+      <div class="flex flex-col gap-1.5 text-xs">
+        <div class="flex items-center justify-between text-secondary">
+          <span class="font-bold text-on-surface" id="twilio-preview-heading">SMS Advisory Preview (Feature Phone)</span>
+          <span class="font-mono text-[11px]" id="twilio-char-count">138 chars • 1 Segment</span>
+        </div>
+        <div class="p-3 bg-surface-container-low rounded-xl border border-surface-variant font-mono text-xs text-on-surface leading-relaxed max-h-32 overflow-y-auto select-all" id="twilio-preview-content">
+          Loading preview...
+        </div>
+      </div>
+
+      <!-- Dispatch Action Button & Audio Test -->
+      <div class="flex flex-col sm:flex-row gap-2">
+        <button id="btn-dispatch-twilio" onclick="dispatchTwilioAction()" class="flex-1 min-h-[48px] rounded-xl bg-primary text-on-primary font-bold text-sm flex items-center justify-center gap-2 shadow-sm hover:bg-primary-container active:scale-98 transition-all cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]" id="twilio-dispatch-icon">send</span>
+          <span id="twilio-dispatch-label">Send Cellular SMS</span>
+        </button>
+        <button onclick="previewTwilioAudio()" id="btn-twilio-preview-voice" class="min-h-[48px] px-4 rounded-xl bg-surface-container hover:bg-surface-variant text-primary font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]">volume_up</span>
+          <span>Hear Voice Preview</span>
+        </button>
+      </div>
+
+      <!-- Live Dispatch Status & Telemetry Output -->
+      <div id="twilio-result-card" class="p-3 rounded-xl bg-surface-container-low border border-surface-variant text-xs space-y-1.5 hidden">
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-on-surface flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+            <span id="twilio-res-status">Dispatch Successful</span>
+          </span>
+          <span class="text-[10px] font-mono text-secondary" id="twilio-res-time">Just now</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2 text-[11px]">
+          <div><strong>Twilio SID:</strong> <span class="font-mono text-primary text-[10px]" id="twilio-res-sid">-</span></div>
+          <div><strong>Mode:</strong> <span class="font-semibold text-emerald-700" id="twilio-res-mode">Simulation</span></div>
+        </div>
+        <p class="text-[11px] text-on-surface-variant" id="twilio-res-detail">Advisory dispatched to recipient.</p>
+      </div>
+
+      <!-- Quick Credentials / Setup Helper -->
+      <details class="text-xs text-secondary bg-surface-container-low p-2.5 rounded-xl border border-surface-variant group">
+        <summary class="font-bold text-on-surface cursor-pointer select-none flex items-center justify-between">
+          <span>Configure Live Carrier Credentials (backend/.env)</span>
+          <span class="material-symbols-outlined text-[16px] group-open:rotate-180 transition-transform">expand_more</span>
+        </summary>
+        <div class="mt-2 text-[11px] space-y-1.5 leading-relaxed text-on-surface-variant">
+          <p>To physically ring or text the farmer's real SIM card (<code class="bg-surface-container px-1 py-0.5 rounded font-mono">+91 97318 03808</code>) over cellular towers, configure:</p>
+          <pre class="bg-surface-container-lowest p-2 rounded border border-surface-variant font-mono text-[10px] select-all overflow-x-auto">TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_AUTH_TOKEN=your_auth_token_here
+TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
+          <p class="text-secondary text-[10px]">Headless CLI command (no browser required): <code class="font-mono bg-surface-container px-1 py-0.5 rounded">python backend/dispatch_advisory.py --to +919731803808 --channel both --lang kn</code></p>
+        </div>
+      </details>
+      
+    </div>
+  </div>
+
+  <!-- Modal: Full Advisory Details -->
+  <div class="fixed inset-0 z-50 bg-inverse-surface/50 backdrop-blur-xs flex flex-col justify-end hidden opacity-0 transition-opacity duration-200" id="adviceModal">
+    <div class="w-full max-w-[640px] mx-auto bg-surface-container-lowest rounded-t-3xl p-5 flex flex-col gap-4 max-h-[88vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-[24px]">assignment</span>
+          <div>
+            <h3 class="text-base font-bold text-on-surface">Agronomic Advisory Notice</h3>
+            <p class="text-[11px] text-secondary">Demonstration Advisory Protocol</p>
+          </div>
+        </div>
+        <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface" onclick="closeModal('adviceModal')" type="button">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+      <div class="space-y-2.5">
+        <div class="p-3 bg-surface-container-low rounded-xl border border-surface-variant">
+          <span class="text-xs font-bold text-primary block mb-1" id="advice-stage1-header">1. What did we notice? (Observation)</span>
+          <p class="text-xs text-on-surface-variant leading-relaxed" id="advice-notice-body">
+            Canopy moisture index reflectance anomaly in North-East quadrant. Vegetative baseline index: 0.58 vs 0.70 benchmark.
+          </p>
+        </div>
+        <div class="p-3 bg-surface-container-low rounded-xl border border-surface-variant">
+          <span class="text-xs font-bold text-primary block mb-1" id="advice-stage2-header">2. What could it mean? (Interpretation)</span>
+          <p class="text-xs text-on-surface-variant leading-relaxed" id="advice-meaning-body">
+            Topsoil drying due to sunny 31°C afternoon exposure and lack of surface mulch, or potential root aeration blockage.
+          </p>
+        </div>
+        <div class="p-3 bg-surface-container-low rounded-xl border border-surface-variant">
+          <span class="text-xs font-bold text-primary block mb-1" id="advice-stage3-header">3. What should I do next? (Action Steps)</span>
+          <ul class="text-xs text-on-surface-variant list-disc pl-4 space-y-1" id="advice-steps-list">
+            <li>Walk to the North-East boundary and press soil by hand to check moisture depth.</li>
+            <li>Inspect crop stems for yellowing or fungal lesions.</li>
+            <li>If top 5 cm is dry, irrigate in late afternoon when evaporation drops.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 p-2.5 bg-surface-container rounded-xl text-xs text-on-surface">
+        <span class="material-symbols-outlined text-primary shrink-0">verified</span>
+        <span id="advice-disclaimer">Standard ICAR / State Agricultural University Demonstration Protocol.</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button class="flex-1 min-h-[48px] rounded-xl bg-primary text-on-primary font-bold text-sm" onclick="closeModal('adviceModal')" type="button">
+          Understood &amp; Close
+        </button>
+        <button class="min-h-[48px] px-3 rounded-xl bg-surface-container text-primary font-semibold text-xs flex items-center justify-center gap-1" onclick="toggleAudioAdvice()" type="button">
+          <span class="material-symbols-outlined text-[18px]">volume_up</span>
+          <span>Voice Readout</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Guide & How It Works -->
+  <div class="fixed inset-0 z-50 bg-inverse-surface/50 backdrop-blur-xs flex flex-col justify-end hidden opacity-0 transition-opacity duration-200" id="guideModal">
+    <div class="w-full max-w-[640px] mx-auto bg-surface-container-lowest rounded-t-3xl p-5 flex flex-col gap-4 max-h-[85vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-[24px]">school</span>
+          <h3 class="text-lg font-bold text-on-surface">How EARTHWORM Works</h3>
+        </div>
+        <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface" onclick="closeModal('guideModal')" type="button">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+      <div class="space-y-3 text-xs text-on-surface-variant leading-relaxed">
+        <div class="p-3 bg-surface-container rounded-xl">
+          <span class="font-bold text-on-surface block mb-1">1. Satellites scan crop light reflectance</span>
+          Sentinel-2 scans districts regularly using multi-spectral bands to measure chlorophyll and green biomass reflection.
+        </div>
+        <div class="p-3 bg-surface-container rounded-xl">
+          <span class="font-bold text-on-surface block mb-1">2. Local Weather Integration</span>
+          Combines rain forecast and humidity data to estimate if soil drying or crop stress is occurring.
+        </div>
+        <div class="p-3 bg-surface-container rounded-xl">
+          <span class="font-bold text-on-surface block mb-1">3. Timely Farmer Notice</span>
+          Alerts you before crop stress visibly expands across the field so you save water, inputs, and protect yield.
+        </div>
+      </div>
+      <button class="w-full min-h-[48px] rounded-xl bg-primary text-on-primary font-bold text-sm" onclick="closeModal('guideModal')" type="button">
+        Got it!
+      </button>
+    </div>
+  </div>
+
+  <!-- Interactive Modal for Health & Water Actions -->
+  <div class="fixed inset-0 z-50 bg-inverse-surface/50 backdrop-blur-xs flex flex-col justify-end hidden opacity-0 transition-opacity duration-200" id="infoModal">
+    <div class="w-full max-w-[640px] mx-auto bg-surface-container-lowest rounded-t-3xl p-5 flex flex-col gap-4 max-h-[85vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-bold text-on-surface" id="info-modal-title">Action Detail</h3>
+        <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface" onclick="closeModal('infoModal')" type="button">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+      <div class="text-xs text-on-surface-variant leading-relaxed p-3 bg-surface-container-low rounded-xl" id="info-modal-body">
+        Action details go here.
+      </div>
+      <button class="w-full min-h-[48px] rounded-xl bg-primary text-on-primary font-bold text-sm" onclick="closeModal('infoModal')" type="button">
+        Close
+      </button>
+    </div>
+  </div>
+
+  <!-- Audio Toast Notification & Player Bar -->
+  <div class="fixed top-20 inset-x-4 max-w-[420px] mx-auto z-[100] bg-inverse-surface text-inverse-on-surface p-3 rounded-2xl shadow-2xl flex items-center justify-between gap-3 hidden transition-all border border-white/10" id="audioToast">
+    <div class="flex items-center gap-2.5 min-w-0">
+      <div class="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shrink-0 shadow-xs relative">
+        <span class="material-symbols-outlined text-primary-fixed text-[20px]" id="audioToastIcon">graphic_eq</span>
+        <span id="audioToastWave" class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+      </div>
+      <div class="flex flex-col text-xs min-w-0">
+        <div class="flex items-center gap-1.5">
+          <span class="font-bold truncate text-[12px]" id="audioToastTitle">Natural Neural Voice</span>
+          <span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-300 border border-emerald-700/50">HD Human</span>
+        </div>
+        <span class="text-surface-variant text-[11px] truncate max-w-[210px]" id="audioToastSub">Playing advisory...</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-1.5 shrink-0">
+      <button class="px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-mono text-[11px] transition-colors cursor-pointer" onclick="cycleAudioSpeed()" id="audioSpeedBtn" type="button" title="Toggle Speed">
+        1.0x
+      </button>
+      <button class="px-2.5 py-1 rounded-lg bg-primary text-on-primary font-bold text-xs hover:bg-primary-container transition-colors cursor-pointer flex items-center gap-1" onclick="stopAudioAdvice()" type="button">
+        <span class="material-symbols-outlined text-[14px]">stop</span>
+        <span>Stop</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC & BACKEND API INTEGRATION -->
+  <script>
+    // Region Dataset for Pan-India Selector (Offline Fixture + Fallback)
+    const REGIONS_DATA = {
+      mandya: {
+        location: "Mandya, Karnataka",
+        crop: "Paddy (Sona Masoori)",
+        parcel: "Parcel #142/A",
+        plotTitle: "142/A (Mandya, Karnataka)",
+        cropTitle: "Paddy (Sona Masoori)",
+        area: "1.85 Hectares (~4.5 Acres)",
+        satImage: "assets/mandya.jpg",
+        satPass: "24 Feb 2024 • Sentinel-2 Pass",
+        satPolygon: "125,45 285,35 305,135 145,150",
+        alertMarker: { cx: 210, cy: 95 },
+        advisoryTitle: "Field Needs Inspection: Canopy Moisture Change",
+        advisoryDesc: "Status: Possible change in vegetative reflectance detected in the North-East zone. Requires physical ground verification before scheduling irrigation or chemical treatments.",
+        metric: "0.58 (Dip of 12% vs. healthy benchmark 0.70)",
+        notice: "Multi-spectral vegetation index (NDVI) shows a localized drop of 12% in the North-East quarter. Rest of parcel maintains standard canopy vigor.",
+        meaning: "Possible uneven subsoil water percolation, clogged drip emitter line, or early localized moisture stress on lower stems.",
+        action: "Conduct perimeter walk along NE ridge. Check top 10 cm root zone moisture before activating pump. If stems show rust lesions, consult Kisan helpline.",
+        sms: "[EARTHWORM-AGRI] Plot 142/A (Mandya): Moisture stress detected in NE zone. No rain expected next 3 days. Inspect topsoil before irrigating.",
+        voiceTranscript: "Namaskara farmer. Earthworm satellite check for plot 142/A in Mandya shows lower canopy moisture in the northeast zone. No rain is expected for three days. Please check the topsoil before turning on irrigation pumps.",
+        weatherOutlook: "Mandya: 31°C • No rain expected next 3 days • 12 km/h gentle wind.",
+        weatherHeader: "Regional 3-Day Outlook (Open-Meteo Demonstration)",
+        days: [
+          { day: "Day 1", icon: "sunny", temp: "31° / 21°", rain: "0 mm rain" },
+          { day: "Day 2", icon: "partly_cloudy_day", temp: "32° / 20°", rain: "0 mm rain" },
+          { day: "Day 3", icon: "cloud", temp: "30° / 22°", rain: "<1 mm rain" }
+        ],
+        recommendation: "Stable dry weather next 3 days. Suitable for weed clearing and ground parcel inspection.",
+        history: [
+          { date: "04 Feb", ndvi: 0.68, height: "97%" },
+          { date: "09 Feb", ndvi: 0.66, height: "94%" },
+          { date: "14 Feb", ndvi: 0.63, height: "90%" },
+          { date: "19 Feb", ndvi: 0.61, height: "87%" },
+          { date: "24 Feb", ndvi: 0.58, height: "82%" }
+        ]
+      },
+      ludhiana: {
+        location: "Ludhiana, Punjab",
+        crop: "Wheat (PBW 343)",
+        parcel: "Parcel #89/C",
+        plotTitle: "89/C (Ludhiana, Punjab)",
+        cropTitle: "Wheat (PBW 343 - Late Sown)",
+        area: "2.4 Hectares (~5.9 Acres)",
+        satImage: "assets/ludhiana.jpg",
+        satPass: "23 Feb 2024 • Sentinel-2 Pass",
+        satPolygon: "85,45 320,40 305,170 80,165",
+        alertMarker: { cx: 200, cy: 105 },
+        advisoryTitle: "Wheat Vigour Normal: Nitrogen Top-dress Window",
+        advisoryDesc: "Status: Vegetative index indicates vigorous tillering. Good canopy cover observed. Optimal window for second split of urea before mild daytime rise.",
+        metric: "0.72 (Normal healthy vegetative benchmark 0.70)",
+        notice: "Vegetative reflectance is high and uniformly green across the entire field parcel.",
+        meaning: "Strong root establishment and active tillering stage. High nutrient uptake potential.",
+        action: "Apply recommended urea dose ahead of scheduled light canal run. Check for yellow rust signs on lower leaf blades.",
+        sms: "[EARTHWORM-AGRI] Plot 89/C (Ludhiana): High vigor detected. Excellent tillering. Urea top-dressing window open.",
+        voiceTranscript: "Sat Sri Akal. Earthworm report for plot 89/C in Ludhiana shows healthy wheat tillering with strong vigor. Optimal window for urea application is open.",
+        weatherOutlook: "Ludhiana: 24°C • Sunny skies • Morning fog clearing • 8 km/h NW wind.",
+        weatherHeader: "Regional 3-Day Outlook (Open-Meteo Demonstration)",
+        days: [
+          { day: "Day 1", icon: "wb_sunny", temp: "24° / 11°", rain: "0 mm rain" },
+          { day: "Day 2", icon: "sunny", temp: "25° / 12°", rain: "0 mm rain" },
+          { day: "Day 3", icon: "partly_cloudy_day", temp: "23° / 10°", rain: "0 mm rain" }
+        ],
+        recommendation: "Mild temperatures and clear sun favorable for wheat tillering and light intercultural operations.",
+        history: [
+          { date: "03 Feb", ndvi: 0.62, height: "88%" },
+          { date: "08 Feb", ndvi: 0.66, height: "94%" },
+          { date: "13 Feb", ndvi: 0.69, height: "98%" },
+          { date: "18 Feb", ndvi: 0.71, height: "100%" },
+          { date: "23 Feb", ndvi: 0.72, height: "100%" }
+        ]
+      },
+      varanasi: {
+        location: "Varanasi, Uttar Pradesh",
+        crop: "Mustard & Vegetables",
+        parcel: "Parcel #214/B",
+        plotTitle: "214/B (Varanasi, UP)",
+        cropTitle: "Mustard (Varuna) & Winter Cabbage",
+        area: "1.2 Hectares (~2.9 Acres)",
+        satImage: "assets/varanasi.jpg",
+        satPass: "22 Feb 2024 • Sentinel-2 Pass",
+        satPolygon: "70,65 295,50 330,150 120,180",
+        alertMarker: { cx: 195, cy: 105 },
+        advisoryTitle: "Check for Aphid Infestation on Siliquae",
+        advisoryDesc: "Status: Dense vegetative cluster observed. Moderate relative humidity morning conditions create vulnerability for mustard aphids. Inspect lower leaves.",
+        metric: "0.64 (Vegetative coverage high vs 0.65 benchmark)",
+        notice: "Dense biomass canopy detected with high relative humidity retention in central furrow.",
+        meaning: "Optimal microclimate for aphid proliferation during early morning flowering hours.",
+        action: "Scout central rows at 8 AM. If aphids exceed 10-15 per twig, prepare yellow sticky traps or neem seed kernel extract.",
+        sms: "[EARTHWORM-AGRI] Plot 214/B (Varanasi): Dense foliage & morning humidity favor aphids. Scout inner rows before watering.",
+        voiceTranscript: "Namaskar farmer. Earthworm advisory for plot 214/B in Varanasi warns that high canopy density may foster aphids. Please scout morning rows.",
+        weatherOutlook: "Varanasi: 28°C • Warm afternoons • Low humidity • Clear skies.",
+        weatherHeader: "Regional 3-Day Outlook (Open-Meteo Demonstration)",
+        days: [
+          { day: "Day 1", icon: "wb_sunny", temp: "28° / 14°", rain: "0 mm rain" },
+          { day: "Day 2", icon: "sunny", temp: "29° / 15°", rain: "0 mm rain" },
+          { day: "Day 3", icon: "wb_sunny", temp: "28° / 14°", rain: "0 mm rain" }
+        ],
+        recommendation: "Dry spells persist. Check pod formation. Avoid excessive watering during peak flowering.",
+        history: [
+          { date: "02 Feb", ndvi: 0.58, height: "89%" },
+          { date: "07 Feb", ndvi: 0.61, height: "93%" },
+          { date: "12 Feb", ndvi: 0.63, height: "96%" },
+          { date: "17 Feb", ndvi: 0.64, height: "98%" },
+          { date: "22 Feb", ndvi: 0.64, height: "98%" }
+        ]
+      },
+      nashik: {
+        location: "Nashik, Maharashtra",
+        crop: "Onion / Grapes",
+        parcel: "Parcel #56/D",
+        plotTitle: "56/D (Dindori, Nashik)",
+        cropTitle: "Late Kharif Onion (Red Pinhead)",
+        area: "1.6 Hectares (~3.9 Acres)",
+        satImage: "assets/nashik.jpg",
+        satPass: "21 Feb 2024 • Sentinel-2 Pass",
+        satPolygon: "105,40 295,55 285,185 95,160",
+        alertMarker: { cx: 190, cy: 115 },
+        advisoryTitle: "Bulb Development Stage: Soil Moisture Check",
+        advisoryDesc: "Status: Reflectance consistent with bulb expansion. Maintain uniform micro-irrigation. Withhold irrigation 10 days prior to anticipated lifting.",
+        metric: "0.61 (Expected bulb filling signature vs 0.62 benchmark)",
+        notice: "Canopy expansion stabilizing; spectral shift indicates transition into bulb swelling.",
+        meaning: "Crop requires steady moisture but no waterlogging; high vulnerability to purple blotch.",
+        action: "Maintain 2-hour drip runs every alternate day. Check drip emitters for salt blockage in lateral lines.",
+        sms: "[EARTHWORM-AGRI] Plot 56/D (Nashik): Bulb filling stage in progress. Maintain alternate-day drip irrigation.",
+        voiceTranscript: "Namaskar. Earthworm advisory for plot 56/D in Nashik indicates active bulb swelling. Maintain alternate day drip cycles.",
+        weatherOutlook: "Nashik: 30°C • Dry afternoon heat • 14 km/h wind • Zero rain.",
+        weatherHeader: "Regional 3-Day Outlook (Open-Meteo Demonstration)",
+        days: [
+          { day: "Day 1", icon: "sunny", temp: "30° / 16°", rain: "0 mm rain" },
+          { day: "Day 2", icon: "sunny", temp: "31° / 17°", rain: "0 mm rain" },
+          { day: "Day 3", icon: "partly_cloudy_day", temp: "29° / 15°", rain: "0 mm rain" }
+        ],
+        recommendation: "High day temperatures accelerate drying. Monitor drip line emitters for salt clogging.",
+        history: [
+          { date: "01 Feb", ndvi: 0.54, height: "87%" },
+          { date: "06 Feb", ndvi: 0.57, height: "91%" },
+          { date: "11 Feb", ndvi: 0.59, height: "95%" },
+          { date: "16 Feb", ndvi: 0.60, height: "96%" },
+          { date: "21 Feb", ndvi: 0.61, height: "98%" }
+        ]
+      }
+    };
+
+
+    // Comprehensive Localizations for All Supported Languages
+    const LANGUAGE_OVERRIDES = {
+      kn: {
+        mandya: {
+          advisoryTitle: "ಹೊಲ ಪರಿಶೀಲನೆ ಅಗತ್ಯ: ತೇವಾಂಶದಲ್ಲಿ ವ್ಯತ್ಯಾಸ",
+          advisoryDesc: "ಸ್ಥಿತಿ: ಈಶಾನ್ಯ ಭಾಗದಲ್ಲಿ ಬೆಳೆ ಹಸಿರಿನಲ್ಲಿ ಶೇ. 12 ರಷ್ಟು ಇಳಿಕೆ ಕಂಡುಬಂದಿದೆ. ನೀರು ಹಾಯಿಸುವ ಮುನ್ನ ಮಣ್ಣಿನ ತೇವಾಂಶ ಪರಿಶೀಲಿಸಿ.",
+          metric: "0.58 (ಸಾಮಾನ್ಯ ಮಟ್ಟ 0.70 ಕ್ಕಿಂತ 12% ಇಳಿಕೆ)",
+          notice: "ಮಂಡ್ಯ ಪ್ಲಾಟ್ 142/A ಈಶಾನ್ಯ ವಲಯದಲ್ಲಿ ಎನ್‌ಡಿವಿಐ ಸೂಚ್ಯಂಕದಲ್ಲಿ ಶೇ. 12 ರಷ್ಟು ಕುಸಿತ ಕಂಡುಬಂದಿದೆ.",
+          meaning: "ಉಪ-ಮಣ್ಣಿನ ನೀರಿನ ಕೊರತೆ, ಹನಿ ನೀರಾವರಿ ಪೈಪ್ ಕಟ್ಟಿಕೊಂಡಿರುವುದು ಅಥವಾ ಆರಂಭಿಕ ನೀರಿನ ಕೊರತೆ ಇರಬಹುದು.",
+          action: "ಈಶಾನ್ಯ ದಿಕ್ಕಿನ ಬದುವಿನಲ್ಲಿ ನಡೆದು ಮಣ್ಣನ್ನು ಕೈಯಿಂದ ಮುಟ್ಟಿ ತೇವಾಂಶ ಪರೀಕ್ಷಿಸಿ.",
+          sms: "[ಅರ್ಥ್‌ವರ್ಮ್-ಕೃಷಿ] ಪ್ಲಾಟ್ 142/A (ಮಂಡ್ಯ): ಈಶಾನ್ಯ ಭಾಗದಲ್ಲಿ ತೇವಾಂಶ ಇಳಿಕೆ. ಮುಂದಿನ 3 ದಿನ ಮಳೆಯಿಲ್ಲ. ನೀರು ಹಾಯಿಸುವ ಮುನ್ನ ಮಣ್ಣು ಪರಿಶೀಲಿಸಿ.",
+          voiceTranscript: "ನಮಸ್ಕಾರ ರೈತ ಬಾಂಧವರೇ. ಮಂಡ್ಯ ಪ್ಲಾಟ್ 142/A ಉಪಗ್ರಹ ವರದಿಯಂತೆ ಈಶಾನ್ಯ ವಲಯದಲ್ಲಿ ಬೆಳೆ ತೇವಾಂಶ ಕಡಿಮೆಯಾಗಿದೆ. ಮುಂದಿನ ಮೂರು ದಿನ ಮಳೆಯ ಮುನ್ಸೂಚನೆ ಇಲ್ಲ. ನೀರು ಹಾಯಿಸುವ ಮೊದಲು ಮಣ್ಣನ್ನು ಪರಿಶೀಲಿಸಿ."
+        },
+        ludhiana: {
+          advisoryTitle: "ಗೋಧಿ ಬೆಳೆ ಆರೋಗ್ಯಕರ: ಪೋಷಕಾಂಶ ನೀಡುವ ಸಮಯ",
+          advisoryDesc: "ಸ್ಥಿತಿ: ಗೋಧಿ ಬೆಳೆಯಲ್ಲಿ ಉತ್ತಮ ಚಿಗುರು ಮತ್ತು ಹಸಿರು ಕಂಡುಬಂದಿದೆ. ಯೂರಿಯಾ ಸಿಂಪಡಣೆಗೆ ಸಕಾಲ.",
+          metric: "0.72 (ಆರೋಗ್ಯಕರ ಮಾನದಂಡ 0.70)",
+          notice: "ಇಡೀ ಪ್ಲಾಟ್‌ನಲ್ಲಿ ಬೆಳೆ ಹಸಿರು ಉತ್ತಮವಾಗಿದ್ದು ತೇವಾಂಶ ಸ್ಥಿರವಾಗಿದೆ.",
+          meaning: "ಬೇರುಗಳ ಬೆಳವಣಿಗೆ ಉತ್ತಮವಾಗಿದೆ, ಪೋಷಕಾಂಶಗಳನ್ನು ಹೀರಿಕೊಳ್ಳಲು ಸಕಾಲ.",
+          action: "ಕಾಲುವೆ ನೀರು ಬರುವ ಮುನ್ನ ಶಿಫಾರಸು ಮಾಡಿದ ಪ್ರಮಾಣದ ಗೊಬ್ಬರ ನೀಡಿ.",
+          sms: "[ಅರ್ಥ್‌ವರ್ಮ್-ಕೃಷಿ] ಪ್ಲಾಟ್ 89/C (ಲೂಧಿಯಾನ): ಗೋಧಿ ಬೆಳೆ ಉತ್ತಮವಾಗಿದೆ. ಯೂರಿಯಾ ಗೊಬ್ಬರ ನೀಡಲು ಸಕಾಲ.",
+          voiceTranscript: "ನಮಸ್ಕಾರ. ಲೂಧಿಯಾನದ ಪ್ಲಾಟ್ 89/C ಗೋಧಿ ಬೆಳೆ ಸಮೃದ್ಧವಾಗಿದೆ. ಪೋಷಕಾಂಶ ನೀಡುವ ಸಮಯ ಬಂದಿದೆ."
+        }
+      },
+      hi: {
+        mandya: {
+          advisoryTitle: "खेत का निरीक्षण आवश्यक: नमी में बदलाव",
+          advisoryDesc: "स्थिति: उत्तर-पूर्वी हिस्से में वनस्पति सूचकांक में 12% की गिरावट। सिंचाई से पहले मिट्टी की नमी जांचें।",
+          metric: "0.58 (सामान्य से 12% गिरावट)",
+          notice: "उत्तर-पूर्वी चतुर्थांश में वनस्पति सूचकांक (NDVI) में 12% की कमी देखी गई है।",
+          meaning: "मिट्टी की ऊपरी परत का सूखना या ड्रिप नोजल में रुकावट हो सकती है।",
+          action: "उत्तर-पूर्व किनारे पर चलकर मिट्टी को हाथ से दबाकर नमी की गहराई जांचें।",
+          sms: "[अर्थवर्म-कृषि] प्लॉट 142/A (मांड्या): उत्तर-पूर्व में नमी की कमी। अगले 3 दिन बारिश नहीं। सिंचाई से पहले मिट्टी जांचें।",
+          voiceTranscript: "नमस्कार किसान भाइयों। मांड्या के प्लॉट 142/A में उत्तर-पूर्वी हिस्से में नमी की कमी दर्ज की गई है। सिंचाई करने से पहले मिट्टी की जांच अवश्य करें।"
+        },
+        ludhiana: {
+          advisoryTitle: "गेहूं की फसल स्वस्थ: यूरिया देने का सही समय",
+          advisoryDesc: "स्थिति: फसल में जोरदार कल्ले फूट रहे हैं। हल्की धूप से पहले दूसरी बार यूरिया देने का उपयुक्त समय।",
+          metric: "0.72 (सामान्य स्वस्थ मानक 0.70)",
+          notice: "पूरे खेत में वनस्पति सूचकांक उच्च और एकसमान हरा है।",
+          meaning: "जड़ों का मजबूत विकास और सक्रिय फुटाव अवस्था।",
+          action: "नहर का पानी आने से पहले अनुशंसित यूरिया डालें।",
+          sms: "[अर्थवर्म-कृषि] प्लॉट 89/C (लुधियाना): गेहूं में अच्छी वृद्धि। यूरिया टॉप-ड्रेसिंग का समय।",
+          voiceTranscript: "सत श्री अकाल। लुधियाना प्लॉट 89/C में गेहूं की फसल स्वस्थ है। यूरिया खाद देने का सही समय है।"
+        }
+      },
+      te: {
+        mandya: {
+          advisoryTitle: "క్షేత్ర పరిశీలన అవసరం: తేమలో మార్పు",
+          advisoryDesc: "స్థితి: ఈశాన్య భాగంలో పంట పచ్చదనంలో 12% తగ్గుదల గుర్తించబడింది. నీరు పెట్టే ముందు నేలలో తేమను తనిఖీ చేయండి.",
+          metric: "0.58 (సాధారణ స్థాయి కంటే 12% తగ్గుదల)",
+          notice: "మండ్య ప్లాట్ 142/A ఈశాన్య భాగంలో NDVI సూచిక 12% తగ్గింది. మిగిలిన పొలం ఆరోగ్యంగా ఉంది.",
+          meaning: "భూమి లోపల తేమ కొరత, డ్రిప్ పైపులో అడ్డంకులు లేదా ప్రాథమిక నీటి ఎద్దడి ఉండవచ్చు.",
+          action: "ఈశాన్య సరిహద్దు వెంబడి నడిచి చేత్తో నేలను ఒత్తి తేమ లోతును తనిఖీ చేయండి.",
+          sms: "[అర్థ్‌వర్మ్-అగ్రి] ప్లాట్ 142/A (మండ్య): ఈశాన్యంలో తేమ కొరత. వచ్చే 3 రోజులు వర్షం లేదు. నీరు పెట్టే ముందు నేల తనిఖీ చేయండి.",
+          voiceTranscript: "నమస్కారం రైతు సోదరులారా. మండ్య ప్లాట్ 142/A ఉపగ్రహ నివేదిక ప్రకారం ఈశాన్య భాగంలో పంట తేమ తగ్గింది. వచ్చే మూడు రోజులు వర్ష సూచన లేదు. నీరు పెట్టే ముందు నేలను తనిఖీ చేయండి."
+        },
+        ludhiana: {
+          advisoryTitle: "గోధుమ పంట ఆరోగ్యంగా ఉంది: ఎరువులు వేసే సమయం",
+          advisoryDesc: "స్థితి: పంటలో మంచి పిలకలు మరియు పచ్చదనం కనిపిస్తుంది. యూరియా వేయడానికి అనుకూల సమయం.",
+          metric: "0.72 (ఆరోగ్యకర ప్రమాణం 0.70)",
+          notice: "మొత్తం పొలంలో పంట పచ్చదనం స్థిరంగా మరియు ఆరోగ్యంగా ఉంది.",
+          meaning: "వేర్లు బలంగా అభివృద్ధి చెందుతున్నాయి, పోషకాలను గ్రహించడానికి అనుకూలం.",
+          action: "కాలువ నీరు వచ్చే ముందు సిఫార్సు చేసిన మోతాదులో యూరియా వేయండి.",
+          sms: "[అర్థ్‌వర్మ్-అగ్రి] ప్లాట్ 89/C (లూధియానా): గోధుమ పంట పచ్చగా ఉంది. యూరియా వేయడానికి సమయం.",
+          voiceTranscript: "నమస్కారం. లూధియానా ప్లాట్ 89/C లో గోధుమ పంట ఏపుగా పెరుగుతోంది. యూరియా వేయడానికి అనుకూల సమయం."
+        }
+      },
+      ta: {
+        mandya: {
+          advisoryTitle: "வயல் ஆய்வு தேவை: ஈரப்பதத்தில் மாற்றம்",
+          advisoryDesc: "நிலை: வடகிழக்கு பகுதியில் பயிர் பசுமையில் 12% குறைவு கண்டறியப்பட்டுள்ளது. பாசனம் செய்வதற்கு முன் மண்ணின் ஈரப்பதத்தை சரிபார்க்கவும்.",
+          metric: "0.58 (வழக்கமான அளவை விட 12% குறைவு)",
+          notice: "மண்டியா நிலம் 142/A வடகிழக்கு பகுதியில் NDVI குறியீட்டில் 12% குறைவு ஏற்பட்டுள்ளது.",
+          meaning: "மண்ணின் கீழ் ஈரப்பதம் குறைவு, சொட்டு நீர் குழாயில் அடைப்பு அல்லது ஆரம்ப கால நீர் பற்றாக்குறை இருக்கலாம்.",
+          action: "வடகிழக்கு வரப்பில் நடந்து சென்று கைகளால் மண்ணை அழுத்தி ஈரப்பத ஆழத்தை சரிபார்க்கவும்.",
+          sms: "[எர்த்வார்ம்-அக்ரி] நிலம் 142/A (மண்டியா): வடகிழக்கில் ஈரப்பதம் குறைவு. அடுத்த 3 நாட்களுக்கு மழை இல்லை. பாசனத்திற்கு முன் மண்ணை சோதிக்கவும்.",
+          voiceTranscript: "வணக்கம் விவசாய நண்பர்களே. மண்டியா நிலம் 142/A செயற்கைக்கோள் ஆய்வில் வடகிழக்கு பகுதியில் ஈரப்பதம் குறைந்துள்ளது. அடுத்த மூன்று நாட்களுக்கு மழை வாய்ப்பில்லை. பாசனம் செய்வதற்கு முன் மண்ணை சோதிக்கவும்."
+        },
+        ludhiana: {
+          advisoryTitle: "கோதுமை பயிர் நலம்: உரமிடுவதற்கான உகந்த நேரம்",
+          advisoryDesc: "நிலை: பயிர் தீவிர தூர் கட்டும் நிலையில் உள்ளது. யூரியா உரம் இடுவதற்கான சரியான தருணம்.",
+          metric: "0.72 (ஆரோக்கியமான குறியீடு 0.70)",
+          notice: "முழு நிலத்திலும் பயிர் சீரான பசுமையுடன் செழிப்பாக உள்ளது.",
+          meaning: "வேர்கள் நன்றாக வளர்ந்துள்ளன, ஊட்டச்சத்துக்களை உறிஞ்சும் திறன் அதிகம்.",
+          action: "கால்வாய் பாசனத்திற்கு முன் பரிந்துரைக்கப்பட்ட அளவு யூரியாவை இடவும்.",
+          sms: "[எர்த்வார்ம்-அக்ரி] நிலம் 89/C (லூதியானா): கோதுமை பயிர் நலம். யூரியா உரமிட உகந்த நேரம்.",
+          voiceTranscript: "வணக்கம். லூதியானா நிலம் 89/C கோதுமை பயிர் மிக நன்றாக உள்ளது. யூரியா மேலுரமிடும் நேரம் வந்துள்ளது."
+        }
+      },
+      mr: {
+        mandya: {
+          advisoryTitle: "शेत तपासणी आवश्यक: ओलाव्यामध्ये बदल",
+          advisoryDesc: "स्थिती: ईशान्य भागात पिकाच्या हिरवेपणात १२% घट दिसून आली आहे. पाणी देण्यापूर्वी जमिनीतील ओलावा तपासा.",
+          metric: "०.५८ (सर्वसाधारण मानकापेक्षा १२% घट)",
+          notice: "मांड्या प्लॉट १४२/A च्या ईशान्य भागात NDVI निर्देशांकात १२% घट नोंदवली गेली आहे.",
+          meaning: "जमिनीतील ओलाव्याची कमतरता, ठिबक नळीत अडथळा किंवा सुरुवातीचा पाण्याचा ताण असू शकतो.",
+          action: "ईशान्य बांधावर फिरून हाताने माती दाबून ओलाव्याची खोली तपासा.",
+          sms: "[अर्थवर्म-कृषी] प्लॉट १४२/A (मांड्या): ईशान्य भागात ओलावा कमी. पुढील ३ दिवस पाऊस नाही. पाणी देण्यापूर्वी माती तपासा.",
+          voiceTranscript: "नमस्कार शेतकरी मित्रांनो. मांड्या प्लॉट १४२/A उपग्रह तपासणीनुसार ईशान्य भागात पिकाचा ओलावा कमी झाला आहे. पुढील तीन दिवस पावसाची शक्यता नाही. पाणी देण्यापूर्वी माती तपासा."
+        },
+        ludhiana: {
+          advisoryTitle: "गहू पीक निरोगी: युरिया खत देण्याची योग्य वेळ",
+          advisoryDesc: "स्थिती: पिकाची वाढ जोमदार असून फुटवे चांगले फुटले आहेत. युरिया खताचा दुसरा हप्ता देण्याची हीच वेळ आहे.",
+          metric: "०.७२ (निरोगी मानक ०.७०)",
+          notice: "संपूर्ण शेतात पिकाचा हिरवेपणा उच्च आणि एकसमान आहे.",
+          meaning: "मुळांची वाढ चांगली असून पोषक तत्वे शोषून घेण्याची क्षमता उत्तम आहे.",
+          action: "कालव्याचे पाणी सोडण्यापूर्वी शिफारस केलेले युरिया खत द्या.",
+          sms: "[अर्थवर्म-कृषी] प्लॉट ८९/C (लुधियाना): गहू पिकाची जोमदार वाढ. युरिया खत देण्याची वेळ.",
+          voiceTranscript: "नमस्कार. लुधियाना प्लॉट ८९/C मधील गहू पीक उत्तम स्थितीत आहे. युरिया खताचा हप्ता देण्याची वेळ झाली आहे."
+        }
+      },
+      bn: {
+        mandya: {
+          advisoryTitle: "জমি পরিদর্শন প্রয়োজন: আর্দ্রতায় পরিবর্তন",
+          advisoryDesc: "অবস্থা: উত্তর-পূর্ব অংশে ফসলের সবুজ সূচকে ১২% হ্রাস লক্ষ্য করা গেছে। সেচ দেওয়ার আগে মাটির আর্দ্রতা পরীক্ষা করুন।",
+          metric: "০.৫৮ (স্বাভাবিক মানদণ্ড থেকে ১২% হ্রাস)",
+          notice: "মান্ড্য প্লট ১৪২/A-এর উত্তর-পূর্ব অংশে NDVI সূচক ১২% কমেছে।",
+          meaning: "মাটির অভ্যন্তরে পানির ঘাটতি, ড্রিপ লাইনে বাধা বা প্রাথমিক আর্দ্রতার চাপ হতে পারে।",
+          action: "উত্তর-পূর্ব সীমানায় হেঁটে হাত দিয়ে মাটি চেপে আর্দ্রতার গভীরতা পরীক্ষা করুন।",
+          sms: "[আর্থওয়ার্ম-কৃষি] প্লট ১৪২/A (মান্ড্য): উত্তর-পূর্বে আর্দ্রতার টান। আগামী ৩ দিন বৃষ্টি নেই। সেচের আগে মাটি পরীক্ষা করুন।",
+          voiceTranscript: "নমস্কার কৃষক বন্ধুরা। মান্ড্য প্লট ১৪২/A উপগ্রহ চিত্রে উত্তর-পূর্ব অংশে আর্দ্রতা হ্রাসের ইঙ্গিত মিলেছে। আগামী তিন দিন কোনো বৃষ্টির সম্ভাবনা নেই। সেচ দেওয়ার পূর্বে মাটির আর্দ্রতা যাচাই করুন।"
+        },
+        ludhiana: {
+          advisoryTitle: "গম ফসল স্বাস্থ্যকর: ইউরিয়া প্রয়োগের উপযুক্ত সময়",
+          advisoryDesc: "অবস্থা: ফসলের বৃদ্ধি জোরালো এবং কান্ড ভালো মেলছে। দ্বিতীয় দফায় ইউরিয়া সার দেওয়ার সঠিক সময়।",
+          metric: "০.৭২ (স্বাস্থ্যকর মানদণ্ড ০.৭০)",
+          notice: "পুরো জমিতে ফসলের সবুজ বর্ণ চমৎকার ও সামঞ্জস্যপূর্ণ।",
+          meaning: "শিকড় মজবুত এবং পুষ্টি গ্রহণের অনুকূল সময়।",
+          action: "সেচ প্রদানের পূর্বে নির্দেশিত মাত্রায় ইউরিয়া সার দিন।",
+          sms: "[আর্থওয়ার্ম-কৃষি] প্লট ৮৯/C (লুধিয়ানা): গমের চমৎকার বৃদ্ধি। ইউরিয়া সার প্রয়োগের সময়।",
+          voiceTranscript: "নমস্কার। লুধিয়ানা প্লট ৮৯/C-তে গম ফসল অত্যন্ত স্বাস্থ্যবান। ইউরিয়া সার প্রয়োগের অনুকূল সময় উপস্থিত।"
+        }
+      }
+    };
+
+    const TRANSLATIONS = {
+      en: {
+        heroTitle: "Understand Your Crops Before Problems Grow.",
+        heroSubtitle: "Free space-based vegetative index and agrometeorological insights for Indian farmers.",
+        heroTag: "Space & Weather Observations",
+        bannerTitle: "Prototype Demonstration Data",
+        bannerText: "Satellite reflectance & agromet observations. Always verify ground conditions before applying treatments.",
+        checkField: "Check My Field",
+        howItWorks: "How It Works",
+        viewAdvice: "View Full Advice",
+        audioBtn: "Listen Voice Advice",
+        tsTitle: "NDVI 20-Day Trend (Sentinel-2)",
+        tsBenchmark: "Seasonal Benchmark: 0.70",
+        regionHeader: "Select Demo Field (Pan-India)",
+        tilesHeader: "Three Practical Field Actions",
+        tile1: "1. Check Crop Health",
+        tile2: "2. Should I Water?",
+        tile3: "3. View Weather Forecast",
+        speechLang: "en-IN",
+        stage1: "1. What did we notice? (Observation)",
+        stage2: "2. What could it mean? (Interpretation)",
+        stage3: "3. What should I do next? (Action Steps)"
+      },
+      kn: {
+        heroTitle: "ಸಮಸ್ಯೆಗಳು ಬೆಳೆಯುವ ಮುನ್ನ ನಿಮ್ಮ ಬೆಳೆಗಳನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಿ.",
+        heroSubtitle: "ಭಾರತೀಯ ರೈತರಿಗೆ ಉಪಗ್ರಹ ಆಧಾರಿತ ಉಚಿತ ಬೆಳೆ ಆರೋಗ್ಯ ಮತ್ತು ಹವಾಮಾನ ಮಾಹಿತಿ.",
+        heroTag: "ಉಪಗ್ರಹ ಮತ್ತು ಹವಾಮಾನ ಮಾಹಿತಿ",
+        bannerTitle: "ಮಾದರಿ ಪ್ರದರ್ಶನ ದತ್ತಾಂಶ",
+        bannerText: "ಉಪಗ್ರಹ ಪ್ರತಿಫಲನ ಮತ್ತು ಹವಾಮಾನ ಮಾಹಿತಿ. ಚಿಕಿತ್ಸೆ ನೀಡುವ ಮುನ್ನ ಹೊಲದಲ್ಲಿ ಪರಿಶೀಲಿಸಿ.",
+        checkField: "ನನ್ನ ಹೊಲ ಪರಿಶೀಲಿಸಿ",
+        howItWorks: "ಇದು ಹೇಗೆ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತದೆ",
+        viewAdvice: "ಸಂಪೂರ್ಣ ಸಲಹೆ ನೋಡಿ",
+        audioBtn: "ಧ್ವನಿ ಸಲಹೆ ಕೇಳಿ (ಕನ್ನಡ)",
+        tsTitle: "ಎನ್‌ಡಿವಿಐ 20-ದಿನಗಳ ಪ್ರವೃತ್ತಿ (ಸೆಂಟಿನೆಲ್-2)",
+        tsBenchmark: "ಋತುವಿನ ಮಾನದಂಡ: 0.70",
+        regionHeader: "ಮಾದರಿ ಹೊಲವನ್ನು ಆಯ್ಕೆಮಾಡಿ",
+        tilesHeader: "ಮೂರು ಮುಖ್ಯ ಹೊಲದ ಕ್ರಮಗಳು",
+        tile1: "೧. ಬೆಳೆ ಆರೋಗ್ಯ ಪರೀಕ್ಷಿಸಿ",
+        tile2: "೨. ನೀರು ಹಾಯಿಸಬೇಕೇ?",
+        tile3: "೩. ಹವಾಮಾನ ಮುನ್ಸೂಚನೆ",
+        speechLang: "kn-IN",
+        stage1: "೧. ಗಮನಿಸಿದ್ದು ಏನು? (ಗಮನಿಸಿದ್ದು)",
+        stage2: "೨. ಅರ್ಥವೇನು? (ಅರ್ಥವೇನು)",
+        stage3: "೩. ಮುಂದೇನು ಮಾಡಬೇಕು? (ಮುಂದೇನು)"
+      },
+      hi: {
+        heroTitle: "समस्या बढ़ने से पहले अपनी फसल को समझें।",
+        heroSubtitle: "भारतीय किसानों के लिए मुफ्त उपग्रह वनस्पति सूचकांक और कृषि मौसम सलाह।",
+        heroTag: "अंतरिक्ष एवं मौसम अवलोकन",
+        bannerTitle: "प्रोटोटाइप प्रदर्शन डेटा",
+        bannerText: "उपग्रह परावर्तन और मौसम संबंधी डेटा। उपचार लागू करने से पहले खेत में जांचें।",
+        checkField: "मेरा खेत जांचें",
+        howItWorks: "यह कैसे काम करता है",
+        viewAdvice: "पूरी सलाह देखें",
+        audioBtn: "सलाह सुनें (हिन्दी)",
+        tsTitle: "NDVI 20-दिवसीय रुझान (सेंटिनल-2)",
+        tsBenchmark: "मौसमी बेंचमार्क: 0.70",
+        regionHeader: "प्रदर्शन खेत चुनें (अखिल भारतीय)",
+        tilesHeader: "तीन व्यावहारिक क्षेत्रीय कार्य",
+        tile1: "1. फसल का स्वास्थ्य जांचें",
+        tile2: "2. क्या मुझे पानी देना चाहिए?",
+        tile3: "3. मौसम पूर्वानुमान देखें",
+        speechLang: "hi-IN",
+        stage1: "1. हमने क्या देखा? (निरीक्षण)",
+        stage2: "2. इसका क्या मतलब हो सकता है? (अर्थ)",
+        stage3: "3. आगे क्या करना चाहिए? (कदम)"
+      },
+      te: {
+        heroTitle: "సమస్యలు పెరగకముందే మీ పంటను అర్థం చేసుకోండి.",
+        heroSubtitle: "భారతీయ రైతులకు ఉచిత అంతరిక్ష ఆధారిత పంట ఆరోగ్యం మరియు వాతావరణ సమాచారం.",
+        heroTag: "అంతరిక్ష & వాతావరణ పరిశీలనలు",
+        bannerTitle: "నమూనా ప్రదర్శన సమాచారం",
+        bannerText: "ఉపగ్రహ పరావర్తన మరియు వ్యవసాయ వాతావరణ పరిశీలనలు. చికిత్సలు వర్తించే ముందు నేల పరిస్థితులను పరిశీలించండి.",
+        checkField: "నా పొలాన్ని తనిఖీ చేయండి",
+        howItWorks: "ఇది ఎలా పని చేస్తుంది",
+        viewAdvice: "పూర్తి సలహాను చూడండి",
+        audioBtn: "వాయిస్ సలహా వినండి (తెలుగు)",
+        tsTitle: "NDVI 20 రోజుల పోకడ (సెంటినెల్-2)",
+        tsBenchmark: "సీజనల్ ప్రమాణం: 0.70",
+        regionHeader: "డెమో పొలాన్ని ఎంచుకోండి (అఖిల భారతదేశం)",
+        tilesHeader: "మూడు ఆచరణాత్మక క్షేత్ర చర్యలు",
+        tile1: "1. పంట ఆరోగ్యాన్ని తనిఖీ చేయండి",
+        tile2: "2. నీరు పెట్టాలా?",
+        tile3: "3. వాతావరణ సూచన చూడండి",
+        speechLang: "te-IN",
+        stage1: "1. మనం ఏమి గమనించాం? (గమనింపు)",
+        stage2: "2. దీని అర్థం ఏమిటి? (వివరణ)",
+        stage3: "3. తరువాత ఏమి చేయాలి? (చర్యలు)"
+      },
+      ta: {
+        heroTitle: "பிரச்சனைகள் வளர்வதற்கு முன் உங்கள் பயிர்களை புரிந்து கொள்ளுங்கள்.",
+        heroSubtitle: "இந்திய விவசாயிகளுக்கு செயற்கைக்கோள் அடிப்படையிலான இலவச பயிர் ஆரோக்கியம் மற்றும் வானிலை வழிகாட்டல்.",
+        heroTag: "விண்வெளி & வானிலை ஆய்வுகள்",
+        bannerTitle: "மாதிரி செயல்விளக்கத் தரவு",
+        bannerText: "செயற்கைக்கோள் மற்றும் வேளாண்-வானிலை அவதானிப்புகள். மருந்து தெளிக்கும் முன் நிலத்தை நேரடியாகப் பரிசோதிக்கவும்.",
+        checkField: "எனது வயலை சோதிக்கவும்",
+        howItWorks: "இது எவ்வாறு செயல்படுகிறது",
+        viewAdvice: "முழு ஆலோசனையை காண்க",
+        audioBtn: "குரல் ஆலோசனையை கேட்கவும் (தமிழ்)",
+        tsTitle: "NDVI 20-நாள் போக்கு (சென்டினல்-2)",
+        tsBenchmark: "பருவகால அளவுகோல்: 0.70",
+        regionHeader: "மாதிரி நிலத்தைத் தேர்ந்தெடுக்கவும் (அகில இந்தியா)",
+        tilesHeader: "மூன்று நடைமுறை வயல் நடவடிக்கைகள்",
+        tile1: "1. பயிர் ஆரோக்கியத்தை சரிபார்க்கவும்",
+        tile2: "2. தண்ணீர் பாய்ச்ச வேண்டுமா?",
+        tile3: "3. வானிலை முன்னறிவிப்பைப் பார்க்கவும்",
+        speechLang: "ta-IN",
+        stage1: "1. நாம் கவனித்தது என்ன? (கவனிப்பு)",
+        stage2: "2. இதற்கு என்ன அர்த்தம்? (பொருள்)",
+        stage3: "3. அடுத்து என்ன செய்ய வேண்டும்? (நடவடிக்கை)"
+      },
+      mr: {
+        heroTitle: "समस्या वाढण्यापूर्वी तुमचे पीक समजून घ्या.",
+        heroSubtitle: "भारतीय शेतकऱ्यांसाठी उपग्रह-आधारित मोफत पीक आरोग्य आणि कृषी हवामान सल्ला.",
+        heroTag: "अंतराळ आणि हवामान निरीक्षणे",
+        bannerTitle: "प्रोटोटाइप प्रात्यक्षिक डेटा",
+        bannerText: "उपग्रह परावर्तन आणि कृषी हवामान निरीक्षणे. फवारणीपूर्वी प्रत्यक्ष शेतात जाऊन खात्री करा.",
+        checkField: "माझे शेत तपासा",
+        howItWorks: "हे कसे कार्य करते",
+        viewAdvice: "संपूर्ण सल्ला पहा",
+        audioBtn: "ध्वनी सल्ला ऐका (मराठी)",
+        tsTitle: "NDVI २०-दिवसीय कल (सेंटिनेल-२)",
+        tsBenchmark: "हंगामी मानक: ०.७०",
+        regionHeader: "प्रात्यक्षिक शेत निवडा (अखिल भारतीय)",
+        tilesHeader: "तीन व्यावहारिक शेती कृती",
+        tile1: "१. पिकाचे आरोग्य तपासा",
+        tile2: "२. पाणी द्यावे का?",
+        tile3: "३. हवामान अंदाज पहा",
+        speechLang: "mr-IN",
+        stage1: "1. आम्ही काय पाहिले? (निरीक्षण)",
+        stage2: "2. याचा काय अर्थ असू शकतो? (अर्थ)",
+        stage3: "3. पुढे काय करावे? (कृती)"
+      },
+      bn: {
+        heroTitle: "সমস্যা বাড়ার আগেই আপনার ফসলকে বুঝুন।",
+        heroSubtitle: "ভারতীয় কৃষকদের জন্য উপগ্রহ-ভিত্তিক বিনামূল্যের ফসলের স্বাস্থ্য ও আবহাওয়া তথ্য।",
+        heroTag: "মহাকাশ ও আবহাওয়া পর্যবেক্ষণ",
+        bannerTitle: "নমুনা প্রদর্শনী তথ্য",
+        bannerText: "উপগ্রহ প্রতিফলন ও কৃষি আবহাওয়া পর্যবেক্ষণ। প্রয়োগের আগে সর্বদা মাঠের অবস্থা যাচাই করুন।",
+        checkField: "আমার জমি যাচাই করুন",
+        howItWorks: "এটি কীভাবে কাজ করে",
+        viewAdvice: "সম্পূর্ণ পরামর্শ দেখুন",
+        audioBtn: "ভয়েস পরামর্শ শুনুন (বাংলা)",
+        tsTitle: "NDVI ২০-দিনের প্রবণতা (সেন্টিনেল-২)",
+        tsBenchmark: "মৌসুমী মানদণ্ড: ০.৭০",
+        regionHeader: "প্রদর্শনী জমি নির্বাচন করুন (সর্বভারতীয়)",
+        tilesHeader: "তিনটি কার্যকর মাঠ পর্যায়ের পদক্ষেপ",
+        tile1: "১. ফসলের স্বাস্থ্য পরীক্ষা করুন",
+        tile2: "২. পানি কি দেওয়া উচিত?",
+        tile3: "৩. আবহাওয়ার পূর্বাভাস দেখুন",
+        speechLang: "bn-IN",
+        stage1: "1. আমরা কী লক্ষ্য করেছি? (পর্যবেক্ষণ)",
+        stage2: "2. এর অর্থ কী হতে পারে? (অর্থ)",
+        stage3: "3. এরপর কী করা উচিত? (পদক্ষেপ)"
+      }
+    };
+
+    let currentRegionKey = 'mandya';
+    let currentLang = 'en';
+    let isSpeaking = false;
+    let backendAvailable = false;
+
+    function getApiBase() {
+      // If served directly by backend on port 8080 or deployed in production (Vercel/cloud)
+      if (window.location.port === '8080' || (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && window.location.protocol !== 'file:')) {
+        return '';
+      }
+      // If opened via file:// or another local dev server (port 5500, 3000, 5173, etc.)
+      return 'http://127.0.0.1:8080';
+    }
+
+    // Detect and Connect to FastAPI Backend
+    async function checkBackendHealth() {
+      const pill = document.getElementById('api-status-pill');
+      const dot = document.getElementById('api-status-dot');
+      const text = document.getElementById('api-status-text');
+      const apiBase = getApiBase();
+
+      try {
+        const res = await fetch(`${apiBase}/api/health`);
+        if (res.ok) {
+          const data = await res.json();
+          backendAvailable = true;
+          dot.className = "w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse";
+          text.textContent = data.data_mode === "live" ? "Backend: Live" : "Backend: Demo";
+          pill.className = "text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 flex items-center gap-1";
+          return;
+        }
+      } catch (err) {
+        // Direct fallback check on port 8080 for file:// protocol or mismatched dev ports
+        try {
+          const res2 = await fetch('http://127.0.0.1:8080/api/health');
+          if (res2.ok) {
+            backendAvailable = true;
+            dot.className = "w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse";
+            text.textContent = "Backend: Live";
+            pill.className = "text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 flex items-center gap-1";
+            return;
+          }
+        } catch (e2) {}
+      }
+
+      // Offline fallback
+      backendAvailable = false;
+      dot.className = "w-1.5 h-1.5 rounded-full bg-amber-500";
+      text.textContent = "Offline Demo";
+      pill.className = "text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-800 flex items-center gap-1";
+    }
+
+    // Dynamic Satellite View State & Leaflet Map Cache
+    let currentLayer = 'true-color';
+    let radarScanActive = true;
+    let splitCompareActive = false;
+    let leafletMap = null;
+    let leafletParcelLayer = null;
+    let leafletMarker = null;
+
+    const SPECTRAL_DATA = {
+      mandya: {
+        plot: "Plot #142/A • Mandya (Karnataka)",
+        sensor: "Copernicus Sentinel-2B (MSI Level-2A BOA)",
+        coords: "12°31'05\" N, 76°53'06\" E • Elev: 662m",
+        pass: "24 Feb 2024 • 10:48 UTC (Cloud: 0.8%)",
+        ndviVal: "0.58 (Benchmark 0.70 • -17% Drop)",
+        ndviDesc: "Multi-spectral vegetation index indicates localized canopy stress in the North-East quarter. Rest of parcel maintains standard canopy vigor.",
+        ndviSignal: "Red light (665 nm) absorption decreased; NIR (842 nm) reflectance reduced due to early moisture stress.",
+        cirVal: "NIR (B08): 0.42 • Red (B04): 0.14",
+        cirDesc: "Color Infrared (CIR) false-color return reveals lowered cellular turgor in the NE zone; western quadrants exhibit dense crimson foliage.",
+        cirSignal: "Healthy leaf mesophyll reflects 40–50% NIR. Cell dehydration reduces internal scattering, dampening CIR brightness.",
+        moistureVal: "NDMI: +0.20 • SWIR (B11): 0.28",
+        moistureDesc: "Normalized Difference Moisture Index confirms localized soil percolation deficit along the NE ridge. Top 10 cm root zone drying.",
+        bands: { b3: "0.08 (Peak)", b4: "0.14 (Absorb)", b8: "0.42 (Scatter)", b11: "0.28 (Water)" }
+      },
+      ludhiana: {
+        plot: "Plot #89/C • Ludhiana (Punjab)",
+        sensor: "Copernicus Sentinel-2A (MSI Level-2A BOA)",
+        coords: "30°54'04\" N, 75°51'25\" E • Elev: 244m",
+        pass: "22 Feb 2024 • 11:05 UTC (Cloud: 1.4%)",
+        ndviVal: "0.72 (Benchmark 0.68 • +6% Optimal)",
+        ndviDesc: "High uniform chlorophyll density across entire cadastral parcel. Active tillering in PBW 343 wheat progressing with high leaf vigor.",
+        ndviSignal: "High Red (665 nm) chlorophyll absorption (>90%) with strong NIR (842 nm) canopy scattering.",
+        cirVal: "NIR (B08): 0.62 • Red (B04): 0.06",
+        cirDesc: "Brilliant crimson false-color return throughout parcel. Dense canopy coverage with high Leaf Area Index (LAI ~3.8).",
+        cirSignal: "Optimal cellular hydration and nitrogen assimilation producing maximum Near-Infrared reflectance.",
+        moistureVal: "NDMI: +0.55 • SWIR (B11): 0.18",
+        moistureDesc: "Canopy water absorption optimal. Sub-surface moisture retention steady following canal irrigation.",
+        bands: { b3: "0.07 (Peak)", b4: "0.06 (Absorb)", b8: "0.62 (Scatter)", b11: "0.18 (Water)" }
+      },
+      varanasi: {
+        plot: "Plot #214/B • Varanasi (Uttar Pradesh)",
+        sensor: "Copernicus Sentinel-2B (MSI Level-2A BOA)",
+        coords: "25°19'48\" N, 83°00'07\" E • Elev: 81m",
+        pass: "23 Feb 2024 • 10:32 UTC (Cloud: 2.1%)",
+        ndviVal: "0.64 (Benchmark 0.65 • Stable 0%)",
+        ndviDesc: "Uniform vegetative vigor consistent with flowering stage in Varuna mustard and intercropped vegetables. Balanced canopy development.",
+        ndviSignal: "Moderate yellow blossom signature mixing with green leaf reflectance; healthy physiological progression.",
+        cirVal: "NIR (B08): 0.52 • Red (B04): 0.09",
+        cirDesc: "Consistent moderate crimson response across all ridges. No signs of aphid infestation or moisture wilt.",
+        cirSignal: "Uniform vegetative cellular structure across Gangetic alluvial loam soil bed.",
+        moistureVal: "NDMI: +0.41 • SWIR (B11): 0.22",
+        moistureDesc: "Adequate soil water retention; irrigation can be withheld for the next 4–5 days.",
+        bands: { b3: "0.08 (Peak)", b4: "0.09 (Absorb)", b8: "0.52 (Scatter)", b11: "0.22 (Water)" }
+      },
+      nashik: {
+        plot: "Plot #56/D • Nashik (Maharashtra)",
+        sensor: "Copernicus Sentinel-2A (MSI Level-2A BOA)",
+        coords: "20°00'54\" N, 73°48'54\" E • Elev: 560m",
+        pass: "21 Feb 2024 • 10:52 UTC (Cloud: 0.4%)",
+        ndviVal: "0.61 (Benchmark 0.62 • -2% Nominal)",
+        ndviDesc: "Steady canopy density across Red Pinhead onion field at bulb expansion stage. Healthy cylindrical leaf tops.",
+        ndviSignal: "Characteristic onion erect canopy reflectance with good ground coverage and minimal soil background noise.",
+        cirVal: "NIR (B08): 0.48 • Red (B04): 0.10",
+        cirDesc: "Even false-color infrared distribution. No fungal purple blotch or thrips damage signatures detected.",
+        cirSignal: "Stable turgor pressure maintained through scheduled micro-drip irrigation.",
+        moistureVal: "NDMI: +0.33 • SWIR (B11): 0.24",
+        moistureDesc: "Drip root zone maintaining steady hydration; deficit minimal.",
+        bands: { b3: "0.07 (Peak)", b4: "0.10 (Absorb)", b8: "0.48 (Scatter)", b11: "0.24 (Water)" }
+      }
+    };
+
+    const REGION_GEO = {
+      mandya: { lat: 12.518, lon: 76.885, zoom: 16, elev: "662m", polygon: [[12.522, 76.881], [12.523, 76.889], [12.515, 76.891], [12.514, 76.883]] },
+      ludhiana: { lat: 30.901, lon: 75.857, zoom: 16, elev: "244m", polygon: [[30.905, 75.852], [30.906, 75.862], [30.897, 75.861], [30.896, 75.853]] },
+      varanasi: { lat: 25.330, lon: 83.002, zoom: 16, elev: "81m", polygon: [[25.334, 82.998], [25.335, 83.007], [25.326, 83.006], [25.325, 82.999]] },
+      nashik: { lat: 20.015, lon: 73.815, zoom: 16, elev: "560m", polygon: [[20.019, 73.811], [20.020, 73.820], [20.011, 73.819], [20.010, 73.812]] }
+    };
+
+    function toggleRadarScan() {
+      radarScanActive = !radarScanActive;
+      const scanline = document.getElementById('radar-scanline');
+      const btn = document.getElementById('btn-toggle-radar');
+      const icon = document.getElementById('radar-icon');
+      const txt = document.getElementById('radar-text');
+      if (radarScanActive) {
+        if (scanline) scanline.style.display = 'block';
+        if (btn) btn.className = "text-[10px] font-semibold px-2 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface flex items-center gap-1 transition-all cursor-pointer";
+        if (icon) icon.className = "material-symbols-outlined text-[13px] text-primary";
+        if (txt) txt.textContent = "Radar Scan";
+      } else {
+        if (scanline) scanline.style.display = 'none';
+        if (btn) btn.className = "text-[10px] font-semibold px-2 py-1 rounded-lg bg-surface-container-high text-secondary flex items-center gap-1 transition-all cursor-pointer opacity-70";
+        if (icon) icon.className = "material-symbols-outlined text-[13px] text-secondary";
+        if (txt) txt.textContent = "Scan Paused";
+      }
+    }
+
+    function toggleCompareSplit() {
+      splitCompareActive = !splitCompareActive;
+      const splitCont = document.getElementById('split-image-container');
+      const splitImg = document.getElementById('satellite-split-img');
+      const btn = document.getElementById('btn-compare-split');
+      const apiBase = getApiBase();
+
+      if (splitCompareActive) {
+        if (splitCont) {
+          splitCont.style.display = 'block';
+          splitCont.style.width = '50%';
+        }
+        if (splitImg) {
+          splitImg.src = backendAvailable ? `${apiBase}/api/farms/${currentRegionKey}/satellite-image?layer=ndvi` : `assets/${currentRegionKey}_ndvi.jpg`;
+        }
+        if (btn) btn.classList.add('bg-primary/20', 'text-primary', 'border', 'border-primary/40');
+      } else {
+        if (splitCont) splitCont.style.display = 'none';
+        if (btn) btn.classList.remove('bg-primary/20', 'text-primary', 'border', 'border-primary/40');
+      }
+    }
+
+    function handleSatMouseMove(e) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const xPct = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+      const yPct = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
+
+      if (splitCompareActive) {
+        const splitCont = document.getElementById('split-image-container');
+        if (splitCont) splitCont.style.width = `${xPct}%`;
+      }
+
+      const geo = REGION_GEO[currentRegionKey] || REGION_GEO.mandya;
+      const latEst = (geo.lat + (0.5 - yPct / 100) * 0.008).toFixed(4);
+      const lonEst = (geo.lon + (xPct / 100 - 0.5) * 0.008).toFixed(4);
+
+      const hudCoords = document.getElementById('hud-coords');
+      if (hudCoords) hudCoords.textContent = `${latEst}° N, ${lonEst}° E`;
+
+      const hudMetric = document.getElementById('hud-metric');
+      if (hudMetric) {
+        const ndviVal = (0.42 + (xPct * 0.003) + (Math.sin(yPct) * 0.04)).toFixed(2);
+        hudMetric.textContent = `NDVI: ${ndviVal} • ${ndviVal < 0.6 ? 'Stress' : 'Healthy'}`;
+      }
+    }
+
+    function handleSatMouseLeave() {
+      if (splitCompareActive) {
+        const splitCont = document.getElementById('split-image-container');
+        if (splitCont) splitCont.style.width = '50%';
+      }
+    }
+
+    async function switchSatelliteLayer(layerName) {
+      currentLayer = layerName;
+      document.querySelectorAll('.sat-layer-btn').forEach(btn => {
+        btn.classList.remove('active', 'bg-primary', 'text-on-primary', 'shadow-sm');
+        btn.classList.add('bg-surface-container', 'text-on-surface');
+      });
+      const activeBtn = document.getElementById(`layer-btn-${layerName}`);
+      if (activeBtn) {
+        activeBtn.classList.add('active', 'bg-primary', 'text-on-primary', 'shadow-sm');
+        activeBtn.classList.remove('bg-surface-container', 'text-on-surface');
+      }
+
+      const satImg = document.getElementById('satellite-img');
+      const leafletCont = document.getElementById('satellite-leaflet-map');
+      const svgOverlay = document.getElementById('sat-svg-overlay');
+      const legend = document.getElementById('ndvi-legend-bar');
+      const apiBase = getApiBase();
+
+      if (layerName === 'map') {
+        if (satImg) satImg.style.display = 'none';
+        if (svgOverlay) svgOverlay.style.display = 'none';
+        if (leafletCont) leafletCont.style.display = 'block';
+        if (legend) legend.style.display = 'none';
+        initOrUpdateLeafletMap(currentRegionKey);
+      } else {
+        if (leafletCont) leafletCont.style.display = 'none';
+        if (satImg) satImg.style.display = 'block';
+        if (svgOverlay) svgOverlay.style.display = 'block';
+        if (legend) legend.style.display = (layerName === 'ndvi' || layerName === 'false-color') ? 'flex' : 'none';
+
+        // Load layer imagery
+        const targetSrc = backendAvailable
+          ? `${apiBase}/api/farms/${currentRegionKey}/satellite-image?layer=${layerName}&t=${Date.now()}`
+          : `assets/${currentRegionKey}_${layerName}.jpg`;
+
+        satImg.src = targetSrc;
+      }
+    }
+
+    function initOrUpdateLeafletMap(regionKey) {
+      const geo = REGION_GEO[regionKey] || REGION_GEO.mandya;
+      const mapEl = document.getElementById('satellite-leaflet-map');
+      if (!mapEl) return;
+
+      if (!leafletMap && typeof L !== 'undefined') {
+        leafletMap = L.map('satellite-leaflet-map', {
+          zoomControl: false,
+          attributionControl: false
+        }).setView([geo.lat, geo.lon], geo.zoom);
+
+        // High-resolution Esri World Imagery Satellite Tiles
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+          maxZoom: 18
+        }).addTo(leafletMap);
+
+        // Minimal Zoom Control
+        L.control.zoom({ position: 'topright' }).addTo(leafletMap);
+      }
+
+      if (leafletMap) {
+        leafletMap.invalidateSize();
+        leafletMap.flyTo([geo.lat, geo.lon], geo.zoom, { duration: 1.2 });
+
+        if (leafletParcelLayer) leafletMap.removeLayer(leafletParcelLayer);
+        if (leafletMarker) leafletMap.removeLayer(leafletMarker);
+
+        leafletParcelLayer = L.polygon(geo.polygon, {
+          color: '#ffddb5',
+          weight: 2.5,
+          dashArray: '6, 4',
+          fillColor: '#e8a23a',
+          fillOpacity: 0.22
+        }).addTo(leafletMap);
+
+        const customIcon = L.divIcon({
+          className: 'custom-sat-pin',
+          html: '<div style="background:#005230; color:#fff; border:2px solid #a8f3c2; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold; box-shadow:0 0 10px rgba(0,82,48,0.8);">!</div>',
+          iconSize: [24, 24],
+          iconAnchor: [12, 12]
+        });
+
+        leafletMarker = L.marker([geo.lat, geo.lon], { icon: customIcon }).addTo(leafletMap);
+        leafletMarker.bindPopup(`<strong>${REGIONS_DATA[regionKey].parcel}</strong><br/>Crop: ${REGIONS_DATA[regionKey].cropName}<br/>NDVI: ${REGIONS_DATA[regionKey].metric}`);
+      }
+    }
+
+    async function refreshSatellitePass() {
+      const spinIcon = document.getElementById('refresh-icon');
+      const overlay = document.getElementById('sat-loading-overlay');
+      const satImg = document.getElementById('satellite-img');
+      const apiBase = getApiBase();
+
+      if (spinIcon) spinIcon.classList.add('animate-spin');
+      if (overlay) {
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
+        overlay.classList.add('opacity-100');
+      }
+
+      const timestamp = Date.now();
+      if (currentLayer !== 'map' && satImg) {
+        satImg.src = backendAvailable
+          ? `${apiBase}/api/farms/${currentRegionKey}/satellite-image?layer=${currentLayer}&t=${timestamp}`
+          : `assets/${currentRegionKey}.jpg`;
+      }
+
+      if (backendAvailable) {
+        try {
+          const metaRes = await fetch(`${apiBase}/api/farms/${currentRegionKey}/satellite-metadata`);
+          if (metaRes.ok) {
+            const meta = await metaRes.json();
+            const dateTag = document.getElementById('sat-date-tag');
+            if (dateTag) dateTag.textContent = `${meta.latest_pass} (Refreshed Live)`;
+            const orbitTag = document.getElementById('sat-orbit-tag');
+            if (orbitTag) orbitTag.textContent = `${meta.orbit} • Solar Zenith ${meta.solar_zenith}`;
+          }
+        } catch (e) {}
+      }
+
+      setTimeout(() => {
+        if (spinIcon) spinIcon.classList.remove('animate-spin');
+        if (overlay) {
+          overlay.classList.remove('opacity-100');
+          overlay.classList.add('opacity-0', 'pointer-events-none');
+        }
+      }, 750);
+    }
+
+    function showStressZoneDetail() {
+      const data = REGIONS_DATA[currentRegionKey];
+      if (!data) return;
+      alert(`🛰️ Sentinel-2 Cadastral Anomaly Detected:\n\nParcel: ${data.parcel}\nObservation: ${data.notice}\nAgronomic Meaning: ${data.meaning}\nRecommended Action: ${data.action}`);
+    }
+
+    async function selectRegion(regionKey) {
+      currentRegionKey = regionKey;
+      let data = REGIONS_DATA[regionKey];
+      if (!data) return;
+      const apiBase = getApiBase();
+
+      // Update active pill button
+      document.querySelectorAll('.region-pill').forEach(btn => {
+        btn.classList.remove('bg-primary-container', 'text-on-primary', 'border-primary');
+        btn.classList.add('bg-surface-container-lowest', 'text-on-surface', 'border-surface-variant');
+      });
+      const activeBtn = document.getElementById('pill-' + regionKey);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-primary-container', 'text-on-primary', 'border-primary');
+        activeBtn.classList.remove('bg-surface-container-lowest', 'text-on-surface', 'border-surface-variant');
+      }
+
+      // If backend available, fetch live advisory & satellite metadata
+      if (backendAvailable) {
+        try {
+          const [advRes, metaRes] = await Promise.all([
+            fetch(`${apiBase}/api/farms/${regionKey}/advisory?language=${currentLang}`),
+            fetch(`${apiBase}/api/farms/${regionKey}/satellite-metadata`)
+          ]);
+          if (advRes.ok) {
+            const adv = await advRes.json();
+            data.advisoryTitle = adv.headline;
+            data.advisoryDesc = adv.description;
+            data.notice = adv.notice;
+            data.meaning = adv.meaning;
+            data.action = adv.next_steps[0] || data.action;
+            data.sms = adv.sms_preview;
+            data.voiceTranscript = adv.voice_transcript;
+          }
+          if (metaRes.ok) {
+            const meta = await metaRes.json();
+            const dateTag = document.getElementById('sat-date-tag');
+            if (dateTag && meta.latest_pass) dateTag.textContent = meta.latest_pass;
+            const orbitTag = document.getElementById('sat-orbit-tag');
+            if (orbitTag && meta.orbit) orbitTag.textContent = `${meta.orbit} • Sun Zenith ${meta.solar_zenith}`;
+            const hudCoords = document.getElementById('hud-coords');
+            if (hudCoords && meta.coordinates) hudCoords.textContent = meta.coordinates.formatted;
+            const elevTag = document.getElementById('hud-elev');
+            if (elevTag && REGION_GEO[regionKey]) elevTag.textContent = `Elev: ${REGION_GEO[regionKey].elev}`;
+          }
+        } catch (e) {
+          console.warn("Backend fetch failed, using fallback:", e);
+        }
+      }
+
+      // Apply language overrides for current selected language
+      if (LANGUAGE_OVERRIDES[currentLang] && LANGUAGE_OVERRIDES[currentLang][regionKey]) {
+        const o = LANGUAGE_OVERRIDES[currentLang][regionKey];
+        data = { ...data, ...o };
+      }
+
+      // Update UI Elements
+      document.getElementById('parcel-id-tag').textContent = data.parcel;
+      document.getElementById('advisory-title').textContent = data.advisoryTitle;
+      document.getElementById('advisory-desc').textContent = data.advisoryDesc;
+      document.getElementById('advisory-metric').textContent = data.metric;
+      document.getElementById('card-notice').textContent = data.notice;
+      document.getElementById('card-meaning').textContent = data.meaning;
+      document.getElementById('card-action').textContent = data.action;
+
+      // Update Satellite Image / Leaflet Map
+      if (currentLayer === 'map') {
+        initOrUpdateLeafletMap(regionKey);
+      } else {
+        const satImg = document.getElementById('satellite-img');
+        if (satImg) {
+          const targetSrc = backendAvailable
+            ? `${apiBase}/api/farms/${regionKey}/satellite-image?layer=${currentLayer}&t=${Date.now()}`
+            : (data.satImage || `assets/${regionKey}.jpg`);
+
+          const fallbackSrc = data.satImage || "assets/mandya.jpg";
+          satImg.onerror = function() {
+            if (this.src !== fallbackSrc && !this.src.endsWith(fallbackSrc)) {
+              this.src = fallbackSrc;
+            }
+          };
+          satImg.src = targetSrc;
+        }
+
+        const splitImg = document.getElementById('satellite-split-img');
+        if (splitImg && splitCompareActive) {
+          splitImg.src = backendAvailable
+            ? `${apiBase}/api/farms/${regionKey}/satellite-image?layer=ndvi`
+            : `assets/${regionKey}_ndvi.jpg`;
+        }
+      }
+
+      const poly = document.getElementById('parcel-polygon');
+      if (poly && data.satPolygon) {
+        poly.setAttribute('points', data.satPolygon);
+      }
+
+      const alertMarker = document.getElementById('parcel-alert-marker');
+      if (alertMarker && data.alertMarker) {
+        alertMarker.setAttribute('transform', `translate(${data.alertMarker.cx - 210}, ${data.alertMarker.cy - 95})`);
+      }
+
+      // Time series bars
+      const tsContainer = document.getElementById('ndvi-history-bars');
+      if (data.history && tsContainer) {
+        tsContainer.innerHTML = data.history.map((pt, idx) => {
+          const isCurrent = idx === data.history.length - 1;
+          const borderClass = isCurrent ? "border-2 border-tertiary-container" : "border border-surface-variant";
+          const barColor = isCurrent ? "bg-tertiary-container" : "bg-primary";
+          const textColor = isCurrent ? "text-tertiary font-bold" : "text-primary font-bold";
+          return `
+            <div class="bg-surface-container-lowest p-1 rounded-lg ${borderClass} flex flex-col items-center">
+              <span class="text-[9px] ${isCurrent ? 'font-bold text-tertiary' : 'text-secondary'}">${pt.date}</span>
+              <div class="w-full bg-primary/15 h-7 rounded-sm flex items-end justify-center my-0.5">
+                <div class="w-full ${barColor} rounded-sm" style="height: ${pt.height};"></div>
+              </div>
+              <span class="text-[10px] ${textColor}">${pt.ndvi}</span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Weather Card
+      document.getElementById('weather-source-tag').textContent = data.weatherHeader;
+      document.getElementById('action-weather-desc').textContent = data.weatherOutlook;
+      document.getElementById('weather-recommendation').innerHTML = `
+        <span class="material-symbols-outlined text-primary text-[18px] shrink-0">check_circle</span>
+        <span class="leading-tight">${data.recommendation}</span>
+      `;
+      const grid = document.getElementById('forecast-grid');
+      grid.innerHTML = data.days.map(d => `
+        <div class="bg-surface-container-lowest p-2.5 rounded-xl border border-surface-variant flex flex-col items-center">
+          <span class="text-[11px] font-semibold text-secondary">${d.day}</span>
+          <span class="material-symbols-outlined text-tertiary-container my-1 text-[22px]">${d.icon}</span>
+          <span class="text-sm font-bold text-on-surface">${d.temp}</span>
+          <span class="text-[10px] text-primary font-medium">${d.rain}</span>
+        </div>
+      `).join('');
+
+      // Modal Data (My Farm / Advice)
+      document.getElementById('modal-plot-id').textContent = data.plotTitle;
+      document.getElementById('modal-crop-id').textContent = data.cropTitle;
+      document.getElementById('modal-area-id').textContent = data.area || "1.85 Hectares";
+      document.getElementById('modal-notice-text').textContent = data.notice;
+      document.getElementById('modal-meaning-text').textContent = data.meaning;
+      document.getElementById('modal-action-text').textContent = data.action;
+      document.getElementById('modal-sms-text').textContent = data.sms;
+      document.getElementById('advice-notice-body').textContent = data.notice;
+      document.getElementById('advice-meaning-body').textContent = data.meaning;
+
+      // Satellite Spectral Modal Data (Check My Field)
+      const spec = SPECTRAL_DATA[regionKey] || SPECTRAL_DATA.mandya;
+      if (document.getElementById('sat-modal-plot')) {
+        document.getElementById('sat-modal-plot').textContent = spec.plot;
+        document.getElementById('sat-modal-sensor').textContent = spec.sensor;
+        document.getElementById('sat-modal-coords').textContent = spec.coords;
+        document.getElementById('sat-modal-pass').textContent = spec.pass;
+        document.getElementById('sat-modal-ndvi').textContent = spec.ndviVal;
+        document.getElementById('sat-modal-ndvi-desc').textContent = spec.ndviDesc;
+        document.getElementById('sat-modal-ndvi-signal').textContent = spec.ndviSignal;
+        document.getElementById('sat-modal-cir').textContent = spec.cirVal;
+        document.getElementById('sat-modal-cir-desc').textContent = spec.cirDesc;
+        document.getElementById('sat-modal-cir-signal').textContent = spec.cirSignal;
+        document.getElementById('sat-modal-moisture').textContent = spec.moistureVal;
+        document.getElementById('sat-modal-moisture-desc').textContent = spec.moistureDesc;
+        document.getElementById('sat-modal-b3').textContent = spec.bands.b3;
+        document.getElementById('sat-modal-b4').textContent = spec.bands.b4;
+        document.getElementById('sat-modal-b8').textContent = spec.bands.b8;
+        document.getElementById('sat-modal-b11').textContent = spec.bands.b11;
+      }
+    }
+
+    function changeLanguage(langCode) {
+      if (typeof stopAudioAdvice === 'function') {
+        stopAudioAdvice();
+      }
+      currentLang = langCode;
+      const t = TRANSLATIONS[langCode] || TRANSLATIONS.en;
+      document.getElementById('hero-title').textContent = t.heroTitle;
+      document.getElementById('hero-subtitle').textContent = t.heroSubtitle;
+      document.getElementById('hero-tag').textContent = t.heroTag;
+      document.getElementById('banner-title').textContent = t.bannerTitle;
+      document.getElementById('banner-text').textContent = t.bannerText;
+      document.getElementById('btn-check-field').textContent = t.checkField;
+      document.getElementById('btn-guide').textContent = t.howItWorks;
+      document.getElementById('btn-view-advice').textContent = t.viewAdvice;
+      document.getElementById('btn-audio-listen').textContent = t.audioBtn;
+      document.getElementById('ts-title').textContent = t.tsTitle;
+      document.getElementById('ts-benchmark').textContent = t.tsBenchmark;
+      document.getElementById('region-selector-header').textContent = t.regionHeader;
+      document.getElementById('tiles-header').textContent = t.tilesHeader;
+      document.getElementById('tile1-title').textContent = t.tile1;
+      document.getElementById('tile2-title').textContent = t.tile2;
+      document.getElementById('tile3-title').textContent = t.tile3;
+
+      // Update 3-Stage Headers across the Card, Parcel Inspector Modal, and Advice Modal
+      const s1 = t.stage1 || "1. What did we notice? (Observation)";
+      const s2 = t.stage2 || "2. What could it mean? (Interpretation)";
+      const s3 = t.stage3 || "3. What should I do next? (Action Steps)";
+      ['card-stage1-header', 'modal-stage1-header', 'advice-stage1-header'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = s1;
+      });
+      ['card-stage2-header', 'modal-stage2-header', 'advice-stage2-header'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = s2;
+      });
+      ['card-stage3-header', 'modal-stage3-header', 'advice-stage3-header'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = s3;
+      });
+
+      // Re-trigger selectRegion to update localized advisory text
+      selectRegion(currentRegionKey);
+      if (typeof updateTwilioPreview === 'function') {
+        updateTwilioPreview();
+      }
+    }
+
+    // ==========================================
+    // HIGH-FIDELITY NATURAL HUMAN SPEECH & TWILIO
+    // ==========================================
+    let audioPlayer = null;
+    let audioPlaybackRate = 1.0;
+    let activeTwilioChannel = 'sms'; // 'sms' or 'voice'
+
+    function getActiveVoiceTranscript() {
+      // 1. Check active language override
+      if (LANGUAGE_OVERRIDES[currentLang] && LANGUAGE_OVERRIDES[currentLang][currentRegionKey]) {
+        const o = LANGUAGE_OVERRIDES[currentLang][currentRegionKey];
+        if (o.voiceTranscript) return o.voiceTranscript;
+        if (o.advisoryDesc) return o.advisoryDesc;
+      }
+      // 2. Fallback to region dataset
+      const data = REGIONS_DATA[currentRegionKey] || {};
+      return data.voiceTranscript || data.advisoryDesc || "Earthworm agronomic satellite advisory.";
+    }
+
+    function getActiveSmsPreview() {
+      if (LANGUAGE_OVERRIDES[currentLang] && LANGUAGE_OVERRIDES[currentLang][currentRegionKey]) {
+        const o = LANGUAGE_OVERRIDES[currentLang][currentRegionKey];
+        if (o.sms) return o.sms;
+      }
+      const data = REGIONS_DATA[currentRegionKey] || {};
+      return data.sms || "[EARTHWORM-AGRI] Field advisory update.";
+    }
+
+    async function toggleAudioAdvice() {
+      if (isSpeaking) {
+        stopAudioAdvice();
+        return;
+      }
+
+      const textToSpeak = getActiveVoiceTranscript();
+      const langConfig = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
+      const apiBase = getApiBase();
+
+      // Show enhanced Audio Toast bar immediately
+      showAudioBar(`Natural Human Speech • ${langConfig.speechLang || currentLang.toUpperCase()}`, textToSpeak);
+      setAudioPlayState(true);
+
+      const encodedText = encodeURIComponent(textToSpeak);
+      const urlCandidates = [
+        `${apiBase}/api/communications/speak?language=${currentLang}&farm_id=${currentRegionKey}&text=${encodedText}&t=${Date.now()}`,
+        `http://127.0.0.1:8080/api/communications/speak?language=${currentLang}&farm_id=${currentRegionKey}&text=${encodedText}&t=${Date.now()}`,
+        `${apiBase}/api/communications/speak?language=${currentLang}&farm_id=${currentRegionKey}&t=${Date.now()}`,
+        `http://127.0.0.1:8080/api/communications/speak?language=${currentLang}&farm_id=${currentRegionKey}&t=${Date.now()}`
+      ];
+
+      const uniqueUrls = [...new Set(urlCandidates)];
+      let playedSuccessfully = false;
+
+      for (const targetUrl of uniqueUrls) {
+        try {
+          if (!audioPlayer) {
+            audioPlayer = new Audio();
+          }
+          audioPlayer.src = targetUrl;
+          audioPlayer.playbackRate = audioPlaybackRate;
+
+          audioPlayer.onplay = () => setAudioPlayState(true);
+          audioPlayer.onended = () => stopAudioAdvice();
+
+          await audioPlayer.play();
+          playedSuccessfully = true;
+          break;
+        } catch (err) {
+          if (err && err.name === 'AbortError') {
+            // User clicked pause/stop intentionally
+            return;
+          }
+          console.warn("Audio stream attempt failed:", targetUrl, err);
+        }
+      }
+
+      if (!playedSuccessfully && !isSpeaking) {
+        fallbackWebSpeech(textToSpeak, currentLang);
+      }
+    }
+
+    function fallbackDirectAudio(text, lang) {
+      try {
+        const targetLang = lang.toLowerCase();
+        const shortText = text.length > 140 ? text.substring(0, 140) : text;
+        const directUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${targetLang}&q=${encodeURIComponent(shortText)}`;
+        if (!audioPlayer) audioPlayer = new Audio();
+        audioPlayer.src = directUrl;
+        audioPlayer.playbackRate = audioPlaybackRate;
+        audioPlayer.onended = () => stopAudioAdvice();
+        audioPlayer.onerror = () => fallbackWebSpeech(text, lang);
+        audioPlayer.play().catch(() => fallbackWebSpeech(text, lang));
+      } catch (e) {
+        fallbackWebSpeech(text, lang);
+      }
+    }
+
+    function fallbackWebSpeech(text, lang) {
+      if (!('speechSynthesis' in window)) {
+        showToast("Audio unavailable", text.substring(0, 60));
+        stopAudioAdvice();
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      const langConfig = TRANSLATIONS[lang] || TRANSLATIONS.en;
+      utterance.lang = langConfig.speechLang || 'en-IN';
+      utterance.rate = 0.92;
+      utterance.pitch = 1.0;
+
+      // Select best non-robotic voice from installed voices
+      if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = () => {};
+      }
+      const voices = window.speechSynthesis.getVoices();
+      const bestVoice = voices.find(v => v.lang.startsWith(lang) && !v.name.includes("Desktop"))
+                     || voices.find(v => v.lang.includes("IN"))
+                     || voices.find(v => v.lang.startsWith(lang));
+      if (bestVoice) utterance.voice = bestVoice;
+
+      utterance.onend = () => stopAudioAdvice();
+      utterance.onerror = () => stopAudioAdvice();
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function setAudioPlayState(playing) {
+      isSpeaking = playing;
+      const icon = document.getElementById('audio-icon');
+      const btnTxt = document.getElementById('btn-audio-listen');
+      const toastWave = document.getElementById('audioToastWave');
+      if (playing) {
+        if (icon) icon.textContent = "pause";
+        if (btnTxt) btnTxt.textContent = "Pause Voice Advice";
+        if (toastWave) toastWave.classList.remove('hidden');
+      } else {
+        const t = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
+        if (icon) icon.textContent = "volume_up";
+        if (btnTxt) btnTxt.textContent = t.audioBtn || "Listen Voice Advice";
+        if (toastWave) toastWave.classList.add('hidden');
+      }
+    }
+
+    function stopAudioAdvice() {
+      if (audioPlayer) {
+        audioPlayer.pause();
+        audioPlayer.currentTime = 0;
+      }
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      setAudioPlayState(false);
+      const toast = document.getElementById('audioToast');
+      if (toast) toast.classList.add('hidden');
+    }
+
+    function cycleAudioSpeed() {
+      const speeds = [1.0, 1.25, 0.85];
+      const curIdx = speeds.indexOf(audioPlaybackRate);
+      audioPlaybackRate = speeds[(curIdx + 1) % speeds.length];
+      if (audioPlayer) audioPlayer.playbackRate = audioPlaybackRate;
+      const btn = document.getElementById('audioSpeedBtn');
+      if (btn) btn.textContent = `${audioPlaybackRate}x`;
+    }
+
+    function showAudioBar(title, subtitle) {
+      const toast = document.getElementById('audioToast');
+      if (!toast) return;
+      document.getElementById('audioToastTitle').textContent = title;
+      document.getElementById('audioToastSub').textContent = subtitle;
+      toast.classList.remove('hidden');
+    }
+
+    // ==========================================
+    // TWILIO DISPATCHER & SIMULATION FUNCTIONS
+    // ==========================================
+    function openTwilioModal(channel = 'sms') {
+      openModal('twilioModal');
+      switchTwilioChannel(channel);
+      updateTwilioPreview();
+    }
+
+    function switchTwilioChannel(channel) {
+      activeTwilioChannel = channel;
+      const btnSms = document.getElementById('twilio-tab-sms');
+      const btnVoice = document.getElementById('twilio-tab-voice');
+      const dispatchIcon = document.getElementById('twilio-dispatch-icon');
+      const dispatchLabel = document.getElementById('twilio-dispatch-label');
+      const previewHeading = document.getElementById('twilio-preview-heading');
+
+      if (channel === 'sms') {
+        btnSms.className = "py-2.5 px-3 rounded-lg bg-surface-container-lowest text-primary shadow-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer font-bold";
+        btnVoice.className = "py-2.5 px-3 rounded-lg text-secondary hover:text-on-surface flex items-center justify-center gap-1.5 transition-all cursor-pointer font-bold";
+        dispatchIcon.textContent = "send";
+        dispatchLabel.textContent = "Send Twilio SMS";
+        previewHeading.textContent = "SMS Advisory Preview (Feature Phone)";
+      } else {
+        btnVoice.className = "py-2.5 px-3 rounded-lg bg-surface-container-lowest text-primary shadow-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer font-bold";
+        btnSms.className = "py-2.5 px-3 rounded-lg text-secondary hover:text-on-surface flex items-center justify-center gap-1.5 transition-all cursor-pointer font-bold";
+        dispatchIcon.textContent = "phone_forwarded";
+        dispatchLabel.textContent = "Initiate Twilio Voice Call";
+        previewHeading.textContent = "IVR Agronomic Voice Script";
+      }
+      updateTwilioPreview();
+    }
+
+    function updateTwilioPreview() {
+      const plotEl = document.getElementById('twilio-target-plot');
+      const langEl = document.getElementById('twilio-target-lang');
+      const previewEl = document.getElementById('twilio-preview-content');
+      const countEl = document.getElementById('twilio-char-count');
+
+      const data = REGIONS_DATA[currentRegionKey] || {};
+      if (plotEl) plotEl.textContent = data.plotTitle || currentRegionKey.toUpperCase();
+      
+      const langNames = {
+        en: "English", kn: "ಕನ್ನಡ (Kannada)", hi: "हिन्दी (Hindi)",
+        te: "తెలుగు (Telugu)", ta: "தமிழ் (Tamil)", mr: "मराठी (Marathi)", bn: "বাংলা (Bengali)"
+      };
+      if (langEl) langEl.textContent = langNames[currentLang] || currentLang.toUpperCase();
+
+      if (activeTwilioChannel === 'sms') {
+        const text = getActiveSmsPreview();
+        if (previewEl) previewEl.textContent = text;
+        const segs = Math.ceil(text.length / 160) || 1;
+        if (countEl) countEl.textContent = `${text.length} chars • ${segs} Segment${segs > 1 ? 's' : ''}`;
+      } else {
+        const text = getActiveVoiceTranscript();
+        if (previewEl) previewEl.textContent = text;
+        const estSec = Math.max(15, Math.round(text.length / 12));
+        if (countEl) countEl.textContent = `~${estSec}s Audio Duration • Natural Human Voice`;
+      }
+    }
+
+    async function dispatchTwilioAction() {
+      const phoneInput = document.getElementById('twilio-phone-input');
+      const toPhone = phoneInput ? phoneInput.value.trim() : "+919731803808";
+      const apiBase = getApiBase();
+      const resCard = document.getElementById('twilio-result-card');
+      const resStatus = document.getElementById('twilio-res-status');
+      const resSid = document.getElementById('twilio-res-sid');
+      const resMode = document.getElementById('twilio-res-mode');
+      const resDetail = document.getElementById('twilio-res-detail');
+      const resTime = document.getElementById('twilio-res-time');
+      const btn = document.getElementById('btn-dispatch-twilio');
+
+      btn.disabled = true;
+      btn.classList.add('opacity-75');
+
+      const endpoint = activeTwilioChannel === 'sms' 
+        ? `${apiBase}/api/communications/sms` 
+        : `${apiBase}/api/communications/call`;
+
+      const payload = activeTwilioChannel === 'sms'
+        ? { to: toPhone, farm_id: currentRegionKey, language: currentLang, message: getActiveSmsPreview() }
+        : { to: toPhone, farm_id: currentRegionKey, language: currentLang, script: getActiveVoiceTranscript() };
+
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        const recipientNumber = data.to || toPhone || "+91 97318 03808";
+        resCard.classList.remove('hidden');
+        resTime.textContent = new Date().toLocaleTimeString();
+
+        if (activeTwilioChannel === 'sms') {
+          resStatus.textContent = data.mode === "live" ? "Cellular SMS Dispatched (Live Carrier)" : "Cellular SMS Simulation Delivered";
+          resSid.textContent = data.sid || "SM" + Math.random().toString(36).substring(2, 12);
+          resMode.textContent = data.mode === "live" ? "Live GSM/PSTN Carrier" : "Simulation Mode (Verified)";
+          resDetail.textContent = `Sent ${data.segments || 1} segment(s) to ${recipientNumber} in ${currentLang.toUpperCase()}. Delivered directly to farmer's handset (no browser needed).`;
+          showToast("Cellular SMS Dispatched", `Sent to ${recipientNumber}`);
+        } else {
+          resStatus.textContent = data.mode === "live" ? "Cellular IVR Call Dialing (Live Carrier)" : "Cellular IVR Call Connected (Simulation)";
+          resSid.textContent = data.sid || "CA" + Math.random().toString(36).substring(2, 12);
+          resMode.textContent = data.mode === "live" ? "Live GSM/PSTN Trunk" : "Simulation Mode (Verified)";
+          resDetail.textContent = `Automated voice call placed to ${recipientNumber} in ${currentLang.toUpperCase()} via ${data.voice_name || 'Neural Human Voice'}. Handset receives call over cellular tower.`;
+          showToast("Cellular Call Placed", `Dialing ${recipientNumber}...`);
+        }
+      } catch (err) {
+        console.warn("Backend communication endpoint failed, performing client-side simulation:", err);
+        const recipientNumber = toPhone || "+91 97318 03808";
+        resCard.classList.remove('hidden');
+        resTime.textContent = new Date().toLocaleTimeString();
+        const fakeSid = (activeTwilioChannel === 'sms' ? "SM" : "CA") + Math.random().toString(36).substring(2, 18);
+        resStatus.textContent = activeTwilioChannel === 'sms' ? "Cellular SMS Delivered (Simulation)" : "Cellular IVR Call Connected (Simulation)";
+        resSid.textContent = fakeSid;
+        resMode.textContent = "Offline Simulation Mode";
+        resDetail.textContent = `Dispatched to ${recipientNumber} in ${currentLang.toUpperCase()} via telecom gateway simulation. Zero web browser required on recipient phone.`;
+        showToast("Low-Bandwidth Dispatched", `Sent to ${recipientNumber}`);
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('opacity-75');
+      }
+    }
+
+    function previewTwilioAudio() {
+      // Plays the high-fidelity neural audio in the selected language
+      toggleAudioAdvice();
+    }
+
+    function playAudioHelp() {
+      openTwilioModal('voice');
+    }
+
+
+        // Modal Helpers
+    function openModal(id) {
+      if (id === 'healthModal') {
+        document.getElementById('info-modal-title').textContent = "1. Crop Health Inspector";
+        document.getElementById('info-modal-body').innerHTML = `
+          <strong>Multispectral Chlorophyll Assessment:</strong><br>
+          Sentinel-2 vegetative index analysis shows 84% normal vigor in ${REGIONS_DATA[currentRegionKey].location}.<br><br>
+          <span class="inline-block px-2.5 py-1 bg-surface-container font-mono text-xs rounded border border-surface-variant">NDVI Index: ${REGIONS_DATA[currentRegionKey].metric}</span><br><br>
+          <em>Note:</em> Cloud-free reference pass. Ground walk recommended along perimeter to inspect localized soil moisture and early disease signs.
+        `;
+        id = 'infoModal';
+      } else if (id === 'waterModal') {
+        document.getElementById('info-modal-title').textContent = "2. Should I Water?";
+        document.getElementById('info-modal-body').innerHTML = `
+          <strong>Root-Zone Moisture &amp; Evaporative Demand:</strong><br>
+          Current estimated soil moisture in upper 15 cm: <strong>Adequate</strong> for ${REGIONS_DATA[currentRegionKey].crop}.<br><br>
+          Upcoming rainfall outlook is dry (0 mm). If you observe surface cracking or afternoon leaf-wilting, apply 2.5 cm depth irrigation in late afternoon to minimize evaporation loss.
+        `;
+        id = 'infoModal';
+      } else if (id === 'weatherModal') {
+        document.getElementById('info-modal-title').textContent = "3. Weather & Spraying Windows";
+        document.getElementById('info-modal-body').innerHTML = `
+          <strong>72-Hour Spraying &amp; Field Operations:</strong><br>
+          Wind speed: 8 - 14 km/h (Favorable, low spray drift risk).<br>
+          Rain probability: Under 10%.<br>
+          Dew point: Normal seasonal condensation during early morning hours. Optimal spray window: 7:30 AM to 10:30 AM.
+        `;
+        id = 'infoModal';
+      }
+
+      const modal = document.getElementById(id);
+      if (modal) {
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.remove('opacity-0'), 10);
+      }
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) {
+        modal.classList.add('opacity-0');
+        setTimeout(() => modal.classList.add('hidden'), 200);
+      }
+    }
+
+    function switchTab(tab) {
+      const tabs = ['home', 'myfarm', 'advice'];
+      tabs.forEach(t => {
+        const el = document.getElementById('tab-' + t);
+        if (t === tab) {
+          el.className = "flex flex-col items-center justify-center gap-0.5 min-w-[80px] h-14 rounded-xl font-bold text-primary bg-surface-container transition-all";
+        } else {
+          el.className = "flex flex-col items-center justify-center gap-0.5 min-w-[80px] h-14 rounded-xl font-medium text-secondary hover:text-primary transition-all";
+        }
+      });
+
+      if (tab === 'myfarm') {
+        openModal('fieldModal');
+      } else if (tab === 'advice') {
+        openModal('adviceModal');
+      }
+    }
+
+    // Copy SMS text
+    function copySmsText() {
+      const text = document.getElementById('modal-sms-text').textContent.trim();
+      navigator.clipboard.writeText(text).then(() => {
+        const label = document.getElementById('copy-sms-label');
+        label.textContent = "Copied!";
+        setTimeout(() => { label.textContent = "Copy SMS"; }, 2000);
+      }).catch(() => {
+        showToast("SMS Text", text);
+      });
+    }
+
+    function showToast(title, subtitle) {
+      const toast = document.getElementById('audioToast');
+      document.getElementById('audioToastTitle').textContent = title;
+      document.getElementById('audioToastSub').textContent = subtitle;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        if (!isSpeaking) toast.classList.add('hidden');
+      }, 3500);
+    }
+
+    // Splash Intro Handling
+    function dismissSplash() {
+      const splash = document.getElementById('intro-splash');
+      if (splash) {
+        splash.style.opacity = '0';
+        splash.style.pointerEvents = 'none';
+        setTimeout(() => { splash.style.display = 'none'; }, 500);
+      }
+      try { sessionStorage.setItem('earthworm_splash_shown', 'true'); } catch (e) {}
+    }
+
+    function replaySplash() {
+      const splash = document.getElementById('intro-splash');
+      if (splash) {
+        splash.style.display = 'flex';
+        splash.style.pointerEvents = 'auto';
+        setTimeout(() => { splash.style.opacity = '1'; }, 10);
+        const worm = document.getElementById('splash-worm');
+        if (worm) {
+          worm.style.animation = 'none';
+          void worm.offsetWidth;
+          worm.style.animation = 'crawlWorm 1.4s ease-in-out forwards';
+        }
+      }
+    }
+
+    // Startup Initialization
+    window.addEventListener('DOMContentLoaded', async () => {
+      await checkBackendHealth();
+      await selectRegion('mandya');
+
+      try {
+        if (sessionStorage.getItem('earthworm_splash_shown') === 'true') {
+          const splash = document.getElementById('intro-splash');
+          if (splash) splash.style.display = 'none';
+          return;
+        }
+      } catch (e) {}
+
+      setTimeout(() => { dismissSplash(); }, 1800);
+    });
+  </script>
+</body>
+</html>
