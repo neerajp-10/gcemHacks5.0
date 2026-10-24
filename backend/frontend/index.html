@@ -251,8 +251,12 @@
               </span>
             </div>
             
-            <!-- Quick Actions: Radar Scan Toggle + Refresh -->
+            <!-- Quick Actions: Mark Land + Radar Scan Toggle + Refresh -->
             <div class="flex items-center gap-1">
+              <button id="btn-toggle-mark-land" onclick="toggleLandMarkingMode()" class="text-[10px] font-bold px-2 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-800 dark:text-emerald-300 flex items-center gap-1 transition-all cursor-pointer border border-emerald-500/30" title="Manually Mark Field Boundary & Acreage">
+                <span class="material-symbols-outlined text-[13px] text-emerald-600">edit_location_alt</span>
+                <span id="mark-land-btn-text">Mark Land</span>
+              </button>
               <button id="btn-toggle-radar" onclick="toggleRadarScan()" class="text-[10px] font-semibold px-2 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface flex items-center gap-1 transition-all cursor-pointer" title="Toggle Radar Laser Scanline">
                 <span class="material-symbols-outlined text-[13px] text-primary" id="radar-icon">sensors</span>
                 <span id="radar-text">Radar Scan</span>
@@ -331,6 +335,45 @@
             <span class="text-xs font-semibold tracking-wide">Acquiring Sentinel-2 Pass...</span>
           </div>
 
+          <!-- Floating Manual Land Marker HUD -->
+          <div id="land-marker-hud" class="absolute top-2 left-2 right-2 z-40 bg-inverse-surface/95 backdrop-blur-md rounded-xl p-2.5 text-inverse-on-surface shadow-2xl border border-emerald-500/40 flex flex-col gap-2 transition-all" style="display: none;">
+            <div class="flex items-center justify-between text-xs">
+              <div class="flex items-center gap-1.5 font-bold text-emerald-400">
+                <span class="material-symbols-outlined text-[16px] animate-pulse">draw</span>
+                <span id="marker-hud-title">Manual Land Boundary Marking</span>
+              </div>
+              <button onclick="toggleLandMarkingMode(false)" class="text-white/60 hover:text-white p-0.5 rounded cursor-pointer" type="button">
+                <span class="material-symbols-outlined text-[16px]">close</span>
+              </button>
+            </div>
+            <p class="text-[11px] text-surface-container-low" id="marker-hud-hint">
+              Tap anywhere on the satellite map to place boundary corner pins for your field.
+            </p>
+            <div class="flex items-center justify-between gap-1 text-[10px] font-mono bg-black/40 px-2 py-1.5 rounded-lg border border-white/10">
+              <div>Corners: <span id="marker-count" class="font-bold text-emerald-300">0</span></div>
+              <div>Est. Area: <span id="marker-area-acres" class="font-bold text-amber-300">0.00</span> Acres (<span id="marker-area-guntas" class="text-amber-200">0</span> Guntas)</div>
+              <div>Perimeter: <span id="marker-perimeter" class="text-surface-container-lowest">0m</span></div>
+            </div>
+            <div class="flex items-center gap-1.5 pt-0.5">
+              <button onclick="addCurrentGpsMarker()" class="flex-1 py-1.5 px-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold text-[10px] flex items-center justify-center gap-1 cursor-pointer transition-colors" title="Use Phone/Device GPS Location" type="button">
+                <span class="material-symbols-outlined text-[12px]">my_location</span>
+                <span id="gps-btn-text">GPS My Spot</span>
+              </button>
+              <button onclick="undoLastMarkerPoint()" id="btn-undo-marker" disabled class="py-1.5 px-2 bg-surface-variant/40 hover:bg-surface-variant/70 disabled:opacity-40 text-on-surface rounded-lg font-bold text-[10px] flex items-center justify-center gap-1 cursor-pointer transition-colors" title="Undo last point" type="button">
+                <span class="material-symbols-outlined text-[12px]">undo</span>
+                <span>Undo</span>
+              </button>
+              <button onclick="clearAllMarkerPoints()" id="btn-clear-markers" disabled class="py-1.5 px-2 bg-surface-variant/40 hover:bg-surface-variant/70 disabled:opacity-40 text-rose-300 rounded-lg font-bold text-[10px] flex items-center justify-center gap-1 cursor-pointer transition-colors" title="Clear all points" type="button">
+                <span class="material-symbols-outlined text-[12px]">delete</span>
+                <span>Clear</span>
+              </button>
+              <button onclick="openSaveLandModal()" id="btn-save-land" disabled class="py-1.5 px-2.5 bg-amber-500 hover:bg-amber-400 disabled:opacity-40 text-black rounded-lg font-extrabold text-[10px] flex items-center justify-center gap-1 cursor-pointer transition-colors" title="Save marked boundary" type="button">
+                <span class="material-symbols-outlined text-[12px]">save</span>
+                <span>Save Land</span>
+              </button>
+            </div>
+          </div>
+
           <!-- Bottom Telemetry & Parcel Bar -->
           <div class="absolute bottom-2 left-2 right-2 z-30 bg-inverse-surface/90 backdrop-blur-md rounded-xl p-2 px-3 text-inverse-on-surface flex items-center justify-between text-xs shadow-md">
             <div class="flex items-center gap-2">
@@ -340,12 +383,13 @@
                 <span class="text-[9px] text-primary-fixed/80 font-mono" id="sat-orbit-tag">Orbit R019 • Sun Zenith 28.4°</span>
               </div>
             </div>
-            <div class="flex items-center gap-1.5">
+            <div class="flex items-center gap-1.5 flex-wrap">
               <button onclick="toggleCompareSplit()" id="btn-compare-split" class="text-[9px] font-bold px-2 py-0.5 rounded bg-surface-variant/40 hover:bg-surface-variant/70 text-on-surface flex items-center gap-1 transition-all cursor-pointer">
                 <span class="material-symbols-outlined text-[11px]">compare</span>
                 <span>Split View</span>
               </button>
-              <span class="text-[11px] font-bold text-primary-fixed bg-primary/40 px-2 py-0.5 rounded" id="parcel-id-tag">Plot #142/A</span>
+              <button onclick="switchParcelDisplay('demo')" id="parcel-id-tag" class="text-[11px] font-bold text-primary-fixed bg-primary/40 px-2 py-0.5 rounded cursor-pointer transition-all">Plot #142/A</button>
+              <div id="custom-parcels-badges" class="flex items-center gap-1"></div>
             </div>
           </div>
 
@@ -871,24 +915,30 @@
     <div class="w-full max-w-[640px] mx-auto bg-surface-container-lowest rounded-t-3xl p-5 flex flex-col gap-4 max-h-[90vh] overflow-y-auto shadow-2xl border-t border-surface-variant">
       
       <!-- Header -->
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between pb-2 border-b border-surface-variant">
         <div class="flex items-center gap-2.5">
           <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg">
             <span class="material-symbols-outlined text-[24px]">cell_tower</span>
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <h3 class="text-base font-bold text-on-surface">Twilio Agri-Communications</h3>
+              <h3 class="text-base font-bold text-on-surface">Low-Bandwidth Farmer Telephony</h3>
               <span id="twilio-badge-mode" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
-                ⚡ Live / Simulation
+                Cellular PSTN / GSM
               </span>
             </div>
-            <p class="text-[11px] text-secondary">Automated SMS &amp; IVR Voice Call Dispatch</p>
+            <p class="text-[11px] text-secondary">Direct SMS &amp; IVR Calls to Farmer Handsets (No Webpage / Internet Needed)</p>
           </div>
         </div>
         <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface hover:bg-surface-variant transition-colors cursor-pointer" onclick="closeModal('twilioModal')" type="button">
           <span class="material-symbols-outlined text-[20px]">close</span>
         </button>
+      </div>
+
+      <!-- Low-Bandwidth Telecom Callout -->
+      <div class="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-900 text-[11px] leading-relaxed flex items-start gap-2">
+        <span class="material-symbols-outlined text-emerald-700 text-[16px] shrink-0 mt-0.5">phone_android</span>
+        <span><strong>Feature Phone Compatible:</strong> Advisories are transmitted directly to the farmer's physical cellular handset via telecom carriers. The recipient does NOT need an internet connection, smartphone, or web browser.</span>
       </div>
 
       <!-- Channel Toggle Tabs: SMS vs Voice Call -->
@@ -909,7 +959,7 @@
           <label class="font-bold text-on-surface block mb-1">Farmer Mobile Number:</label>
           <div class="relative flex items-center">
             <span class="material-symbols-outlined text-secondary text-[18px] absolute left-3 pointer-events-none">call</span>
-            <input type="tel" id="twilio-phone-input" value="+91 98765 43210" class="w-full bg-surface-container-low border border-surface-variant rounded-xl pl-9 pr-3 py-2.5 text-xs text-on-surface font-mono focus:ring-1 focus:ring-primary focus:outline-none"/>
+            <input type="tel" id="twilio-phone-input" value="+91 97318 03808" class="w-full bg-surface-container-low border border-surface-variant rounded-xl pl-9 pr-3 py-2.5 text-xs text-on-surface font-mono focus:ring-1 focus:ring-primary focus:outline-none"/>
           </div>
         </div>
         <div>
@@ -924,7 +974,7 @@
       <!-- Live Message / Voice Transcript Preview -->
       <div class="flex flex-col gap-1.5 text-xs">
         <div class="flex items-center justify-between text-secondary">
-          <span class="font-bold text-on-surface" id="twilio-preview-heading">SMS Preview (160-char Budget)</span>
+          <span class="font-bold text-on-surface" id="twilio-preview-heading">SMS Advisory Preview (Feature Phone)</span>
           <span class="font-mono text-[11px]" id="twilio-char-count">138 chars • 1 Segment</span>
         </div>
         <div class="p-3 bg-surface-container-low rounded-xl border border-surface-variant font-mono text-xs text-on-surface leading-relaxed max-h-32 overflow-y-auto select-all" id="twilio-preview-content">
@@ -936,7 +986,7 @@
       <div class="flex flex-col sm:flex-row gap-2">
         <button id="btn-dispatch-twilio" onclick="dispatchTwilioAction()" class="flex-1 min-h-[48px] rounded-xl bg-primary text-on-primary font-bold text-sm flex items-center justify-center gap-2 shadow-sm hover:bg-primary-container active:scale-98 transition-all cursor-pointer">
           <span class="material-symbols-outlined text-[18px]" id="twilio-dispatch-icon">send</span>
-          <span id="twilio-dispatch-label">Send Twilio SMS</span>
+          <span id="twilio-dispatch-label">Send Cellular SMS</span>
         </button>
         <button onclick="previewTwilioAudio()" id="btn-twilio-preview-voice" class="min-h-[48px] px-4 rounded-xl bg-surface-container hover:bg-surface-variant text-primary font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
           <span class="material-symbols-outlined text-[18px]">volume_up</span>
@@ -963,18 +1013,102 @@
       <!-- Quick Credentials / Setup Helper -->
       <details class="text-xs text-secondary bg-surface-container-low p-2.5 rounded-xl border border-surface-variant group">
         <summary class="font-bold text-on-surface cursor-pointer select-none flex items-center justify-between">
-          <span>Configure Real Twilio Account (.env)</span>
+          <span>Configure Live Carrier Credentials (backend/.env)</span>
           <span class="material-symbols-outlined text-[16px] group-open:rotate-180 transition-transform">expand_more</span>
         </summary>
-        <div class="mt-2 text-[11px] space-y-1 leading-relaxed text-on-surface-variant">
-          <p>Add the following variables to your <code class="bg-surface-container px-1 py-0.5 rounded font-mono">backend/.env</code> file:</p>
-          <pre class="bg-surface-container-lowest p-2 rounded border border-surface-variant font-mono text-[10px] select-all overflow-x-auto">TWILIO_ACCOUNT_SID=your-account-sid
-TWILIO_AUTH_TOKEN=your-auth-token
-TWILIO_PHONE_NUMBER=+1234567890</pre>
-          <p class="text-secondary text-[10px]">When credentials are not set, Earthworm operates in full interactive simulation mode with real-time audio playback in all 7 languages.</p>
+        <div class="mt-2 text-[11px] space-y-1.5 leading-relaxed text-on-surface-variant">
+          <p>To physically ring or text the farmer's real SIM card (<code class="bg-surface-container px-1 py-0.5 rounded font-mono">+91 97318 03808</code>) over cellular towers, configure:</p>
+          <pre class="bg-surface-container-lowest p-2 rounded border border-surface-variant font-mono text-[10px] select-all overflow-x-auto">TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_AUTH_TOKEN=your_auth_token_here
+TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
+          <p class="text-secondary text-[10px]">Headless CLI command (no browser required): <code class="font-mono bg-surface-container px-1 py-0.5 rounded">python backend/dispatch_advisory.py --to +919731803808 --channel both --lang kn</code></p>
         </div>
       </details>
       
+    </div>
+  </div>
+
+  <!-- Modal: Save Custom Land Marker Parcel -->
+  <div class="fixed inset-0 z-50 bg-inverse-surface/60 backdrop-blur-xs flex flex-col justify-end hidden opacity-0 transition-opacity duration-200" id="saveLandModal">
+    <div class="w-full max-w-[640px] mx-auto bg-surface-container-lowest rounded-t-3xl p-5 flex flex-col gap-4 max-h-[90vh] overflow-y-auto shadow-2xl border-t border-surface-variant">
+      
+      <!-- Header -->
+      <div class="flex items-center justify-between pb-2 border-b border-surface-variant">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-bold text-lg">
+            <span class="material-symbols-outlined text-[24px]">bookmark_added</span>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-on-surface" id="save-land-modal-title">Save Marked Field Boundary</h3>
+            <p class="text-[11px] text-secondary">Manually Georeferenced Land Parcel</p>
+          </div>
+        </div>
+        <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface hover:bg-surface-variant transition-colors cursor-pointer" onclick="closeModal('saveLandModal')" type="button">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Parcel Summary Statistics -->
+      <div class="grid grid-cols-3 gap-2 text-center text-xs">
+        <div class="p-2.5 rounded-xl bg-surface-container-low border border-surface-variant">
+          <span class="text-[10px] text-secondary block">Measured Area</span>
+          <span class="font-extrabold text-primary text-sm" id="save-land-acres">0.00 Acres</span>
+          <span class="text-[9px] text-secondary block" id="save-land-guntas">0 Guntas</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-surface-container-low border border-surface-variant">
+          <span class="text-[10px] text-secondary block">Boundary Pins</span>
+          <span class="font-extrabold text-on-surface text-sm" id="save-land-corners">0 Corners</span>
+          <span class="text-[9px] text-secondary block" id="save-land-perimeter">0m perimeter</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-surface-container-low border border-surface-variant">
+          <span class="text-[10px] text-secondary block">Estimated Vigor</span>
+          <span class="font-extrabold text-emerald-600 text-sm" id="save-land-ndvi">0.65 NDVI</span>
+          <span class="text-[9px] text-secondary block">Sentinel-2 Sync</span>
+        </div>
+      </div>
+
+      <!-- Form Inputs: Name & Crop -->
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="font-bold text-on-surface block mb-1">Field / Parcel Name:</label>
+          <input type="text" id="save-land-name" value="My Marked Field" class="w-full bg-surface-container-low border border-surface-variant rounded-xl px-3 py-2.5 text-xs text-on-surface font-semibold focus:ring-1 focus:ring-primary focus:outline-none"/>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="font-bold text-on-surface block mb-1">Cultivated Crop:</label>
+            <select id="save-land-crop" class="w-full bg-surface-container-low border border-surface-variant rounded-xl px-3 py-2.5 text-xs text-on-surface font-semibold focus:ring-1 focus:ring-primary focus:outline-none">
+              <option value="Paddy (Rice)">Paddy (Rice)</option>
+              <option value="Sugarcane">Sugarcane</option>
+              <option value="Wheat">Wheat</option>
+              <option value="Mustard">Mustard</option>
+              <option value="Onion">Onion</option>
+              <option value="Cotton">Cotton</option>
+              <option value="Maize">Maize</option>
+              <option value="Horticulture">Horticulture</option>
+            </select>
+          </div>
+          <div>
+            <label class="font-bold text-on-surface block mb-1">Survey / Cadastral # (Optional):</label>
+            <input type="text" id="save-land-survey" placeholder="e.g. 142/B" class="w-full bg-surface-container-low border border-surface-variant rounded-xl px-3 py-2.5 text-xs text-on-surface focus:ring-1 focus:ring-primary focus:outline-none"/>
+          </div>
+        </div>
+        <div>
+          <label class="font-bold text-on-surface block mb-1">Plot Notes:</label>
+          <textarea id="save-land-notes" rows="2" placeholder="e.g. Boundary marked along the north irrigation canal near the pump house" class="w-full bg-surface-container-low border border-surface-variant rounded-xl p-2.5 text-xs text-on-surface focus:ring-1 focus:ring-primary focus:outline-none resize-none"></textarea>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-2 pt-1">
+        <button class="flex-1 min-h-[48px] rounded-xl bg-primary text-on-primary font-bold text-sm flex items-center justify-center gap-1.5 shadow-sm hover:bg-primary-container transition-all cursor-pointer" onclick="confirmSaveLandParcel()" type="button">
+          <span class="material-symbols-outlined text-[18px]">check_circle</span>
+          <span>Save My Land Parcel</span>
+        </button>
+        <button class="min-h-[48px] px-4 rounded-xl bg-surface-container text-on-surface hover:bg-surface-variant font-semibold text-xs cursor-pointer" onclick="closeModal('saveLandModal')" type="button">
+          Cancel
+        </button>
+      </div>
+
     </div>
   </div>
 
@@ -1411,7 +1545,10 @@ TWILIO_PHONE_NUMBER=+1234567890</pre>
         speechLang: "en-IN",
         stage1: "1. What did we notice? (Observation)",
         stage2: "2. What could it mean? (Interpretation)",
-        stage3: "3. What should I do next? (Action Steps)"
+        stage3: "3. What should I do next? (Action Steps)",
+        markLand: "Mark Land",
+        markingActive: "Manual Land Boundary Marking",
+        tapMap: "Tap on satellite map to place boundary corner pins for your field."
       },
       kn: {
         heroTitle: "ಸಮಸ್ಯೆಗಳು ಬೆಳೆಯುವ ಮುನ್ನ ನಿಮ್ಮ ಬೆಳೆಗಳನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಿ.",
@@ -1433,7 +1570,10 @@ TWILIO_PHONE_NUMBER=+1234567890</pre>
         speechLang: "kn-IN",
         stage1: "೧. ಗಮನಿಸಿದ್ದು ಏನು? (ಗಮನಿಸಿದ್ದು)",
         stage2: "೨. ಅರ್ಥವೇನು? (ಅರ್ಥವೇನು)",
-        stage3: "೩. ಮುಂದೇನು ಮಾಡಬೇಕು? (ಮುಂದೇನು)"
+        stage3: "೩. ಮುಂದೇನು ಮಾಡಬೇಕು? (ಮುಂದೇನು)",
+        markLand: "ಜಮೀನು ಗುರುತಿಸಿ",
+        markingActive: "ಕೈಯಾರೆ ಜಮೀನಿನ ಗಡಿ ಗುರುತಿಸುವಿಕೆ",
+        tapMap: "ನಿಮ್ಮ ಜಮೀನಿನ ಗಡಿ ಗುರುತಿಸಲು ಉಪಗ್ರಹ ನಕ್ಷೆಯ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ."
       },
       hi: {
         heroTitle: "समस्या बढ़ने से पहले अपनी फसल को समझें।",
@@ -1455,7 +1595,10 @@ TWILIO_PHONE_NUMBER=+1234567890</pre>
         speechLang: "hi-IN",
         stage1: "1. हमने क्या देखा? (निरीक्षण)",
         stage2: "2. इसका क्या मतलब हो सकता है? (अर्थ)",
-        stage3: "3. आगे क्या करना चाहिए? (कदम)"
+        stage3: "3. आगे क्या करना चाहिए? (कदम)",
+        markLand: "जमीन चिह्नित करें",
+        markingActive: "खेत की सीमा का मैन्युअल अंकन",
+        tapMap: "अपने खेत के कोनों को चिह्नित करने के लिए मानचित्र पर टैप करें।"
       },
       te: {
         heroTitle: "సమస్యలు పెరగకముందే మీ పంటను అర్థం చేసుకోండి.",
@@ -1477,7 +1620,10 @@ TWILIO_PHONE_NUMBER=+1234567890</pre>
         speechLang: "te-IN",
         stage1: "1. మనం ఏమి గమనించాం? (గమనింపు)",
         stage2: "2. దీని అర్థం ఏమిటి? (వివరణ)",
-        stage3: "3. తరువాత ఏమి చేయాలి? (చర్యలు)"
+        stage3: "3. తరువాత ఏమి చేయాలి? (చర్యలు)",
+        markLand: "భూమిని గుర్తించండి",
+        markingActive: "పొలం సరిహద్దు గుర్తింపు",
+        tapMap: "మీ పొలం సరిహద్దులను గుర్తించడానికి మ్యాప్‌పై క్లిక్ చేయండి."
       },
       ta: {
         heroTitle: "பிரச்சனைகள் வளர்வதற்கு முன் உங்கள் பயிர்களை புரிந்து கொள்ளுங்கள்.",
@@ -1499,7 +1645,10 @@ TWILIO_PHONE_NUMBER=+1234567890</pre>
         speechLang: "ta-IN",
         stage1: "1. நாம் கவனித்தது என்ன? (கவனிப்பு)",
         stage2: "2. இதற்கு என்ன அர்த்தம்? (பொருள்)",
-        stage3: "3. அடுத்து என்ன செய்ய வேண்டும்? (நடவடிக்கை)"
+        stage3: "3. அடுத்து என்ன செய்ய வேண்டும்? (நடவடிக்கை)",
+        markLand: "நிலத்தை குறிக்கவும்",
+        markingActive: "நில எல்லை குறித்தல்",
+        tapMap: "உங்கள் நிலத்தின் மூலைகளை குறிக்க வரைபடத்தில் தட்டவும்."
       },
       mr: {
         heroTitle: "समस्या वाढण्यापूर्वी तुमचे पीक समजून घ्या.",
@@ -1521,7 +1670,10 @@ TWILIO_PHONE_NUMBER=+1234567890</pre>
         speechLang: "mr-IN",
         stage1: "1. आम्ही काय पाहिले? (निरीक्षण)",
         stage2: "2. याचा काय अर्थ असू शकतो? (अर्थ)",
-        stage3: "3. पुढे काय करावे? (कृती)"
+        stage3: "3. पुढे काय करावे? (कृती)",
+        markLand: "जमीन चिन्हांकित करा",
+        markingActive: "शेत सीमा चिन्हांकन",
+        tapMap: "आपल्या शेताच्या सीमा आखण्यासाठी नकाशावर क्लिक करा."
       },
       bn: {
         heroTitle: "সমস্যা বাড়ার আগেই আপনার ফসলকে বুঝুন।",
@@ -1543,7 +1695,10 @@ TWILIO_PHONE_NUMBER=+1234567890</pre>
         speechLang: "bn-IN",
         stage1: "1. আমরা কী লক্ষ্য করেছি? (পর্যবেক্ষণ)",
         stage2: "2. এর অর্থ কী হতে পারে? (অর্থ)",
-        stage3: "3. এরপর কী করা উচিত? (পদক্ষেপ)"
+        stage3: "3. এরপর কী করা উচিত? (পদক্ষেপ)",
+        markLand: "জমি চিহ্নিত করুন",
+        markingActive: "জমির সীমানা চিহ্নিতকরণ",
+        tapMap: "আপনার জমির সীমানা চিহ্নিত করতে মানচিত্রে ক্লিক করুন।"
       }
     };
 
@@ -1806,6 +1961,13 @@ TWILIO_PHONE_NUMBER=+1234567890</pre>
 
         // Minimal Zoom Control
         L.control.zoom({ position: 'topright' }).addTo(leafletMap);
+
+        // Map Click Listener for Manual Land Boundary Marking
+        leafletMap.on('click', function(e) {
+          if (isLandMarkingActive) {
+            handleAddLandMarkerPoint(e.latlng.lat, e.latlng.lng);
+          }
+        });
       }
 
       if (leafletMap) {
@@ -1832,7 +1994,463 @@ TWILIO_PHONE_NUMBER=+1234567890</pre>
 
         leafletMarker = L.marker([geo.lat, geo.lon], { icon: customIcon }).addTo(leafletMap);
         leafletMarker.bindPopup(`<strong>${REGIONS_DATA[regionKey].parcel}</strong><br/>Crop: ${REGIONS_DATA[regionKey].cropName}<br/>NDVI: ${REGIONS_DATA[regionKey].metric}`);
+
+        renderSavedCustomParcelsOnMap();
       }
+    }
+
+    // ==========================================
+    // MANUAL LAND MARKER (FARMER LAND BOUNDARY)
+    // ==========================================
+    let isLandMarkingActive = false;
+    let landMarkerPoints = []; // Array of { lat, lng, marker }
+    let landMarkerPolygon = null;
+    let savedCustomParcels = []; // Loaded from localStorage and backend
+    let activeCustomParcelId = null;
+    let savedParcelLayers = []; // Map layers for saved parcels
+
+    function loadSavedCustomParcels() {
+      try {
+        const local = localStorage.getItem('earthworm_custom_parcels');
+        if (local) {
+          savedCustomParcels = JSON.parse(local);
+        }
+      } catch (e) {
+        console.warn("Could not load local custom parcels:", e);
+      }
+      renderCustomParcelBadges();
+
+      // Also fetch from backend asynchronously if available
+      const apiBase = getApiBase();
+      fetch(`${apiBase}/api/farms/${currentRegionKey}/custom-markers`)
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.markers && data.markers.length > 0) {
+            data.markers.forEach(m => {
+              if (!savedCustomParcels.some(p => p.id === m.id)) {
+                savedCustomParcels.push(m);
+              }
+            });
+            renderCustomParcelBadges();
+            if (leafletMap) renderSavedCustomParcelsOnMap();
+          }
+        })
+        .catch(() => {});
+    }
+
+    function toggleLandMarkingMode(forceState) {
+      if (typeof forceState === 'boolean') {
+        isLandMarkingActive = forceState;
+      } else {
+        isLandMarkingActive = !isLandMarkingActive;
+      }
+
+      const btn = document.getElementById('btn-toggle-mark-land');
+      const hud = document.getElementById('land-marker-hud');
+      const mapEl = document.getElementById('satellite-leaflet-map');
+
+      if (isLandMarkingActive) {
+        // Automatically switch to Interactive Map layer
+        if (currentLayer !== 'map') {
+          switchSatelliteLayer('map');
+        }
+
+        if (btn) {
+          btn.classList.add('bg-emerald-600', 'text-white', 'shadow-md');
+          btn.classList.remove('bg-emerald-500/15', 'text-emerald-800', 'dark:text-emerald-300');
+        }
+        if (hud) hud.style.display = 'flex';
+        if (mapEl) mapEl.style.cursor = 'crosshair';
+
+        if (leafletMap) {
+          leafletMap.invalidateSize();
+        }
+
+        const t = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
+        showToast(t.markingActive || "Manual Land Marking Active", t.tapMap || "Tap on map to drop field boundary corners");
+      } else {
+        if (btn) {
+          btn.classList.remove('bg-emerald-600', 'text-white', 'shadow-md');
+          btn.classList.add('bg-emerald-500/15', 'text-emerald-800', 'dark:text-emerald-300');
+        }
+        if (hud) hud.style.display = 'none';
+        if (mapEl) mapEl.style.cursor = '';
+      }
+    }
+
+    function handleAddLandMarkerPoint(lat, lng) {
+      if (!isLandMarkingActive) return;
+
+      const ptIdx = landMarkerPoints.length + 1;
+      const customPinIcon = L.divIcon({
+        className: 'farmer-corner-pin',
+        html: `<div style="background:#059669; color:#fff; border:2px solid #ffffff; border-radius:50%; width:22px; height:22px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; box-shadow:0 0 8px rgba(0,0,0,0.5);">${ptIdx}</div>`,
+        iconSize: [22, 22],
+        iconAnchor: [11, 11]
+      });
+
+      const marker = L.marker([lat, lng], {
+        icon: customPinIcon,
+        draggable: true
+      }).addTo(leafletMap);
+
+      const ptData = { lat, lng, marker };
+      landMarkerPoints.push(ptData);
+
+      // Draggable point update for precision boundary alignment
+      marker.on('drag', function(e) {
+        const newPos = e.target.getLatLng();
+        ptData.lat = newPos.lat;
+        ptData.lng = newPos.lng;
+        updateMarkingPolygonAndStats();
+      });
+
+      marker.bindPopup(`
+        <div style="font-size:11px; line-height:1.4;">
+          <strong>Boundary Corner #${ptIdx}</strong><br/>
+          Lat: ${lat.toFixed(5)}° N<br/>
+          Lng: ${lng.toFixed(5)}° E<br/>
+          <button onclick="removeMarkerPoint(${ptIdx - 1})" style="color:#e11d48; font-weight:bold; font-size:10px; margin-top:4px; cursor:pointer;">
+            Remove Corner
+          </button>
+        </div>
+      `);
+
+      updateMarkingPolygonAndStats();
+    }
+
+    function removeMarkerPoint(index) {
+      if (index >= 0 && index < landMarkerPoints.length) {
+        const removed = landMarkerPoints.splice(index, 1)[0];
+        if (removed && removed.marker && leafletMap) {
+          leafletMap.removeLayer(removed.marker);
+        }
+        // Re-number remaining markers
+        landMarkerPoints.forEach((p, idx) => {
+          const newIdx = idx + 1;
+          const pinEl = p.marker.getElement();
+          if (pinEl) {
+            const innerDiv = pinEl.querySelector('div');
+            if (innerDiv) innerDiv.textContent = newIdx;
+          }
+        });
+        updateMarkingPolygonAndStats();
+      }
+    }
+
+    function undoLastMarkerPoint() {
+      if (landMarkerPoints.length > 0) {
+        removeMarkerPoint(landMarkerPoints.length - 1);
+      }
+    }
+
+    function clearAllMarkerPoints() {
+      landMarkerPoints.forEach(p => {
+        if (p.marker && leafletMap) {
+          leafletMap.removeLayer(p.marker);
+        }
+      });
+      landMarkerPoints = [];
+      if (landMarkerPolygon && leafletMap) {
+        leafletMap.removeLayer(landMarkerPolygon);
+        landMarkerPolygon = null;
+      }
+      updateMarkingPolygonAndStats();
+    }
+
+    function addCurrentGpsMarker() {
+      if (!navigator.geolocation) {
+        showToast("GPS Not Supported", "Your browser does not support geolocation.");
+        return;
+      }
+
+      const gpsBtn = document.getElementById('gps-btn-text');
+      if (gpsBtn) gpsBtn.textContent = "Acquiring...";
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          if (gpsBtn) gpsBtn.textContent = "GPS My Spot";
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          if (leafletMap) {
+            leafletMap.setView([lat, lng], 17);
+          }
+          handleAddLandMarkerPoint(lat, lng);
+          showToast("GPS Point Added", `Accurate to ~${Math.round(pos.coords.accuracy)}m`);
+        },
+        (err) => {
+          if (gpsBtn) gpsBtn.textContent = "GPS My Spot";
+          console.warn("GPS error:", err);
+          showToast("GPS Notice", "Using farm plot center (GPS location unavailable).");
+          const geo = REGION_GEO[currentRegionKey] || REGION_GEO.mandya;
+          handleAddLandMarkerPoint(geo.lat, geo.lon);
+        },
+        { enableHighAccuracy: true, timeout: 7000 }
+      );
+    }
+
+    function calculatePolygonAreaAcres(points) {
+      if (!points || points.length < 3) return 0;
+      const R = 6378137; // Earth radius in meters
+      let area = 0;
+      for (let i = 0; i < points.length; i++) {
+        const p1 = points[i];
+        const p2 = points[(i + 1) % points.length];
+        area += (p2.lng - p1.lng) * (Math.PI / 180) * (2 + Math.sin(p1.lat * (Math.PI / 180)) + Math.sin(p2.lat * (Math.PI / 180)));
+      }
+      area = Math.abs(area * R * R / 2.0);
+      return area * 0.000247105; // sq meters to acres
+    }
+
+    function calculatePerimeterMeters(points) {
+      if (!points || points.length < 2) return 0;
+      let dist = 0;
+      const R = 6371e3;
+      for (let i = 0; i < points.length; i++) {
+        const p1 = points[i];
+        const p2 = points[(i + 1) % points.length];
+        if (i === points.length - 1 && points.length === 2) break;
+        const dLat = (p2.lat - p1.lat) * Math.PI / 180;
+        const dLon = (p2.lng - p1.lng) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(p1.lat * Math.PI / 180) * Math.cos(p2.lat * Math.PI / 180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        dist += R * c;
+      }
+      return dist;
+    }
+
+    function updateMarkingPolygonAndStats() {
+      const coords = landMarkerPoints.map(p => [p.lat, p.lng]);
+      const rawPoints = landMarkerPoints.map(p => ({ lat: p.lat, lng: p.lng }));
+
+      if (landMarkerPolygon && leafletMap) {
+        leafletMap.removeLayer(landMarkerPolygon);
+        landMarkerPolygon = null;
+      }
+
+      if (coords.length === 2 && leafletMap) {
+        landMarkerPolygon = L.polyline(coords, {
+          color: '#10b981',
+          weight: 3,
+          dashArray: '5, 5'
+        }).addTo(leafletMap);
+      } else if (coords.length >= 3 && leafletMap) {
+        landMarkerPolygon = L.polygon(coords, {
+          color: '#10b981',
+          weight: 3,
+          dashArray: '6, 4',
+          fillColor: '#10b981',
+          fillOpacity: 0.28
+        }).addTo(leafletMap);
+      }
+
+      const acres = calculatePolygonAreaAcres(rawPoints);
+      const guntas = Math.round(acres * 40 * 10) / 10;
+      const perimeter = calculatePerimeterMeters(rawPoints);
+
+      const countEl = document.getElementById('marker-count');
+      const acresEl = document.getElementById('marker-area-acres');
+      const guntasEl = document.getElementById('marker-area-guntas');
+      const perimEl = document.getElementById('marker-perimeter');
+      const hintEl = document.getElementById('marker-hud-hint');
+      const undoBtn = document.getElementById('btn-undo-marker');
+      const clearBtn = document.getElementById('btn-clear-markers');
+      const saveBtn = document.getElementById('btn-save-land');
+
+      if (countEl) countEl.textContent = coords.length;
+      if (acresEl) acresEl.textContent = acres.toFixed(2);
+      if (guntasEl) guntasEl.textContent = guntas;
+      if (perimEl) perimEl.textContent = Math.round(perimeter) + 'm';
+
+      if (undoBtn) undoBtn.disabled = coords.length === 0;
+      if (clearBtn) clearBtn.disabled = coords.length === 0;
+      if (saveBtn) saveBtn.disabled = coords.length < 3;
+
+      if (hintEl) {
+        if (coords.length === 0) {
+          hintEl.textContent = "Tap anywhere on the satellite map to place boundary corner pins for your field.";
+        } else if (coords.length === 1) {
+          hintEl.textContent = "Corner 1 placed. Tap next boundary point to draw field edge.";
+        } else if (coords.length === 2) {
+          hintEl.textContent = "2 corners connected. Tap 3rd corner to enclose field area.";
+        } else {
+          hintEl.textContent = `Field boundary enclosed! Estimated: ${acres.toFixed(2)} Acres (${guntas} Guntas). Click 'Save Land' to store.`;
+        }
+      }
+    }
+
+    function openSaveLandModal() {
+      const rawPoints = landMarkerPoints.map(p => ({ lat: p.lat, lng: p.lng }));
+      if (rawPoints.length < 3) {
+        showToast("Boundary Incomplete", "Please mark at least 3 corner points to enclose your land.");
+        return;
+      }
+      const acres = calculatePolygonAreaAcres(rawPoints);
+      const guntas = Math.round(acres * 40 * 10) / 10;
+      const perimeter = Math.round(calculatePerimeterMeters(rawPoints));
+
+      document.getElementById('save-land-acres').textContent = acres.toFixed(2) + " Acres";
+      document.getElementById('save-land-guntas').textContent = guntas + " Guntas";
+      document.getElementById('save-land-corners').textContent = rawPoints.length + " Corners";
+      document.getElementById('save-land-perimeter').textContent = perimeter + "m perimeter";
+
+      const rData = REGIONS_DATA[currentRegionKey];
+      const regionName = rData ? (rData.location || rData.plotTitle || "Field").split(',')[0] : "Field";
+      document.getElementById('save-land-name').value = `My ${regionName} Plot`;
+
+      openModal('saveLandModal');
+    }
+
+    async function confirmSaveLandParcel() {
+      const name = document.getElementById('save-land-name').value.trim() || "My Marked Plot";
+      const crop = document.getElementById('save-land-crop').value || "Paddy";
+      const survey = document.getElementById('save-land-survey').value.trim();
+      const notes = document.getElementById('save-land-notes').value.trim();
+
+      const rawPoints = landMarkerPoints.map(p => ({ lat: p.lat, lng: p.lng }));
+      const acres = calculatePolygonAreaAcres(rawPoints);
+      const hectares = acres * 0.404686;
+
+      // Compute centroid
+      let sumLat = 0, sumLng = 0;
+      rawPoints.forEach(p => { sumLat += p.lat; sumLng += p.lng; });
+      const centroid = {
+        lat: sumLat / rawPoints.length,
+        lng: sumLng / rawPoints.length
+      };
+
+      const parcelObj = {
+        id: "plot_user_" + Date.now().toString(36),
+        farm_id: currentRegionKey,
+        name: name,
+        crop: crop,
+        survey: survey,
+        notes: notes,
+        area_acres: parseFloat(acres.toFixed(2)),
+        area_hectares: parseFloat(hectares.toFixed(2)),
+        points: rawPoints,
+        centroid: centroid,
+        created_at: new Date().toISOString()
+      };
+
+      savedCustomParcels.push(parcelObj);
+      try {
+        localStorage.setItem('earthworm_custom_parcels', JSON.stringify(savedCustomParcels));
+      } catch (e) {
+        console.warn("LocalStorage save error:", e);
+      }
+
+      // Sync to backend API
+      const apiBase = getApiBase();
+      try {
+        await fetch(`${apiBase}/api/farms/custom-marker`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(parcelObj)
+        });
+      } catch (err) {
+        console.warn("Backend sync failed, saved locally:", err);
+      }
+
+      closeModal('saveLandModal');
+      toggleLandMarkingMode(false);
+      clearAllMarkerPoints();
+      renderSavedCustomParcelsOnMap();
+      renderCustomParcelBadges();
+      switchParcelDisplay(parcelObj.id);
+
+      showToast("Land Marked Successfully", `Saved ${parcelObj.name} (${parcelObj.area_acres} Acres)`);
+    }
+
+    function renderSavedCustomParcelsOnMap() {
+      if (!leafletMap) return;
+      savedParcelLayers.forEach(l => leafletMap.removeLayer(l));
+      savedParcelLayers = [];
+
+      savedCustomParcels.forEach(parcel => {
+        if (parcel.farm_id === currentRegionKey && parcel.points && parcel.points.length >= 3) {
+          const latLngs = parcel.points.map(p => [p.lat, p.lng]);
+          const poly = L.polygon(latLngs, {
+            color: '#059669',
+            weight: 3,
+            dashArray: '5, 3',
+            fillColor: '#10b981',
+            fillOpacity: 0.3
+          }).addTo(leafletMap);
+
+          poly.bindPopup(`
+            <div style="font-size:11px; line-height:1.4;">
+              <strong style="color:#065f46;">${parcel.name}</strong><br/>
+              Crop: ${parcel.crop}<br/>
+              Area: <strong>${parcel.area_acres} Acres</strong> (${Math.round(parcel.area_acres * 40)} Guntas)<br/>
+              <button onclick="deleteCustomParcel('${parcel.id}')" style="color:#e11d48; font-weight:bold; font-size:10px; margin-top:4px; cursor:pointer;">
+                Delete Parcel
+              </button>
+            </div>
+          `);
+
+          savedParcelLayers.push(poly);
+        }
+      });
+    }
+
+    function deleteCustomParcel(parcelId) {
+      savedCustomParcels = savedCustomParcels.filter(p => p.id !== parcelId);
+      try {
+        localStorage.setItem('earthworm_custom_parcels', JSON.stringify(savedCustomParcels));
+      } catch (e) {}
+      const apiBase = getApiBase();
+      fetch(`${apiBase}/api/farms/${currentRegionKey}/custom-markers/${parcelId}`, { method: 'DELETE' }).catch(() => {});
+      renderSavedCustomParcelsOnMap();
+      renderCustomParcelBadges();
+      switchParcelDisplay('demo');
+      showToast("Parcel Removed", "Custom marked land parcel deleted.");
+    }
+
+    function renderCustomParcelBadges() {
+      const container = document.getElementById('custom-parcels-badges');
+      if (!container) return;
+      container.innerHTML = '';
+
+      savedCustomParcels.filter(p => p.farm_id === currentRegionKey).forEach(p => {
+        const btn = document.createElement('button');
+        btn.className = `text-[10px] font-bold px-2 py-0.5 rounded cursor-pointer transition-all ${activeCustomParcelId === p.id ? 'bg-emerald-600 text-white shadow-xs' : 'bg-surface-variant/40 hover:bg-surface-variant/70 text-on-surface'}`;
+        btn.textContent = `${p.name} (${p.area_acres} Ac)`;
+        btn.onclick = () => switchParcelDisplay(p.id);
+        container.appendChild(btn);
+      });
+    }
+
+    function switchParcelDisplay(targetId) {
+      activeCustomParcelId = targetId === 'demo' ? null : targetId;
+      const demoBtn = document.getElementById('parcel-id-tag');
+
+      if (targetId === 'demo') {
+        if (demoBtn) {
+          demoBtn.classList.remove('bg-surface-variant/40');
+          demoBtn.classList.add('bg-primary/40');
+          demoBtn.textContent = REGIONS_DATA[currentRegionKey] ? REGIONS_DATA[currentRegionKey].parcel : "Plot #142/A";
+        }
+        if (leafletMap) {
+          const geo = REGION_GEO[currentRegionKey] || REGION_GEO.mandya;
+          leafletMap.flyTo([geo.lat, geo.lon], geo.zoom, { duration: 1.0 });
+        }
+      } else {
+        const found = savedCustomParcels.find(p => p.id === targetId);
+        if (found) {
+          if (demoBtn) {
+            demoBtn.classList.add('bg-surface-variant/40');
+            demoBtn.classList.remove('bg-primary/40');
+          }
+          if (leafletMap && found.centroid) {
+            leafletMap.flyTo([found.centroid.lat, found.centroid.lng], 17, { duration: 1.0 });
+          }
+          showToast("Viewing Custom Parcel", `${found.name} (${found.area_acres} Acres)`);
+        }
+      }
+      renderCustomParcelBadges();
     }
 
     async function refreshSatellitePass() {
@@ -2094,6 +2712,12 @@ TWILIO_PHONE_NUMBER=+1234567890</pre>
         if (el) el.textContent = s3;
       });
 
+      // Update Mark Land Button and HUD
+      const markBtn = document.getElementById('mark-land-btn-text');
+      if (markBtn) markBtn.textContent = t.markLand || "Mark Land";
+      const hudTitle = document.getElementById('marker-hud-title');
+      if (hudTitle) hudTitle.textContent = t.markingActive || "Manual Land Boundary Marking";
+
       // Re-trigger selectRegion to update localized advisory text
       selectRegion(currentRegionKey);
       if (typeof updateTwilioPreview === 'function') {
@@ -2336,7 +2960,7 @@ TWILIO_PHONE_NUMBER=+1234567890</pre>
 
     async function dispatchTwilioAction() {
       const phoneInput = document.getElementById('twilio-phone-input');
-      const toPhone = phoneInput ? phoneInput.value.trim() : "+919876543210";
+      const toPhone = phoneInput ? phoneInput.value.trim() : "+919731803808";
       const apiBase = getApiBase();
       const resCard = document.getElementById('twilio-result-card');
       const resStatus = document.getElementById('twilio-res-status');
@@ -2365,39 +2989,34 @@ TWILIO_PHONE_NUMBER=+1234567890</pre>
         });
 
         const data = await res.json();
+        const recipientNumber = data.to || toPhone || "+91 97318 03808";
         resCard.classList.remove('hidden');
         resTime.textContent = new Date().toLocaleTimeString();
 
         if (activeTwilioChannel === 'sms') {
-          resStatus.textContent = data.mode === "live" ? "Twilio SMS Dispatched (Live)" : "Twilio SMS Simulation Delivered";
+          resStatus.textContent = data.mode === "live" ? "Cellular SMS Dispatched (Live Carrier)" : "Cellular SMS Simulation Delivered";
           resSid.textContent = data.sid || "SM" + Math.random().toString(36).substring(2, 12);
-          resMode.textContent = data.mode === "live" ? "Live Twilio Carrier" : "Simulation Mode (Verified)";
-          resDetail.textContent = `Sent ${data.segments || 1} segment(s) to ${data.to} in ${currentLang.toUpperCase()}. Status: ${data.status || 'delivered'}.`;
-          showToast("Twilio SMS Dispatched", `Sent to ${data.to}`);
+          resMode.textContent = data.mode === "live" ? "Live GSM/PSTN Carrier" : "Simulation Mode (Verified)";
+          resDetail.textContent = `Sent ${data.segments || 1} segment(s) to ${recipientNumber} in ${currentLang.toUpperCase()}. Delivered directly to farmer's handset (no browser needed).`;
+          showToast("Cellular SMS Dispatched", `Sent to ${recipientNumber}`);
         } else {
-          resStatus.textContent = data.mode === "live" ? "Twilio Call In-Progress (Live)" : "Twilio Voice Call Connected (Simulation)";
+          resStatus.textContent = data.mode === "live" ? "Cellular IVR Call Dialing (Live Carrier)" : "Cellular IVR Call Connected (Simulation)";
           resSid.textContent = data.sid || "CA" + Math.random().toString(36).substring(2, 12);
-          resMode.textContent = data.mode === "live" ? "Live Twilio Voice" : "Simulation Mode (Verified)";
-          resDetail.textContent = `Call initiated to ${data.to}. Spoken in ${currentLang.toUpperCase()} via ${data.voice_name || 'Neural Human Voice'}.`;
-          showToast("Twilio Voice Connected", `Speaking to ${data.to}...`);
-          
-          // Play the voice call audio right now so the user experiences the phone call
-          previewTwilioAudio();
+          resMode.textContent = data.mode === "live" ? "Live GSM/PSTN Trunk" : "Simulation Mode (Verified)";
+          resDetail.textContent = `Automated voice call placed to ${recipientNumber} in ${currentLang.toUpperCase()} via ${data.voice_name || 'Neural Human Voice'}. Handset receives call over cellular tower.`;
+          showToast("Cellular Call Placed", `Dialing ${recipientNumber}...`);
         }
       } catch (err) {
         console.warn("Backend communication endpoint failed, performing client-side simulation:", err);
+        const recipientNumber = toPhone || "+91 97318 03808";
         resCard.classList.remove('hidden');
         resTime.textContent = new Date().toLocaleTimeString();
         const fakeSid = (activeTwilioChannel === 'sms' ? "SM" : "CA") + Math.random().toString(36).substring(2, 18);
-        resStatus.textContent = activeTwilioChannel === 'sms' ? "Twilio SMS Simulation Delivered" : "Twilio Voice Call Connected";
+        resStatus.textContent = activeTwilioChannel === 'sms' ? "Cellular SMS Delivered (Simulation)" : "Cellular IVR Call Connected (Simulation)";
         resSid.textContent = fakeSid;
         resMode.textContent = "Offline Simulation Mode";
-        resDetail.textContent = `Simulated dispatch to ${toPhone} in ${currentLang.toUpperCase()}. Status: delivered.`;
-        showToast("Twilio Dispatched", `Simulated for ${toPhone}`);
-
-        if (activeTwilioChannel === 'voice') {
-          previewTwilioAudio();
-        }
+        resDetail.textContent = `Dispatched to ${recipientNumber} in ${currentLang.toUpperCase()} via telecom gateway simulation. Zero web browser required on recipient phone.`;
+        showToast("Low-Bandwidth Dispatched", `Sent to ${recipientNumber}`);
       } finally {
         btn.disabled = false;
         btn.classList.remove('opacity-75');
@@ -2529,6 +3148,7 @@ TWILIO_PHONE_NUMBER=+1234567890</pre>
     window.addEventListener('DOMContentLoaded', async () => {
       await checkBackendHealth();
       await selectRegion('mandya');
+      loadSavedCustomParcels();
 
       try {
         if (sessionStorage.getItem('earthworm_splash_shown') === 'true') {

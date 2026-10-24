@@ -12,7 +12,7 @@ from app.data.demo.fixtures import (
 )
 from app.schemas.advisory import Advisory
 from app.schemas.communication import CommunicationPreview
-from app.schemas.farm import Farm
+from app.schemas.farm import CustomLandMarker, Farm
 from app.schemas.observation import Observation
 from app.services.sentinel import sentinel_service
 
@@ -131,3 +131,53 @@ def get_farm_weather(farm_id: str):
     if not weather:
         raise HTTPException(status_code=404, detail=f"No weather data for farm '{farm_id}'.")
     return weather
+
+
+_CUSTOM_LAND_MARKERS: dict[str, list[dict]] = {}
+
+
+@router.post("/farms/custom-marker", summary="Save Farmer's Manually Marked Land Boundary")
+def save_custom_marker(marker: CustomLandMarker):
+    """Save a farmer's manually marked land parcel with boundary coordinates and acreage."""
+    if not marker.created_at:
+        marker.created_at = datetime.now(timezone.utc).isoformat()
+    farm_id = marker.farm_id.lower()
+    if farm_id not in _CUSTOM_LAND_MARKERS:
+        _CUSTOM_LAND_MARKERS[farm_id] = []
+
+    # Store or update
+    existing_idx = next((i for i, m in enumerate(_CUSTOM_LAND_MARKERS[farm_id]) if m["id"] == marker.id), None)
+    if existing_idx is not None:
+        _CUSTOM_LAND_MARKERS[farm_id][existing_idx] = marker.model_dump()
+    else:
+        _CUSTOM_LAND_MARKERS[farm_id].append(marker.model_dump())
+
+    return {
+        "success": True,
+        "message": f"Land parcel '{marker.name}' ({marker.area_acres:.2f} Acres) marked successfully.",
+        "marker": marker,
+    }
+
+
+@router.get("/farms/{farm_id}/custom-markers", summary="Get Farmer's Custom Marked Parcels")
+def get_custom_markers(farm_id: str):
+    """Retrieve all manually marked land parcels for a specific farm region."""
+    farm_id_clean = farm_id.lower()
+    markers = _CUSTOM_LAND_MARKERS.get(farm_id_clean, [])
+    return {
+        "farm_id": farm_id_clean,
+        "total_marked_parcels": len(markers),
+        "markers": markers,
+    }
+
+
+@router.delete("/farms/{farm_id}/custom-markers/{marker_id}", summary="Delete a Custom Marked Land Parcel")
+def delete_custom_marker(farm_id: str, marker_id: str):
+    """Delete a custom marked land parcel by ID."""
+    farm_id_clean = farm_id.lower()
+    if farm_id_clean in _CUSTOM_LAND_MARKERS:
+        _CUSTOM_LAND_MARKERS[farm_id_clean] = [
+            m for m in _CUSTOM_LAND_MARKERS[farm_id_clean] if m["id"] != marker_id
+        ]
+    return {"success": True, "deleted_id": marker_id}
+

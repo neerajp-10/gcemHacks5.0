@@ -83,3 +83,41 @@ def test_get_weather():
     data = response.json()
     assert "days" in data
     assert len(data["days"]) == 3
+
+
+def test_custom_land_marker_lifecycle():
+    """Verify farmers can save, retrieve, and delete custom land markers."""
+    payload = {
+        "id": "plot_test_123",
+        "farm_id": "mandya",
+        "name": "Kavitha Sugarcane Plot",
+        "crop": "Sugarcane",
+        "points": [
+            {"lat": 12.518, "lng": 76.888},
+            {"lat": 12.519, "lng": 76.888},
+            {"lat": 12.519, "lng": 76.889},
+            {"lat": 12.518, "lng": 76.889},
+        ],
+        "area_acres": 1.45,
+        "area_hectares": 0.59,
+        "centroid": {"lat": 12.5185, "lng": 76.8885},
+        "created_at": "2026-10-24T06:00:00Z",
+        "notes": "Boundary along north irrigation canal",
+    }
+    # 1. Save marker
+    res_save = client.post("/api/farms/custom-marker", json=payload)
+    assert res_save.status_code == 200
+    assert res_save.json()["success"] is True
+
+    # 2. Retrieve markers for farm
+    res_get = client.get("/api/farms/mandya/custom-markers")
+    assert res_get.status_code == 200
+    data_get = res_get.json()
+    assert data_get["total_marked_parcels"] >= 1
+    assert any(m["id"] == "plot_test_123" for m in data_get["markers"])
+
+    # 3. Delete marker
+    res_del = client.delete("/api/farms/mandya/custom-markers/plot_test_123")
+    assert res_del.status_code == 200
+    assert res_del.json()["success"] is True
+

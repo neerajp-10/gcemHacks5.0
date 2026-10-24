@@ -28,24 +28,32 @@
 5. [Advanced Satellite Parcel Inspector](#5-advanced-satellite-parcel-inspector)
    - [5 Multispectral Satellite Layers](#5-multispectral-satellite-layers)
    - [Agronomic Significance & Interactive Visualizer](#agronomic-significance--interactive-visualizer)
-6. [Libraries & Technologies Used](#6-libraries--technologies-used)
+6. [Manual Land Boundary Marking & Dynamic Acreage Subsystem](#6-manual-land-boundary-marking--dynamic-acreage-subsystem)
+   - [Farmer-Centric Boundary Delineation Workflow](#farmer-centric-boundary-delineation-workflow)
+   - [Live Geodesic Acreage & Perimeter Math (WGS84 Spherical Shoelace)](#live-geodesic-acreage--perimeter-math-wgs84-spherical-shoelace)
+   - ["GPS My Spot" Geolocation Integration](#gps-my-spot-geolocation-integration)
+   - [Draggable Boundary Pins & Real-Time Geometry](#draggable-boundary-pins--real-time-geometry)
+   - [Save Parcel Modal & Cadastral Attributes](#save-parcel-modal--cadastral-attributes)
+   - [Dual-Layer Persistence (LocalStorage + REST API)](#dual-layer-persistence-localstorage--rest-api)
+   - [Quick-Toggle Custom Parcel Badges](#quick-toggle-custom-parcel-badges)
+7. [Libraries & Technologies Used](#7-libraries--technologies-used)
    - [Backend Python Dependencies](#backend-python-dependencies)
    - [Frontend Frameworks & Libraries](#frontend-frameworks--libraries)
-7. [Detailed Python Script & Codebase Documentation](#7-detailed-python-script--codebase-documentation)
+8. [Detailed Python Script & Codebase Documentation](#8-detailed-python-script--codebase-documentation)
    - [Entrypoints & Server Configuration](#entrypoints--server-configuration)
    - [API Route Handlers (FastAPI)](#api-route-handlers-fastapi)
    - [Business Logic & Service Layer](#business-logic--service-layer)
    - [Pydantic Domain Schemas](#pydantic-domain-schemas)
    - [Automated Pytest Suite](#automated-pytest-suite)
-8. [Copernicus Sentinel Hub Live Satellite Integration](#8-copernicus-sentinel-hub-live-satellite-integration)
+9. [Copernicus Sentinel Hub Live Satellite Integration](#9-copernicus-sentinel-hub-live-satellite-integration)
    - [OAuth2 Client Credentials & Token Caching](#oauth2-client-credentials--token-caching)
    - [Process API & True-Color Evalscript](#process-api--true-color-evalscript)
    - [Regional Bounding Boxes & Dynamic Fallbacks](#regional-bounding-boxes--dynamic-fallbacks)
-9. [In-Depth Supabase Integration Architecture](#9-in-depth-supabase-integration-architecture)
-   - [Non-Blocking Hybrid Storage Design](#non-blocking-hybrid-storage-design)
-   - [PostgreSQL Database Schema (DDL)](#postgresql-database-schema-ddl)
-   - [Connection Verification & Safe Probing](#connection-verification--safe-probing)
-10. [Deployment & Execution Instructions](#10-deployment--execution-instructions)
+10. [In-Depth Supabase Integration Architecture](#10-in-depth-supabase-integration-architecture)
+    - [Non-Blocking Hybrid Storage Design](#non-blocking-hybrid-storage-design)
+    - [PostgreSQL Database Schema (DDL)](#postgresql-database-schema-ddl)
+    - [Connection Verification & Safe Probing](#connection-verification--safe-probing)
+11. [Deployment & Execution Instructions](#11-deployment--execution-instructions)
     - [Local Development & CLI Execution](#local-development--cli-execution)
     - [Automated Testing](#automated-testing)
     - [Vercel Serverless Production Deployment](#vercel-serverless-production-deployment)
@@ -258,7 +266,73 @@ Each mode features:
 
 ---
 
-## 6. Libraries & Technologies Used
+## 6. Manual Land Boundary Marking & Dynamic Acreage Subsystem
+
+Smallholder farmers in India often cultivate fragmented, irregularly shaped plots where official cadastral boundaries differ from physical field bunds (*varambas* / *mees*). To give farmers direct control over their land monitoring, Earthworm features an interactive, high-precision **Manual Land Boundary Marker**.
+
+### Farmer-Centric Boundary Delineation Workflow
+1. The farmer taps the **"Mark Land"** (`ಜಮೀನು ಗುರುತಿಸಿ` / `जमीन चिह्नित करें`) button on the Copernicus Sentinel-2 satellite card header.
+2. An interactive glassmorphic HUD appears with live measurements:
+   - **Corner Pin Counter**: Tracks vertices placed (`0 Corners`, `3 Corners`, etc.).
+   - **Live Acreage Readout**: Computes exact area in both **Acres** and **Guntas** ($1\text{ Acre} = 40\text{ Guntas}$, or Cents in southern regions).
+   - **Perimeter Readout**: Computes boundary perimeter in meters or kilometers.
+   - **Quick Action Controls**:
+     - 📍 **GPS My Spot**: Queries device GPS coordinates to drop a pin at the farmer's current physical standing location.
+     - ↩️ **Undo**: Removes the most recently placed corner pin.
+     - 🗑️ **Clear**: Resets all active markers and boundary polygons.
+     - 💾 **Save Land**: Prompts the modal to name and register the marked parcel.
+3. The farmer clicks anywhere on the Leaflet high-resolution satellite basemap to place sequential numbered pins (Pin 1, Pin 2, Pin 3...).
+4. As soon as $\ge 3$ corner points are placed, a closed emerald polygon (`#10b981`) dynamically fills the plot boundary with real-time geodesic acreage calculation.
+
+### Live Geodesic Acreage & Perimeter Math (WGS84 Spherical Shoelace)
+Standard Euclidean Cartesian math produces major distortion when calculating surface area from latitude/longitude coordinates on a spherical planet. Earthworm implements the **Spherical Polygon Excess (Shoelace) Formula** on the WGS84 Earth ellipsoid ($R = 6,378,137\text{ m}$):
+
+$$\text{Area} = R^2 \cdot \left| \sum_{i=1}^{n} (\lambda_{i+1} - \lambda_{i-1}) \cdot \sin(\phi_i) \right| / 2$$
+
+Where $\phi$ is latitude in radians and $\lambda$ is longitude in radians. The computed area in square meters ($m^2$) is converted into regional revenue units:
+- **Acres**: $\text{Acres} = \frac{\text{Area in } m^2}{4046.8564224}$
+- **Guntas**: $\text{Guntas} = (\text{Acres} - \lfloor\text{Acres}\rfloor) \times 40$
+- **Hectares**: $\text{Hectares} = \frac{\text{Area in } m^2}{10000}$
+
+Perimeter is computed by summing the Haversine great-circle distances between adjacent vertices:
+
+$$d = 2R \arcsin\left(\sqrt{\sin^2\left(\frac{\Delta\phi}{2}\right) + \cos(\phi_1)\cos(\phi_2)\sin^2\left(\frac{\Delta\lambda}{2}\right)}\right)$$
+
+### "GPS My Spot" Geolocation Integration
+For farmers walking their physical boundary bunds in the field with a smartphone or tablet:
+- Tapping **"GPS My Spot"** invokes `navigator.geolocation.getCurrentPosition({ enableHighAccuracy: true })`.
+- Earthworm drops a corner marker at the farmer's exact real-world coordinates and pans the satellite viewport to center on them.
+
+### Draggable Boundary Pins & Real-Time Geometry
+- Every corner pin is rendered as an interactive, draggable Leaflet marker (`draggable: true`) with a distinct numbered badge icon (`bg-emerald-600 text-white font-bold ring-2 ring-white`).
+- When a farmer drags any corner marker to adjust it along a field boundary or canal, Leaflet's `drag` event triggers real-time recalculation of the polygon geometry, perimeter, and acreage without dropping new pins.
+
+### Save Parcel Modal & Cadastral Attributes
+When the farmer taps **"Save Land"**:
+- Earthworm opens a glassmorphic dialog displaying verified boundary metrics:
+  - Total Measured Acreage (e.g. `1.85 Acres (1 Ac, 34 Guntas)`).
+  - Number of boundary corners & total perimeter.
+- Form fields allow the farmer to specify:
+  - **Parcel Name** (e.g. *"Kavitha Sugarcane Plot"*).
+  - **Primary Crop** (Paddy, Sugarcane, Ragi, Cotton, Maize, Wheat, Vegetables).
+  - **Survey / Khasra Number** (optional revenue record identifier).
+  - **Field Notes** (soil observations, canal access, sowing date).
+
+### Dual-Layer Persistence (LocalStorage + REST API)
+To ensure reliable operation under intermittent rural internet connectivity:
+1. **Local Storage (`localStorage.earthworm_custom_parcels`)**: Immediately saves parcels on the local device, guaranteeing zero latency, offline availability, and persistence across browser reloads.
+2. **REST API (`POST /api/farms/custom-marker`)**: Simultaneously pushes the parcel JSON payload to the FastAPI backend, where it is indexed in-memory and ready for PostgreSQL/Supabase sync.
+
+### Quick-Toggle Custom Parcel Badges
+Saved parcels are immediately added to the bottom telemetry bar alongside default demo plots (e.g. `[Plot #142/A] [Kavitha Sugarcane Plot (1.85 Ac)]`). Clicking any custom parcel badge:
+- Centers and zooms the satellite map to the parcel's bounding box.
+- Renders the custom boundary polygon with popup details.
+- Displays the measured acreage and crop profile.
+- Provides a delete button to remove obsolete parcels.
+
+---
+
+## 7. Libraries & Technologies Used
 
 ### Backend Python Dependencies
 Defined in [backend/requirements.txt](file:///c:/Earthworm/backend/requirements.txt):
@@ -284,7 +358,7 @@ Defined in [backend/requirements.txt](file:///c:/Earthworm/backend/requirements.
 
 ---
 
-## 7. Detailed Python Script & Codebase Documentation
+## 8. Detailed Python Script & Codebase Documentation
 
 ### Entrypoints & Server Configuration
 
@@ -318,13 +392,16 @@ Handles all telephony, messaging, and audio streaming endpoints:
 - `GET /api/communications/speak`: High-fidelity regional audio streaming endpoint.
 
 #### `backend/app/api/routes/farms.py`
-Exposes cadastral parcel listings and agronomic telemetry:
+Exposes cadastral parcel listings, agronomic telemetry, and manual land marker persistence:
 - `GET /api/farms`: Lists registered parcels with coordinates, crop types, baseline NDVI, and imagery URLs.
 - `GET /api/farms/{farm_id}`: Retrieves details for a specific parcel.
 - `GET /api/farms/{farm_id}/advisory`: Generates 3-stage localized advisory in requested language.
 - `GET /api/farms/{farm_id}/observations`: Returns 20-day historical NDVI observations.
 - `GET /api/farms/{farm_id}/weather`: Returns 3-day agro-meteorological outlook.
 - `GET /api/farms/{farm_id}/satellite-image`: Direct stream of live Sentinel-2 true-color imagery.
+- `POST /api/farms/custom-marker`: Saves a farmer's manually marked land parcel with boundary coordinates, crop, and acreage.
+- `GET /api/farms/{farm_id}/custom-markers`: Retrieves all custom marked parcels for a specific farm region.
+- `DELETE /api/farms/{farm_id}/custom-markers/{marker_id}`: Deletes a saved custom land marker.
 
 #### `backend/app/api/routes/health.py`
 System diagnostics and safe connectivity verification:
@@ -357,22 +434,22 @@ Non-blocking PostgreSQL database integration:
 Standalone CLI script for headless, browser-free low-bandwidth dispatch. Supports `--to`, `--channel`, `--farm`, `--lang`, and `--message` flags with UTF-8 console output.
 
 ### Pydantic Domain Schemas
-- [backend/app/schemas/farm.py](file:///c:/Earthworm/backend/app/schemas/farm.py): `FarmBase`, `FarmResponse`, `FarmListResponse`.
+- [backend/app/schemas/farm.py](file:///c:/Earthworm/backend/app/schemas/farm.py): `FarmBase`, `FarmResponse`, `FarmListResponse`, `CustomMarkerPoint`, `CustomLandMarker`.
 - [backend/app/schemas/advisory.py](file:///c:/Earthworm/backend/app/schemas/advisory.py): `AdvisoryResponse`, `ObservationPoint`, `ObservationsResponse`, `WeatherDay`, `WeatherResponse`.
 
 ### Automated Pytest Suite
 Located in [backend/tests/](file:///c:/Earthworm/backend/tests/):
 - `test_communications.py`: Validates status endpoint, SMS simulation, IVR call generation, unified low-bandwidth dispatch, incoming call/SMS webhooks, and TwiML rendering (7 tests).
-- `test_farms.py`: Tests farm listings, advisory localization, NDVI observations, and weather endpoints (8 tests).
+- `test_farms.py`: Tests farm listings, advisory localization, NDVI observations, weather endpoints, and custom land marker lifecycle (9 tests).
 - `test_health.py`: Validates health checks and route 404 handlers (4 tests).
 - `test_sentinel.py`: Validates Sentinel Hub diagnostics and image serving (3 tests).
 - `test_supabase.py`: Tests credential safety and mock connection states (5 tests).
 - `test_vercel.py`: Validates serverless entrypoint routing (5 tests).
-- **Total: 32 Automated Tests Passing.**
+- **Total: 33 Automated Tests Passing.**
 
 ---
 
-## 8. Copernicus Sentinel Hub Live Satellite Integration
+## 9. Copernicus Sentinel Hub Live Satellite Integration
 
 ### OAuth2 Client Credentials & Token Caching
 Sentinel Hub authentication utilizes OAuth2 Client Credentials (`POST https://services.sentinel-hub.com/oauth/token`):
@@ -407,7 +484,7 @@ function evaluatePixel(sample) {
 
 ---
 
-## 9. In-Depth Supabase Integration Architecture
+## 10. In-Depth Supabase Integration Architecture
 
 ### Non-Blocking Hybrid Storage Design
 Earthworm guarantees 100% application uptime regardless of database connectivity:
@@ -452,7 +529,7 @@ The probe at `GET /api/health/db` tests database accessibility via PostgREST sch
 
 ---
 
-## 10. Deployment & Execution Instructions
+## 11. Deployment & Execution Instructions
 
 ### Local Development & CLI Execution
 
@@ -478,7 +555,7 @@ The probe at `GET /api/health/db` tests database accessibility via PostgREST sch
    - Telephony Status: [http://127.0.0.1:8080/api/communications/status](http://127.0.0.1:8080/api/communications/status)
 
 ### Automated Testing
-Execute all 32 automated tests across health, farms, Sentinel Hub, Supabase, Vercel, and low-bandwidth communications:
+Execute all 33 automated tests across health, farms, Sentinel Hub, Supabase, Vercel, and low-bandwidth communications:
 ```powershell
 pytest -v
 ```
