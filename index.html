@@ -1553,10 +1553,12 @@ TWILIO_PHONE_NUMBER=+1234567890</pre>
     let backendAvailable = false;
 
     function getApiBase() {
-      if (window.location.protocol === 'file:') {
-        return 'http://127.0.0.1:8000';
+      // If served directly by backend on port 8080 or deployed in production (Vercel/cloud)
+      if (window.location.port === '8080' || (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && window.location.protocol !== 'file:')) {
+        return '';
       }
-      return '';
+      // If opened via file:// or another local dev server (port 5500, 3000, 5173, etc.)
+      return 'http://127.0.0.1:8080';
     }
 
     // Detect and Connect to FastAPI Backend
@@ -1577,13 +1579,13 @@ TWILIO_PHONE_NUMBER=+1234567890</pre>
           return;
         }
       } catch (err) {
-        // Fallback for file:// protocol or mismatched dev ports
+        // Direct fallback check on port 8080 for file:// protocol or mismatched dev ports
         try {
-          const res2 = await fetch('http://127.0.0.1:8000/api/health');
+          const res2 = await fetch('http://127.0.0.1:8080/api/health');
           if (res2.ok) {
             backendAvailable = true;
             dot.className = "w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse";
-            text.textContent = "API: Connected";
+            text.textContent = "Backend: Live";
             pill.className = "text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 flex items-center gap-1";
             return;
           }
@@ -2137,34 +2139,46 @@ TWILIO_PHONE_NUMBER=+1234567890</pre>
       const langConfig = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
       const apiBase = getApiBase();
 
-      // Show enhanced Audio Toast bar
+      // Show enhanced Audio Toast bar immediately
       showAudioBar(`Natural Human Speech • ${langConfig.speechLang || currentLang.toUpperCase()}`, textToSpeak);
       setAudioPlayState(true);
 
-      // Stream high-fidelity neural MP3 from backend or direct cloud synthesis
-      try {
-        const audioUrl = `${apiBase}/api/communications/speak?language=${currentLang}&farm_id=${currentRegionKey}&text=${encodeURIComponent(textToSpeak)}&t=${Date.now()}`;
-        if (!audioPlayer) {
-          audioPlayer = new Audio();
-        }
-        audioPlayer.src = audioUrl;
-        audioPlayer.playbackRate = audioPlaybackRate;
+      const encodedText = encodeURIComponent(textToSpeak);
+      const urlCandidates = [
+        `${apiBase}/api/communications/speak?language=${currentLang}&farm_id=${currentRegionKey}&text=${encodedText}&t=${Date.now()}`,
+        `http://127.0.0.1:8080/api/communications/speak?language=${currentLang}&farm_id=${currentRegionKey}&text=${encodedText}&t=${Date.now()}`,
+        `${apiBase}/api/communications/speak?language=${currentLang}&farm_id=${currentRegionKey}&t=${Date.now()}`,
+        `http://127.0.0.1:8080/api/communications/speak?language=${currentLang}&farm_id=${currentRegionKey}&t=${Date.now()}`
+      ];
 
-        audioPlayer.onplay = () => setAudioPlayState(true);
-        audioPlayer.onended = () => stopAudioAdvice();
-        audioPlayer.onerror = (err) => {
-          console.warn("API audio stream error, falling back to direct cloud neural synthesis:", err);
-          fallbackDirectAudio(textToSpeak, currentLang);
-        };
+      const uniqueUrls = [...new Set(urlCandidates)];
+      let playedSuccessfully = false;
 
-        const playPromise = audioPlayer.play();
-        if (playPromise !== undefined) {
-          await playPromise;
+      for (const targetUrl of uniqueUrls) {
+        try {
+          if (!audioPlayer) {
+            audioPlayer = new Audio();
+          }
+          audioPlayer.src = targetUrl;
+          audioPlayer.playbackRate = audioPlaybackRate;
+
+          audioPlayer.onplay = () => setAudioPlayState(true);
+          audioPlayer.onended = () => stopAudioAdvice();
+
+          await audioPlayer.play();
+          playedSuccessfully = true;
+          break;
+        } catch (err) {
+          if (err && err.name === 'AbortError') {
+            // User clicked pause/stop intentionally
+            return;
+          }
+          console.warn("Audio stream attempt failed:", targetUrl, err);
         }
-        return;
-      } catch (err) {
-        console.warn("Playback error, triggering direct fallback:", err);
-        fallbackDirectAudio(textToSpeak, currentLang);
+      }
+
+      if (!playedSuccessfully && !isSpeaking) {
+        fallbackWebSpeech(textToSpeak, currentLang);
       }
     }
 
