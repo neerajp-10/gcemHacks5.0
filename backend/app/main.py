@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from app.api.routes import farms, health
+from app.api.routes import communications, farms, health
 from app.config import settings
 
 
@@ -93,6 +93,11 @@ def create_app() -> FastAPI:
         farms.router,
         prefix=settings.api_prefix,
         tags=["Farms"],
+    )
+    application.include_router(
+        communications.router,
+        prefix=settings.api_prefix,
+        tags=["Communications"],
     )
 
     # Mount Frontend UI static files if present

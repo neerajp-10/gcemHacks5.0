@@ -32,6 +32,21 @@ class Settings(BaseSettings):
     sentinel_oauth_url: str = "https://services.sentinel-hub.com/oauth/token"
     sentinel_process_url: str = "https://services.sentinel-hub.com/api/v1/process"
 
+    # Optional Twilio SMS & Voice Call Credentials
+    twilio_account_sid: Optional[str] = None
+    twilio_auth_token: Optional[str] = None
+    twilio_phone_number: Optional[str] = None
+
+    @property
+    def is_twilio_configured(self) -> bool:
+        """Return True if Twilio credentials and phone number are provided."""
+        return bool(
+            self.twilio_account_sid
+            and self.twilio_auth_token
+            and self.twilio_phone_number
+            and not self.twilio_account_sid.startswith("your-")
+        )
+
     @property
     def effective_supabase_key(self) -> Optional[str]:
         """Return the configured Supabase secret key, checking aliases."""

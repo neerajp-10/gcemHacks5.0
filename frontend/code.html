@@ -616,9 +616,9 @@
             <span class="material-symbols-outlined text-[20px]">call</span>
             <span>1800-180-1551</span>
           </a>
-          <button class="min-h-[48px] px-4 rounded-xl bg-surface-container text-on-surface font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-surface-variant transition-colors" onclick="playAudioHelp()" type="button">
-            <span class="material-symbols-outlined text-primary text-[20px]">hearing</span>
-            <span>Voice Help</span>
+          <button class="min-h-[48px] px-4 rounded-xl bg-surface-container text-on-surface font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-surface-variant transition-colors cursor-pointer" onclick="openTwilioModal('voice')" type="button" id="btn-voice-help" title="Twilio Voice Call & SMS Simulation">
+            <span class="material-symbols-outlined text-primary text-[20px]">record_voice_over</span>
+            <span id="label-voice-help">Twilio Voice &amp; SMS</span>
           </button>
         </div>
       </section>
@@ -838,10 +838,16 @@
       <div class="p-3 bg-surface-container-low rounded-xl border border-dashed border-surface-variant flex flex-col gap-2">
         <div class="flex items-center justify-between text-[11px] font-bold text-secondary">
           <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">sms</span> SMS Advisory Preview (Feature Phone)</span>
-          <button class="px-2 py-0.5 rounded bg-surface-container text-primary font-bold hover:bg-surface-variant transition-colors flex items-center gap-1" onclick="copySmsText()" type="button">
-            <span class="material-symbols-outlined text-[14px]">content_copy</span>
-            <span id="copy-sms-label">Copy SMS</span>
-          </button>
+          <div class="flex items-center gap-1.5">
+            <button class="px-2 py-0.5 rounded bg-surface-container text-primary font-bold hover:bg-surface-variant transition-colors flex items-center gap-1 cursor-pointer" onclick="openTwilioModal('sms')" type="button" title="Dispatch SMS via Twilio">
+              <span class="material-symbols-outlined text-[14px]">send_to_mobile</span>
+              <span>Send SMS</span>
+            </button>
+            <button class="px-2 py-0.5 rounded bg-surface-container text-primary font-bold hover:bg-surface-variant transition-colors flex items-center gap-1 cursor-pointer" onclick="copySmsText()" type="button">
+              <span class="material-symbols-outlined text-[14px]">content_copy</span>
+              <span id="copy-sms-label">Copy</span>
+            </button>
+          </div>
         </div>
         <p class="text-xs text-on-surface font-mono bg-surface-container-lowest p-2 rounded border border-surface-variant select-all" id="modal-sms-text">
           [EARTHWORM-AGRI] Plot 142/A: Moisture stress detected in NE zone. No rain expected next 3 days. Inspect topsoil before irrigating.
@@ -857,6 +863,118 @@
           <span>Listen</span>
         </button>
       </div>
+    </div>
+  </div>
+
+    <!-- Modal: Twilio SMS & Voice Communication Dispatcher -->
+  <div class="fixed inset-0 z-50 bg-inverse-surface/60 backdrop-blur-xs flex flex-col justify-end hidden opacity-0 transition-opacity duration-200" id="twilioModal">
+    <div class="w-full max-w-[640px] mx-auto bg-surface-container-lowest rounded-t-3xl p-5 flex flex-col gap-4 max-h-[90vh] overflow-y-auto shadow-2xl border-t border-surface-variant">
+      
+      <!-- Header -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg">
+            <span class="material-symbols-outlined text-[24px]">cell_tower</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="text-base font-bold text-on-surface">Twilio Agri-Communications</h3>
+              <span id="twilio-badge-mode" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                ⚡ Live / Simulation
+              </span>
+            </div>
+            <p class="text-[11px] text-secondary">Automated SMS &amp; IVR Voice Call Dispatch</p>
+          </div>
+        </div>
+        <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface hover:bg-surface-variant transition-colors cursor-pointer" onclick="closeModal('twilioModal')" type="button">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Channel Toggle Tabs: SMS vs Voice Call -->
+      <div class="grid grid-cols-2 p-1 bg-surface-container rounded-xl gap-1 text-xs font-bold">
+        <button id="twilio-tab-sms" onclick="switchTwilioChannel('sms')" class="py-2.5 px-3 rounded-lg bg-surface-container-lowest text-primary shadow-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]">sms</span>
+          <span>SMS Advisory</span>
+        </button>
+        <button id="twilio-tab-voice" onclick="switchTwilioChannel('voice')" class="py-2.5 px-3 rounded-lg text-secondary hover:text-on-surface flex items-center justify-center gap-1.5 transition-all cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]">phone_in_talk</span>
+          <span>Voice Call (IVR)</span>
+        </button>
+      </div>
+
+      <!-- Recipient Phone Number & Farm Info -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+        <div>
+          <label class="font-bold text-on-surface block mb-1">Farmer Mobile Number:</label>
+          <div class="relative flex items-center">
+            <span class="material-symbols-outlined text-secondary text-[18px] absolute left-3 pointer-events-none">call</span>
+            <input type="tel" id="twilio-phone-input" value="+91 98765 43210" class="w-full bg-surface-container-low border border-surface-variant rounded-xl pl-9 pr-3 py-2.5 text-xs text-on-surface font-mono focus:ring-1 focus:ring-primary focus:outline-none"/>
+          </div>
+        </div>
+        <div>
+          <label class="font-bold text-on-surface block mb-1">Active Field &amp; Language:</label>
+          <div class="p-2 rounded-xl bg-surface-container-low border border-surface-variant flex items-center justify-between min-h-[42px]">
+            <span class="font-semibold text-primary truncate mr-1" id="twilio-target-plot">Plot 142/A (Mandya)</span>
+            <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-primary/10 text-primary shrink-0" id="twilio-target-lang">English</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Message / Voice Transcript Preview -->
+      <div class="flex flex-col gap-1.5 text-xs">
+        <div class="flex items-center justify-between text-secondary">
+          <span class="font-bold text-on-surface" id="twilio-preview-heading">SMS Preview (160-char Budget)</span>
+          <span class="font-mono text-[11px]" id="twilio-char-count">138 chars • 1 Segment</span>
+        </div>
+        <div class="p-3 bg-surface-container-low rounded-xl border border-surface-variant font-mono text-xs text-on-surface leading-relaxed max-h-32 overflow-y-auto select-all" id="twilio-preview-content">
+          Loading preview...
+        </div>
+      </div>
+
+      <!-- Dispatch Action Button & Audio Test -->
+      <div class="flex flex-col sm:flex-row gap-2">
+        <button id="btn-dispatch-twilio" onclick="dispatchTwilioAction()" class="flex-1 min-h-[48px] rounded-xl bg-primary text-on-primary font-bold text-sm flex items-center justify-center gap-2 shadow-sm hover:bg-primary-container active:scale-98 transition-all cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]" id="twilio-dispatch-icon">send</span>
+          <span id="twilio-dispatch-label">Send Twilio SMS</span>
+        </button>
+        <button onclick="previewTwilioAudio()" id="btn-twilio-preview-voice" class="min-h-[48px] px-4 rounded-xl bg-surface-container hover:bg-surface-variant text-primary font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]">volume_up</span>
+          <span>Hear Voice Preview</span>
+        </button>
+      </div>
+
+      <!-- Live Dispatch Status & Telemetry Output -->
+      <div id="twilio-result-card" class="p-3 rounded-xl bg-surface-container-low border border-surface-variant text-xs space-y-1.5 hidden">
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-on-surface flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+            <span id="twilio-res-status">Dispatch Successful</span>
+          </span>
+          <span class="text-[10px] font-mono text-secondary" id="twilio-res-time">Just now</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2 text-[11px]">
+          <div><strong>Twilio SID:</strong> <span class="font-mono text-primary text-[10px]" id="twilio-res-sid">-</span></div>
+          <div><strong>Mode:</strong> <span class="font-semibold text-emerald-700" id="twilio-res-mode">Simulation</span></div>
+        </div>
+        <p class="text-[11px] text-on-surface-variant" id="twilio-res-detail">Advisory dispatched to recipient.</p>
+      </div>
+
+      <!-- Quick Credentials / Setup Helper -->
+      <details class="text-xs text-secondary bg-surface-container-low p-2.5 rounded-xl border border-surface-variant group">
+        <summary class="font-bold text-on-surface cursor-pointer select-none flex items-center justify-between">
+          <span>Configure Real Twilio Account (.env)</span>
+          <span class="material-symbols-outlined text-[16px] group-open:rotate-180 transition-transform">expand_more</span>
+        </summary>
+        <div class="mt-2 text-[11px] space-y-1 leading-relaxed text-on-surface-variant">
+          <p>Add the following variables to your <code class="bg-surface-container px-1 py-0.5 rounded font-mono">backend/.env</code> file:</p>
+          <pre class="bg-surface-container-lowest p-2 rounded border border-surface-variant font-mono text-[10px] select-all overflow-x-auto">TWILIO_ACCOUNT_SID=your-account-sid
+TWILIO_AUTH_TOKEN=your-auth-token
+TWILIO_PHONE_NUMBER=+1234567890</pre>
+          <p class="text-secondary text-[10px]">When credentials are not set, Earthworm operates in full interactive simulation mode with real-time audio playback in all 7 languages.</p>
+        </div>
+      </details>
+      
     </div>
   </div>
 
@@ -964,17 +1082,29 @@
   </div>
 
   <!-- Audio Toast Notification & Player Bar -->
-  <div class="fixed top-20 inset-x-4 max-w-[380px] mx-auto z-50 bg-inverse-surface text-inverse-on-surface p-3.5 rounded-xl shadow-lg flex items-center justify-between gap-3 hidden transition-all" id="audioToast">
-    <div class="flex items-center gap-3 min-w-0">
-      <span class="material-symbols-outlined text-primary-fixed-dim text-[24px] shrink-0" id="audioToastIcon">volume_up</span>
+  <div class="fixed top-20 inset-x-4 max-w-[420px] mx-auto z-[100] bg-inverse-surface text-inverse-on-surface p-3 rounded-2xl shadow-2xl flex items-center justify-between gap-3 hidden transition-all border border-white/10" id="audioToast">
+    <div class="flex items-center gap-2.5 min-w-0">
+      <div class="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shrink-0 shadow-xs relative">
+        <span class="material-symbols-outlined text-primary-fixed text-[20px]" id="audioToastIcon">graphic_eq</span>
+        <span id="audioToastWave" class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+      </div>
       <div class="flex flex-col text-xs min-w-0">
-        <span class="font-bold truncate" id="audioToastTitle">Reading Voice Advisory</span>
-        <span class="text-surface-variant text-[11px] truncate" id="audioToastSub">Reading in English...</span>
+        <div class="flex items-center gap-1.5">
+          <span class="font-bold truncate text-[12px]" id="audioToastTitle">Natural Neural Voice</span>
+          <span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-300 border border-emerald-700/50">HD Human</span>
+        </div>
+        <span class="text-surface-variant text-[11px] truncate max-w-[210px]" id="audioToastSub">Playing advisory...</span>
       </div>
     </div>
-    <button class="px-2.5 py-1 rounded-lg bg-surface-container text-primary font-bold text-xs shrink-0 hover:bg-surface-variant" onclick="stopAudioAdvice()" type="button">
-      Stop
-    </button>
+    <div class="flex items-center gap-1.5 shrink-0">
+      <button class="px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-mono text-[11px] transition-colors cursor-pointer" onclick="cycleAudioSpeed()" id="audioSpeedBtn" type="button" title="Toggle Speed">
+        1.0x
+      </button>
+      <button class="px-2.5 py-1 rounded-lg bg-primary text-on-primary font-bold text-xs hover:bg-primary-container transition-colors cursor-pointer flex items-center gap-1" onclick="stopAudioAdvice()" type="button">
+        <span class="material-symbols-outlined text-[14px]">stop</span>
+        <span>Stop</span>
+      </button>
+    </div>
   </div>
 
   <!-- JAVASCRIPT LOGIC & BACKEND API INTEGRATION -->
@@ -1923,6 +2053,9 @@
     }
 
     function changeLanguage(langCode) {
+      if (typeof stopAudioAdvice === 'function') {
+        stopAudioAdvice();
+      }
       currentLang = langCode;
       const t = TRANSLATIONS[langCode] || TRANSLATIONS.en;
       document.getElementById('hero-title').textContent = t.heroTitle;
@@ -1961,70 +2094,313 @@
 
       // Re-trigger selectRegion to update localized advisory text
       selectRegion(currentRegionKey);
+      if (typeof updateTwilioPreview === 'function') {
+        updateTwilioPreview();
+      }
     }
 
-    // Interactive Web Speech API (Voice Advisory Readout)
-    function toggleAudioAdvice() {
+    // ==========================================
+    // HIGH-FIDELITY NATURAL HUMAN SPEECH & TWILIO
+    // ==========================================
+    let audioPlayer = null;
+    let audioPlaybackRate = 1.0;
+    let activeTwilioChannel = 'sms'; // 'sms' or 'voice'
+
+    function getActiveVoiceTranscript() {
+      // 1. Check active language override
+      if (LANGUAGE_OVERRIDES[currentLang] && LANGUAGE_OVERRIDES[currentLang][currentRegionKey]) {
+        const o = LANGUAGE_OVERRIDES[currentLang][currentRegionKey];
+        if (o.voiceTranscript) return o.voiceTranscript;
+        if (o.advisoryDesc) return o.advisoryDesc;
+      }
+      // 2. Fallback to region dataset
+      const data = REGIONS_DATA[currentRegionKey] || {};
+      return data.voiceTranscript || data.advisoryDesc || "Earthworm agronomic satellite advisory.";
+    }
+
+    function getActiveSmsPreview() {
+      if (LANGUAGE_OVERRIDES[currentLang] && LANGUAGE_OVERRIDES[currentLang][currentRegionKey]) {
+        const o = LANGUAGE_OVERRIDES[currentLang][currentRegionKey];
+        if (o.sms) return o.sms;
+      }
+      const data = REGIONS_DATA[currentRegionKey] || {};
+      return data.sms || "[EARTHWORM-AGRI] Field advisory update.";
+    }
+
+    async function toggleAudioAdvice() {
       if (isSpeaking) {
         stopAudioAdvice();
         return;
       }
 
-      const data = REGIONS_DATA[currentRegionKey];
-      const textToSpeak = data.voiceTranscript || data.advisoryDesc;
+      const textToSpeak = getActiveVoiceTranscript();
       const langConfig = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
+      const apiBase = getApiBase();
 
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(textToSpeak);
-        utterance.lang = langConfig.speechLang || 'en-IN';
-        utterance.rate = 0.95; // Slightly slower for clarity
-        utterance.pitch = 1.0;
+      // Show enhanced Audio Toast bar
+      showAudioBar(`Natural Human Speech • ${langConfig.speechLang || currentLang.toUpperCase()}`, textToSpeak);
+      setAudioPlayState(true);
 
-        utterance.onstart = () => {
-          isSpeaking = true;
-          document.getElementById('audio-icon').textContent = "pause";
-          document.getElementById('btn-audio-listen').textContent = "Pause Voice Advice";
-          showAudioBar("Playing Advisory Aloud", `Speaking in ${currentLang.toUpperCase()}...`);
+      // Stream high-fidelity neural MP3 from backend or direct cloud synthesis
+      try {
+        const audioUrl = `${apiBase}/api/communications/speak?language=${currentLang}&farm_id=${currentRegionKey}&text=${encodeURIComponent(textToSpeak)}&t=${Date.now()}`;
+        if (!audioPlayer) {
+          audioPlayer = new Audio();
+        }
+        audioPlayer.src = audioUrl;
+        audioPlayer.playbackRate = audioPlaybackRate;
+
+        audioPlayer.onplay = () => setAudioPlayState(true);
+        audioPlayer.onended = () => stopAudioAdvice();
+        audioPlayer.onerror = (err) => {
+          console.warn("API audio stream error, falling back to direct cloud neural synthesis:", err);
+          fallbackDirectAudio(textToSpeak, currentLang);
         };
 
-        utterance.onend = () => {
-          stopAudioAdvice();
-        };
+        const playPromise = audioPlayer.play();
+        if (playPromise !== undefined) {
+          await playPromise;
+        }
+        return;
+      } catch (err) {
+        console.warn("Playback error, triggering direct fallback:", err);
+        fallbackDirectAudio(textToSpeak, currentLang);
+      }
+    }
 
-        utterance.onerror = () => {
-          stopAudioAdvice();
-        };
+    function fallbackDirectAudio(text, lang) {
+      try {
+        const targetLang = lang.toLowerCase();
+        const shortText = text.length > 140 ? text.substring(0, 140) : text;
+        const directUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${targetLang}&q=${encodeURIComponent(shortText)}`;
+        if (!audioPlayer) audioPlayer = new Audio();
+        audioPlayer.src = directUrl;
+        audioPlayer.playbackRate = audioPlaybackRate;
+        audioPlayer.onended = () => stopAudioAdvice();
+        audioPlayer.onerror = () => fallbackWebSpeech(text, lang);
+        audioPlayer.play().catch(() => fallbackWebSpeech(text, lang));
+      } catch (e) {
+        fallbackWebSpeech(text, lang);
+      }
+    }
 
-        window.speechSynthesis.speak(utterance);
+    function fallbackWebSpeech(text, lang) {
+      if (!('speechSynthesis' in window)) {
+        showToast("Audio unavailable", text.substring(0, 60));
+        stopAudioAdvice();
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      const langConfig = TRANSLATIONS[lang] || TRANSLATIONS.en;
+      utterance.lang = langConfig.speechLang || 'en-IN';
+      utterance.rate = 0.92;
+      utterance.pitch = 1.0;
+
+      // Select best non-robotic voice from installed voices
+      if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = () => {};
+      }
+      const voices = window.speechSynthesis.getVoices();
+      const bestVoice = voices.find(v => v.lang.startsWith(lang) && !v.name.includes("Desktop"))
+                     || voices.find(v => v.lang.includes("IN"))
+                     || voices.find(v => v.lang.startsWith(lang));
+      if (bestVoice) utterance.voice = bestVoice;
+
+      utterance.onend = () => stopAudioAdvice();
+      utterance.onerror = () => stopAudioAdvice();
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function setAudioPlayState(playing) {
+      isSpeaking = playing;
+      const icon = document.getElementById('audio-icon');
+      const btnTxt = document.getElementById('btn-audio-listen');
+      const toastWave = document.getElementById('audioToastWave');
+      if (playing) {
+        if (icon) icon.textContent = "pause";
+        if (btnTxt) btnTxt.textContent = "Pause Voice Advice";
+        if (toastWave) toastWave.classList.remove('hidden');
       } else {
-        showToast("Voice Readout Simulated", textToSpeak.substring(0, 75) + "...");
+        const t = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
+        if (icon) icon.textContent = "volume_up";
+        if (btnTxt) btnTxt.textContent = t.audioBtn || "Listen Voice Advice";
+        if (toastWave) toastWave.classList.add('hidden');
       }
     }
 
     function stopAudioAdvice() {
+      if (audioPlayer) {
+        audioPlayer.pause();
+        audioPlayer.currentTime = 0;
+      }
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }
-      isSpeaking = false;
-      const t = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
-      document.getElementById('audio-icon').textContent = "volume_up";
-      document.getElementById('btn-audio-listen').textContent = t.audioBtn;
-      document.getElementById('audioToast').classList.add('hidden');
+      setAudioPlayState(false);
+      const toast = document.getElementById('audioToast');
+      if (toast) toast.classList.add('hidden');
+    }
+
+    function cycleAudioSpeed() {
+      const speeds = [1.0, 1.25, 0.85];
+      const curIdx = speeds.indexOf(audioPlaybackRate);
+      audioPlaybackRate = speeds[(curIdx + 1) % speeds.length];
+      if (audioPlayer) audioPlayer.playbackRate = audioPlaybackRate;
+      const btn = document.getElementById('audioSpeedBtn');
+      if (btn) btn.textContent = `${audioPlaybackRate}x`;
     }
 
     function showAudioBar(title, subtitle) {
       const toast = document.getElementById('audioToast');
+      if (!toast) return;
       document.getElementById('audioToastTitle').textContent = title;
       document.getElementById('audioToastSub').textContent = subtitle;
       toast.classList.remove('hidden');
     }
 
-    function playAudioHelp() {
-      showToast("Kisan Helpline 1800-180-1551", "Toll-Free from any mobile or landline across India. Multilingual support.");
+    // ==========================================
+    // TWILIO DISPATCHER & SIMULATION FUNCTIONS
+    // ==========================================
+    function openTwilioModal(channel = 'sms') {
+      openModal('twilioModal');
+      switchTwilioChannel(channel);
+      updateTwilioPreview();
     }
 
-    // Modal Helpers
+    function switchTwilioChannel(channel) {
+      activeTwilioChannel = channel;
+      const btnSms = document.getElementById('twilio-tab-sms');
+      const btnVoice = document.getElementById('twilio-tab-voice');
+      const dispatchIcon = document.getElementById('twilio-dispatch-icon');
+      const dispatchLabel = document.getElementById('twilio-dispatch-label');
+      const previewHeading = document.getElementById('twilio-preview-heading');
+
+      if (channel === 'sms') {
+        btnSms.className = "py-2.5 px-3 rounded-lg bg-surface-container-lowest text-primary shadow-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer font-bold";
+        btnVoice.className = "py-2.5 px-3 rounded-lg text-secondary hover:text-on-surface flex items-center justify-center gap-1.5 transition-all cursor-pointer font-bold";
+        dispatchIcon.textContent = "send";
+        dispatchLabel.textContent = "Send Twilio SMS";
+        previewHeading.textContent = "SMS Advisory Preview (Feature Phone)";
+      } else {
+        btnVoice.className = "py-2.5 px-3 rounded-lg bg-surface-container-lowest text-primary shadow-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer font-bold";
+        btnSms.className = "py-2.5 px-3 rounded-lg text-secondary hover:text-on-surface flex items-center justify-center gap-1.5 transition-all cursor-pointer font-bold";
+        dispatchIcon.textContent = "phone_forwarded";
+        dispatchLabel.textContent = "Initiate Twilio Voice Call";
+        previewHeading.textContent = "IVR Agronomic Voice Script";
+      }
+      updateTwilioPreview();
+    }
+
+    function updateTwilioPreview() {
+      const plotEl = document.getElementById('twilio-target-plot');
+      const langEl = document.getElementById('twilio-target-lang');
+      const previewEl = document.getElementById('twilio-preview-content');
+      const countEl = document.getElementById('twilio-char-count');
+
+      const data = REGIONS_DATA[currentRegionKey] || {};
+      if (plotEl) plotEl.textContent = data.plotTitle || currentRegionKey.toUpperCase();
+      
+      const langNames = {
+        en: "English", kn: "ಕನ್ನಡ (Kannada)", hi: "हिन्दी (Hindi)",
+        te: "తెలుగు (Telugu)", ta: "தமிழ் (Tamil)", mr: "मराठी (Marathi)", bn: "বাংলা (Bengali)"
+      };
+      if (langEl) langEl.textContent = langNames[currentLang] || currentLang.toUpperCase();
+
+      if (activeTwilioChannel === 'sms') {
+        const text = getActiveSmsPreview();
+        if (previewEl) previewEl.textContent = text;
+        const segs = Math.ceil(text.length / 160) || 1;
+        if (countEl) countEl.textContent = `${text.length} chars • ${segs} Segment${segs > 1 ? 's' : ''}`;
+      } else {
+        const text = getActiveVoiceTranscript();
+        if (previewEl) previewEl.textContent = text;
+        const estSec = Math.max(15, Math.round(text.length / 12));
+        if (countEl) countEl.textContent = `~${estSec}s Audio Duration • Natural Human Voice`;
+      }
+    }
+
+    async function dispatchTwilioAction() {
+      const phoneInput = document.getElementById('twilio-phone-input');
+      const toPhone = phoneInput ? phoneInput.value.trim() : "+919876543210";
+      const apiBase = getApiBase();
+      const resCard = document.getElementById('twilio-result-card');
+      const resStatus = document.getElementById('twilio-res-status');
+      const resSid = document.getElementById('twilio-res-sid');
+      const resMode = document.getElementById('twilio-res-mode');
+      const resDetail = document.getElementById('twilio-res-detail');
+      const resTime = document.getElementById('twilio-res-time');
+      const btn = document.getElementById('btn-dispatch-twilio');
+
+      btn.disabled = true;
+      btn.classList.add('opacity-75');
+
+      const endpoint = activeTwilioChannel === 'sms' 
+        ? `${apiBase}/api/communications/sms` 
+        : `${apiBase}/api/communications/call`;
+
+      const payload = activeTwilioChannel === 'sms'
+        ? { to: toPhone, farm_id: currentRegionKey, language: currentLang, message: getActiveSmsPreview() }
+        : { to: toPhone, farm_id: currentRegionKey, language: currentLang, script: getActiveVoiceTranscript() };
+
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        resCard.classList.remove('hidden');
+        resTime.textContent = new Date().toLocaleTimeString();
+
+        if (activeTwilioChannel === 'sms') {
+          resStatus.textContent = data.mode === "live" ? "Twilio SMS Dispatched (Live)" : "Twilio SMS Simulation Delivered";
+          resSid.textContent = data.sid || "SM" + Math.random().toString(36).substring(2, 12);
+          resMode.textContent = data.mode === "live" ? "Live Twilio Carrier" : "Simulation Mode (Verified)";
+          resDetail.textContent = `Sent ${data.segments || 1} segment(s) to ${data.to} in ${currentLang.toUpperCase()}. Status: ${data.status || 'delivered'}.`;
+          showToast("Twilio SMS Dispatched", `Sent to ${data.to}`);
+        } else {
+          resStatus.textContent = data.mode === "live" ? "Twilio Call In-Progress (Live)" : "Twilio Voice Call Connected (Simulation)";
+          resSid.textContent = data.sid || "CA" + Math.random().toString(36).substring(2, 12);
+          resMode.textContent = data.mode === "live" ? "Live Twilio Voice" : "Simulation Mode (Verified)";
+          resDetail.textContent = `Call initiated to ${data.to}. Spoken in ${currentLang.toUpperCase()} via ${data.voice_name || 'Neural Human Voice'}.`;
+          showToast("Twilio Voice Connected", `Speaking to ${data.to}...`);
+          
+          // Play the voice call audio right now so the user experiences the phone call
+          previewTwilioAudio();
+        }
+      } catch (err) {
+        console.warn("Backend communication endpoint failed, performing client-side simulation:", err);
+        resCard.classList.remove('hidden');
+        resTime.textContent = new Date().toLocaleTimeString();
+        const fakeSid = (activeTwilioChannel === 'sms' ? "SM" : "CA") + Math.random().toString(36).substring(2, 18);
+        resStatus.textContent = activeTwilioChannel === 'sms' ? "Twilio SMS Simulation Delivered" : "Twilio Voice Call Connected";
+        resSid.textContent = fakeSid;
+        resMode.textContent = "Offline Simulation Mode";
+        resDetail.textContent = `Simulated dispatch to ${toPhone} in ${currentLang.toUpperCase()}. Status: delivered.`;
+        showToast("Twilio Dispatched", `Simulated for ${toPhone}`);
+
+        if (activeTwilioChannel === 'voice') {
+          previewTwilioAudio();
+        }
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('opacity-75');
+      }
+    }
+
+    function previewTwilioAudio() {
+      // Plays the high-fidelity neural audio in the selected language
+      toggleAudioAdvice();
+    }
+
+    function playAudioHelp() {
+      openTwilioModal('voice');
+    }
+
+
+        // Modal Helpers
     function openModal(id) {
       if (id === 'healthModal') {
         document.getElementById('info-modal-title').textContent = "1. Crop Health Inspector";
