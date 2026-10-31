@@ -24,6 +24,22 @@ class Farm(FarmBase):
     pass
 
 
+class CreateFarmRequest(BaseModel):
+    id: Optional[str] = None
+    name: str = Field(..., description="Farm or Plot Name")
+    district: str = Field(..., description="District Name")
+    state: str = Field(..., description="State Name")
+    crop: str = Field(..., description="Primary Crop")
+    crop_variety: Optional[str] = "Standard Cultivar"
+    crop_season: Optional[str] = "Rabi / Summer"
+    growth_stage: Optional[str] = "Vegetative"
+    survey_plot: Optional[str] = "Custom Parcel"
+    area_hectares: Optional[float] = 1.0
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    baseline_ndvi: Optional[float] = 0.70
+
+
 class CustomMarkerPoint(BaseModel):
     lat: float
     lng: float

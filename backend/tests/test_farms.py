@@ -121,3 +121,66 @@ def test_custom_land_marker_lifecycle():
     assert res_del.status_code == 200
     assert res_del.json()["success"] is True
 
+
+def test_create_and_manage_custom_farm():
+    """Verify users can register new farms and retrieve tailored observations and advisories."""
+    farm_payload = {
+        "name": "Kaveri Basin Plot #5",
+        "district": "Mandya",
+        "state": "Karnataka",
+        "crop": "Sugarcane",
+        "crop_variety": "Co 86032",
+        "crop_season": "Annual",
+        "growth_stage": "Grand Growth",
+        "area_hectares": 1.75,
+        "latitude": 12.520,
+        "longitude": 76.890,
+    }
+
+    # 1. Register new farm
+    res_create = client.post("/api/farms", json=farm_payload)
+    assert res_create.status_code == 201
+    farm_data = res_create.json()
+    farm_id = farm_data["id"]
+    assert "kaveri" in farm_id or "custom" in farm_id
+    assert farm_data["name"] == "Kaveri Basin Plot #5"
+    assert farm_data["crop"] == "Sugarcane"
+
+    # 2. Listed in all farms
+    res_list = client.get("/api/farms")
+    assert res_list.status_code == 200
+    all_farms = res_list.json()
+    assert any(f["id"] == farm_id for f in all_farms)
+
+    # 3. Get farm by ID
+    res_get = client.get(f"/api/farms/{farm_id}")
+    assert res_get.status_code == 200
+    assert res_get.json()["id"] == farm_id
+
+    # 4. Tailored Advisory in English and Kannada
+    res_adv_en = client.get(f"/api/farms/{farm_id}/advisory?language=en")
+    assert res_adv_en.status_code == 200
+    assert "Sugarcane" in res_adv_en.json()["description"] or "Kaveri" in res_adv_en.json()["headline"]
+
+    res_adv_kn = client.get(f"/api/farms/{farm_id}/advisory?language=kn")
+    assert res_adv_kn.status_code == 200
+    assert "Sugarcane" in res_adv_kn.json()["description"] or "ಆರೋಗ್ಯ" in res_adv_kn.json()["headline"]
+
+    # 5. Tailored Observations and Weather
+    res_obs = client.get(f"/api/farms/{farm_id}/observations")
+    assert res_obs.status_code == 200
+    assert res_obs.json()["metric"] == "NDVI"
+
+    res_weather = client.get(f"/api/farms/{farm_id}/weather")
+    assert res_weather.status_code == 200
+    assert res_weather.json()["district"] == "Mandya"
+
+    # 6. Delete custom farm
+    res_del = client.delete(f"/api/farms/{farm_id}")
+    assert res_del.status_code == 200
+    assert res_del.json()["success"] is True
+
+    # 7. Verify deletion
+    res_get_deleted = client.get(f"/api/farms/{farm_id}")
+    assert res_get_deleted.status_code == 404
+

@@ -477,9 +477,14 @@
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="material-symbols-outlined text-primary text-[20px]">pin_drop</span>
-            <span class="text-xs font-bold uppercase tracking-wider text-on-surface" id="region-selector-header">Select Demo Field (Pan-India)</span>
+            <span class="text-xs font-bold uppercase tracking-wider text-on-surface" id="region-selector-header">Select Field (Pan-India)</span>
           </div>
-          <span class="text-[11px] text-secondary font-medium">No login required</span>
+          <div class="flex items-center gap-2">
+            <button onclick="openAddFarmModal()" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl bg-primary text-on-primary hover:bg-primary-container active:scale-95 transition-all shadow-sm cursor-pointer" id="btn-add-farm-header" title="Register and monitor a new farm">
+              <span class="material-symbols-outlined text-[16px]">add_location_alt</span>
+              <span>+ Add Farm</span>
+            </button>
+          </div>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1" id="farm-pills-container">
           <button class="region-pill active-pill p-2.5 rounded-xl border text-left flex items-start gap-2.5 transition-all bg-primary-container text-on-primary border-primary min-h-[48px]" id="pill-mandya" onclick="selectRegion('mandya')" type="button">
@@ -508,6 +513,18 @@
             <div class="flex flex-col min-w-0">
               <span class="text-xs font-bold leading-tight truncate">Nashik (Maharashtra)</span>
               <span class="text-[11px] text-on-surface-variant truncate">Onion / Grapes • Demo Field D</span>
+            </div>
+          </button>
+
+          <!-- Dynamic Container for User-Added Custom Farms -->
+          <div id="custom-farm-pills" class="contents"></div>
+
+          <!-- + Add Your Farm Dashed Pill Card in Grid -->
+          <button class="p-2.5 rounded-xl border-2 border-dashed border-primary/40 hover:border-primary text-left flex items-center justify-center gap-2 transition-all bg-surface-container/40 hover:bg-surface-container text-primary min-h-[48px] cursor-pointer group" onclick="openAddFarmModal()" type="button" id="pill-add-new-farm">
+            <span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">add_circle</span>
+            <div class="flex flex-col min-w-0">
+              <span class="text-xs font-bold leading-tight">+ Add Your Farm</span>
+              <span class="text-[10px] text-secondary truncate">Custom location, crop &amp; GPS</span>
             </div>
           </button>
         </div>
@@ -1212,6 +1229,169 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       <button class="w-full min-h-[48px] rounded-xl bg-primary text-on-primary font-bold text-sm" onclick="closeModal('infoModal')" type="button">
         Close
       </button>
+    </div>
+  </div>
+
+  <!-- Modal: Add New Farm Parcel -->
+  <div class="fixed inset-0 z-50 bg-inverse-surface/50 backdrop-blur-xs flex flex-col justify-end hidden opacity-0 transition-opacity duration-200" id="addFarmModal">
+    <div class="w-full max-w-[640px] mx-auto bg-surface-container-lowest rounded-t-3xl p-5 flex flex-col gap-4 max-h-[90vh] overflow-y-auto shadow-2xl">
+      <!-- Header -->
+      <div class="flex items-center justify-between pb-2 border-b border-surface-variant">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[24px]">add_location_alt</span>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-on-surface">Register New Farm Parcel</h3>
+            <p class="text-[11px] text-secondary">Add your field for satellite vigor analysis &amp; tailored advisory</p>
+          </div>
+        </div>
+        <button class="w-9 h-9 rounded-full bg-surface-container hover:bg-surface-variant flex items-center justify-center text-on-surface transition-colors cursor-pointer" onclick="closeModal('addFarmModal')" type="button">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Quick Preset Suggestions -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[11px] font-bold text-secondary uppercase tracking-wider">Quick Fill Demo Presets</label>
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
+          <button type="button" onclick="applyFarmPreset('Mandya', 'Karnataka', 'Paddy (Sona Masoori)', 12.5200, 76.8900, 'Kaveri Canal Zone')" class="px-2.5 py-1 rounded-lg bg-surface-container text-on-surface hover:bg-primary-container hover:text-on-primary transition-all shrink-0 font-medium cursor-pointer">
+            🌾 Mandya (Paddy)
+          </button>
+          <button type="button" onclick="applyFarmPreset('Shimoga', 'Karnataka', 'Arecanut & Paddy', 13.9290, 75.5680, 'Tunga Basin Plot')" class="px-2.5 py-1 rounded-lg bg-surface-container text-on-surface hover:bg-primary-container hover:text-on-primary transition-all shrink-0 font-medium cursor-pointer">
+            🌴 Shimoga (Areca/Paddy)
+          </button>
+          <button type="button" onclick="applyFarmPreset('Mysuru', 'Karnataka', 'Sugarcane & Ragi', 12.2950, 76.6390, 'Kabini Valley Field')" class="px-2.5 py-1 rounded-lg bg-surface-container text-on-surface hover:bg-primary-container hover:text-on-primary transition-all shrink-0 font-medium cursor-pointer">
+            🎋 Mysuru (Sugarcane)
+          </button>
+          <button type="button" onclick="applyFarmPreset('Guntur', 'Andhra Pradesh', 'Chilli & Cotton', 16.3060, 80.4360, 'Krishna Delta Plot')" class="px-2.5 py-1 rounded-lg bg-surface-container text-on-surface hover:bg-primary-container hover:text-on-primary transition-all shrink-0 font-medium cursor-pointer">
+            🌶️ Guntur (Chilli/Cotton)
+          </button>
+          <button type="button" onclick="applyFarmPreset('Thanjavur', 'Tamil Nadu', 'Kuruvai Paddy', 10.7870, 79.1370, 'Delta Granary Plot')" class="px-2.5 py-1 rounded-lg bg-surface-container text-on-surface hover:bg-primary-container hover:text-on-primary transition-all shrink-0 font-medium cursor-pointer">
+            🌾 Thanjavur (Paddy)
+          </button>
+        </div>
+      </div>
+
+      <!-- Form Inputs -->
+      <form id="add-farm-form" onsubmit="event.preventDefault(); saveNewFarm();" class="space-y-3">
+        <!-- Farm Name -->
+        <div>
+          <label class="block text-xs font-bold text-on-surface mb-1" for="new-farm-name">
+            Farm / Plot Name <span class="text-error">*</span>
+          </label>
+          <input type="text" id="new-farm-name" required placeholder="e.g. Ramesh's Paddy Field or Kaveri Plot #3"
+            class="w-full text-xs p-2.5 rounded-xl border border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-hidden transition-all"/>
+        </div>
+
+        <!-- District & State Grid -->
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-bold text-on-surface mb-1" for="new-farm-district">
+              District <span class="text-error">*</span>
+            </label>
+            <input type="text" id="new-farm-district" required placeholder="e.g. Mandya"
+              class="w-full text-xs p-2.5 rounded-xl border border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-hidden transition-all"/>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-on-surface mb-1" for="new-farm-state">
+              State <span class="text-error">*</span>
+            </label>
+            <input type="text" id="new-farm-state" required placeholder="e.g. Karnataka"
+              class="w-full text-xs p-2.5 rounded-xl border border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-hidden transition-all"/>
+          </div>
+        </div>
+
+        <!-- Crop & Variety -->
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-bold text-on-surface mb-1" for="new-farm-crop">
+              Primary Crop <span class="text-error">*</span>
+            </label>
+            <select id="new-farm-crop" required class="w-full text-xs p-2.5 rounded-xl border border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-hidden transition-all cursor-pointer">
+              <option value="Paddy (Sona Masoori)">Paddy / Rice (Sona Masoori)</option>
+              <option value="Paddy (Basmati / IR64)">Paddy / Rice (Basmati / IR64)</option>
+              <option value="Wheat (PBW 343 / Sharbati)">Wheat (PBW 343 / Sharbati)</option>
+              <option value="Sugarcane (Co 86032)">Sugarcane (Co 86032)</option>
+              <option value="Cotton (Bt Hybrid)">Cotton (Bt Hybrid)</option>
+              <option value="Maize / Corn">Maize / Corn</option>
+              <option value="Ragi (Finger Millet)">Ragi (Finger Millet)</option>
+              <option value="Mustard &amp; Oilseeds">Mustard &amp; Oilseeds</option>
+              <option value="Onion / Garlic">Onion / Garlic</option>
+              <option value="Chilli &amp; Spices">Chilli &amp; Spices</option>
+              <option value="Vegetables &amp; Horticulture">Vegetables &amp; Horticulture</option>
+              <option value="Pulses (Tur / Gram)">Pulses (Tur / Gram)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-on-surface mb-1" for="new-farm-stage">
+              Growth Stage
+            </label>
+            <select id="new-farm-stage" class="w-full text-xs p-2.5 rounded-xl border border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-hidden transition-all cursor-pointer">
+              <option value="Vegetative / Tillering">Vegetative / Tillering</option>
+              <option value="Panicle / Flowering">Panicle / Flowering</option>
+              <option value="Grain / Fruit Formation">Grain / Fruit Formation</option>
+              <option value="Maturity / Pre-Harvest">Maturity / Pre-Harvest</option>
+              <option value="Early Sowing / Seedling">Early Sowing / Seedling</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Field Area & Survey -->
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-bold text-on-surface mb-1" for="new-farm-area">
+              Land Area (Acres)
+            </label>
+            <input type="number" id="new-farm-area" step="0.1" min="0.1" max="100" value="2.0"
+              class="w-full text-xs p-2.5 rounded-xl border border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-hidden transition-all"/>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-on-surface mb-1" for="new-farm-survey">
+              Survey Plot / Khata No.
+            </label>
+            <input type="text" id="new-farm-survey" placeholder="e.g. Survey #142/B"
+              class="w-full text-xs p-2.5 rounded-xl border border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-hidden transition-all"/>
+          </div>
+        </div>
+
+        <!-- Geographic Coordinates & GPS Capture -->
+        <div class="p-3 bg-surface-container-low rounded-xl border border-surface-variant flex flex-col gap-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-on-surface flex items-center gap-1">
+              <span class="material-symbols-outlined text-[16px] text-primary">my_location</span>
+              <span>Coordinates &amp; Map Pin</span>
+            </span>
+            <button type="button" onclick="captureUserGpsForNewFarm()" id="btn-capture-gps" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-primary-container text-on-primary hover:opacity-90 flex items-center gap-1 transition-all cursor-pointer">
+              <span class="material-symbols-outlined text-[14px]">near_me</span>
+              <span id="btn-capture-gps-text">Use My Device GPS</span>
+            </button>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] font-semibold text-secondary mb-0.5" for="new-farm-lat">Latitude (°N)</label>
+              <input type="number" step="0.0001" id="new-farm-lat" value="12.5200" placeholder="12.5200"
+                class="w-full text-xs p-2 rounded-lg border border-outline-variant bg-surface-container-lowest focus:border-primary outline-hidden font-mono"/>
+            </div>
+            <div>
+              <label class="block text-[10px] font-semibold text-secondary mb-0.5" for="new-farm-lon">Longitude (°E)</label>
+              <input type="number" step="0.0001" id="new-farm-lon" value="76.8900" placeholder="76.8900"
+                class="w-full text-xs p-2 rounded-lg border border-outline-variant bg-surface-container-lowest focus:border-primary outline-hidden font-mono"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit and Cancel Buttons -->
+        <div class="flex items-center gap-2 pt-2">
+          <button type="submit" id="btn-save-new-farm" class="flex-1 min-h-[48px] rounded-xl bg-primary text-on-primary font-bold text-sm flex items-center justify-center gap-1.5 shadow-sm hover:bg-primary-container transition-all cursor-pointer">
+            <span class="material-symbols-outlined text-[20px]">add_task</span>
+            <span>Save &amp; Inspect Farm</span>
+          </button>
+          <button type="button" onclick="closeModal('addFarmModal')" class="min-h-[48px] px-4 rounded-xl bg-surface-container hover:bg-surface-variant text-on-surface font-semibold text-xs transition-colors cursor-pointer">
+            Cancel
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -3144,9 +3324,284 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       }
     }
 
+    // ==========================================
+    // CUSTOM FARM REGISTRATION & MANAGEMENT
+    // ==========================================
+    let customUserFarms = [];
+
+    function openAddFarmModal() {
+      openModal('addFarmModal');
+    }
+
+    function applyFarmPreset(district, state, crop, lat, lon, plotName) {
+      const nameEl = document.getElementById('new-farm-name');
+      const distEl = document.getElementById('new-farm-district');
+      const stateEl = document.getElementById('new-farm-state');
+      const cropEl = document.getElementById('new-farm-crop');
+      const latEl = document.getElementById('new-farm-lat');
+      const lonEl = document.getElementById('new-farm-lon');
+
+      if (nameEl) nameEl.value = plotName;
+      if (distEl) distEl.value = district;
+      if (stateEl) stateEl.value = state;
+      if (cropEl) cropEl.value = crop;
+      if (latEl) latEl.value = lat.toFixed(4);
+      if (lonEl) lonEl.value = lon.toFixed(4);
+    }
+
+    function captureUserGpsForNewFarm() {
+      const txt = document.getElementById('btn-capture-gps-text');
+      if (!navigator.geolocation) {
+        alert("Geolocation is not supported by your browser.");
+        return;
+      }
+      if (txt) txt.textContent = "Acquiring GPS...";
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
+          const latEl = document.getElementById('new-farm-lat');
+          const lonEl = document.getElementById('new-farm-lon');
+          if (latEl) latEl.value = lat.toFixed(4);
+          if (lonEl) lonEl.value = lon.toFixed(4);
+          if (txt) txt.textContent = "GPS Locked!";
+          setTimeout(() => { if (txt) txt.textContent = "Use My Device GPS"; }, 2500);
+          showToast("GPS Locked", `${lat.toFixed(4)}° N, ${lon.toFixed(4)}° E`);
+        },
+        (err) => {
+          console.warn("GPS error:", err);
+          if (txt) txt.textContent = "GPS Unavailable";
+          setTimeout(() => { if (txt) txt.textContent = "Use My Device GPS"; }, 2500);
+          alert("Could not access GPS. Please check location permissions or enter coordinates manually.");
+        },
+        { enableHighAccuracy: true, timeout: 8000 }
+      );
+    }
+
+    function loadCustomFarms() {
+      try {
+        const raw = localStorage.getItem('earthworm_custom_farms');
+        customUserFarms = raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        customUserFarms = [];
+      }
+
+      customUserFarms.forEach(registerCustomFarmData);
+      renderCustomFarmPills();
+    }
+
+    function registerCustomFarmData(farm) {
+      const id = farm.id;
+      const lat = parseFloat(farm.latitude) || 12.520;
+      const lon = parseFloat(farm.longitude) || 76.890;
+      const area = farm.area_acres || 2.0;
+
+      REGIONS_DATA[id] = {
+        location: `${farm.district}, ${farm.state}`,
+        crop: farm.crop,
+        cropName: farm.crop,
+        parcel: farm.survey_plot || `Parcel #${farm.id.slice(-4)}`,
+        plotTitle: `${farm.name} (${farm.district}, ${farm.state})`,
+        cropTitle: `${farm.crop} • ${farm.growth_stage || 'Active Growth'}`,
+        area: `${area} Acres (~${(area * 0.4047).toFixed(2)} Ha)`,
+        satImage: "assets/mandya.jpg",
+        satPass: `${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} • Sentinel-2 Pass`,
+        satPolygon: "115,40 295,35 315,140 135,150",
+        alertMarker: { cx: 205, cy: 90 },
+        advisoryTitle: `${farm.name}: Crop Monitoring Active`,
+        advisoryDesc: `Status: Multispectral Sentinel-2 monitoring active for ${farm.crop}. Canopy greenness is healthy and optimal. Ground walk recommended to inspect perimeter soil moisture.`,
+        metric: "0.68 (Optimal Vigor • Baseline 0.70)",
+        notice: `Sentinel-2 reflectance indicates uniform chlorophyll assimilation across ${farm.name}.`,
+        meaning: `Root-zone hydration is adequate for ${farm.crop}. Optimal physiological development phase.`,
+        action: `Inspect perimeter irrigation bunds and check top 10 cm root zone moisture prior to scheduled irrigation.`,
+        sms: `[EARTHWORM-AGRI] ${farm.name} (${farm.district}): ${farm.crop} canopy vigor is healthy. Continue scheduled irrigation.`,
+        voiceTranscript: `Namaskara farmer. Earthworm satellite check for ${farm.name} in ${farm.district}. Your ${farm.crop} canopy vigor is optimal and weather conditions remain favorable.`,
+        weatherOutlook: `${farm.district}: 30°C • Sunny skies • Favorable conditions next 3 days.`,
+        weatherHeader: "Regional 3-Day Outlook (Open-Meteo Integration)",
+        days: [
+          { day: "Day 1", icon: "sunny", temp: "30° / 21°", rain: "0 mm rain" },
+          { day: "Day 2", icon: "partly_cloudy_day", temp: "31° / 20°", rain: "0 mm rain" },
+          { day: "Day 3", icon: "wb_sunny", temp: "29° / 22°", rain: "<1 mm rain" }
+        ],
+        recommendation: `Clear weather favorable for ${farm.crop} canopy growth and field inspections.`,
+        history: [
+          { date: "04 Feb", ndvi: 0.64, height: "91%" },
+          { date: "09 Feb", ndvi: 0.65, height: "93%" },
+          { date: "14 Feb", ndvi: 0.66, height: "94%" },
+          { date: "19 Feb", ndvi: 0.67, height: "96%" },
+          { date: "24 Feb", ndvi: 0.68, height: "97%" }
+        ]
+      };
+
+      SPECTRAL_DATA[id] = {
+        plot: `${farm.name} • ${farm.district} (${farm.state})`,
+        sensor: "Copernicus Sentinel-2B (MSI Level-2A BOA)",
+        coords: `${lat.toFixed(4)}° N, ${lon.toFixed(4)}° E`,
+        pass: `${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} • 10:45 UTC (Cloud: 1.2%)`,
+        ndviVal: "0.68 (Benchmark 0.70 • Optimal Vigor)",
+        ndviDesc: `Multi-spectral vegetation index indicates healthy canopy vigor across ${farm.name}. Balanced chlorophyll concentration.`,
+        ndviSignal: "Strong Red (665 nm) chlorophyll absorption with steady Near-Infrared (842 nm) cellular scattering.",
+        cirVal: "NIR (B08): 0.54 • Red (B04): 0.11",
+        cirDesc: `Color Infrared false-color composite displays healthy crimson foliage across ${farm.crop} rows.`,
+        cirSignal: "Turgid mesophyll cell layers generating uniform NIR reflectance.",
+        moistureVal: "NDMI: +0.44 • SWIR (B11): 0.21",
+        moistureDesc: "Canopy and topsoil moisture levels are currently adequate for crop stage.",
+        bands: { b3: "0.08 (Peak)", b4: "0.11 (Absorb)", b8: "0.54 (Scatter)", b11: "0.21 (Water)" }
+      };
+
+      REGION_GEO[id] = {
+        lat: lat,
+        lon: lon,
+        zoom: 16,
+        elev: "650m",
+        polygon: [
+          [lat + 0.0025, lon - 0.003],
+          [lat + 0.0026, lon + 0.003],
+          [lat - 0.0025, lon + 0.003],
+          [lat - 0.0026, lon - 0.003]
+        ]
+      };
+    }
+
+    function renderCustomFarmPills() {
+      const container = document.getElementById('custom-farm-pills');
+      if (!container) return;
+
+      container.innerHTML = customUserFarms.map(f => {
+        const isSelected = currentRegionKey === f.id;
+        const bgClass = isSelected
+          ? "bg-primary-container text-on-primary border-primary active-pill"
+          : "bg-surface-container-lowest text-on-surface border-surface-variant hover:bg-surface-container";
+        return `
+          <div class="relative group min-w-0">
+            <button class="region-pill ${bgClass} p-2.5 rounded-xl border text-left flex items-start gap-2.5 transition-all w-full min-h-[48px] cursor-pointer" id="pill-${f.id}" onclick="selectRegion('${f.id}')" type="button">
+              <span class="material-symbols-outlined text-[20px] text-primary shrink-0 mt-0.5">agriculture</span>
+              <div class="flex flex-col min-w-0 pr-6">
+                <div class="flex items-center gap-1.5 min-w-0">
+                  <span class="text-xs font-bold leading-tight truncate">${f.name}</span>
+                  <span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-primary/10 text-primary shrink-0">Custom</span>
+                </div>
+                <span class="text-[11px] opacity-80 truncate">${f.crop} • ${f.district}</span>
+              </div>
+            </button>
+            <button onclick="deleteCustomFarm('${f.id}', event)" class="absolute right-2 top-2.5 p-1 rounded-lg text-secondary hover:text-error hover:bg-surface-variant/80 transition-all cursor-pointer z-10" title="Delete custom farm" type="button">
+              <span class="material-symbols-outlined text-[16px]">delete</span>
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function saveNewFarm() {
+      const name = document.getElementById('new-farm-name').value.trim();
+      const district = document.getElementById('new-farm-district').value.trim();
+      const state = document.getElementById('new-farm-state').value.trim();
+      const crop = document.getElementById('new-farm-crop').value;
+      const stage = document.getElementById('new-farm-stage').value;
+      const areaAcres = parseFloat(document.getElementById('new-farm-area').value) || 2.0;
+      const survey = document.getElementById('new-farm-survey').value.trim();
+      const lat = parseFloat(document.getElementById('new-farm-lat').value) || 12.520;
+      const lon = parseFloat(document.getElementById('new-farm-lon').value) || 76.890;
+
+      if (!name || !district || !state) {
+        alert("Please fill in Farm Name, District, and State.");
+        return;
+      }
+
+      const farmId = 'farm_' + Date.now();
+      const newFarm = {
+        id: farmId,
+        name: name,
+        district: district,
+        state: state,
+        crop: crop,
+        growth_stage: stage,
+        area_acres: areaAcres,
+        survey_plot: survey || `Plot #${farmId.slice(-4)}`,
+        latitude: lat,
+        longitude: lon,
+        created_at: new Date().toISOString()
+      };
+
+      customUserFarms.push(newFarm);
+      try {
+        localStorage.setItem('earthworm_custom_farms', JSON.stringify(customUserFarms));
+      } catch (e) {
+        console.warn("LocalStorage save error:", e);
+      }
+
+      registerCustomFarmData(newFarm);
+      renderCustomFarmPills();
+
+      if (backendAvailable) {
+        try {
+          const apiBase = getApiBase();
+          await fetch(`${apiBase}/api/farms`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: farmId,
+              name: name,
+              district: district,
+              state: state,
+              crop: crop,
+              growth_stage: stage,
+              area_hectares: areaAcres * 0.4047,
+              survey_plot: survey || `Plot #${farmId.slice(-4)}`,
+              latitude: lat,
+              longitude: lon
+            })
+          });
+        } catch (e) {
+          console.warn("Backend sync failed, stored in localStorage:", e);
+        }
+      }
+
+      closeModal('addFarmModal');
+      document.getElementById('add-farm-form').reset();
+      await selectRegion(farmId);
+      showToast("Farm Registered", `${name} is now actively monitored`);
+
+      const selSec = document.getElementById('region-selector-header');
+      if (selSec) selSec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    async function deleteCustomFarm(farmId, event) {
+      if (event) event.stopPropagation();
+      const farm = customUserFarms.find(f => f.id === farmId);
+      const name = farm ? farm.name : "this farm";
+      if (!confirm(`Are you sure you want to remove "${name}" from your monitored farms?`)) {
+        return;
+      }
+
+      customUserFarms = customUserFarms.filter(f => f.id !== farmId);
+      try {
+        localStorage.setItem('earthworm_custom_farms', JSON.stringify(customUserFarms));
+      } catch (e) {}
+
+      delete REGIONS_DATA[farmId];
+      delete SPECTRAL_DATA[farmId];
+      delete REGION_GEO[farmId];
+
+      if (backendAvailable) {
+        try {
+          const apiBase = getApiBase();
+          await fetch(`${apiBase}/api/farms/${farmId}`, { method: 'DELETE' });
+        } catch (e) {}
+      }
+
+      renderCustomFarmPills();
+
+      if (currentRegionKey === farmId) {
+        await selectRegion('mandya');
+      }
+      showToast("Farm Removed", `${name} has been deleted`);
+    }
+
     // Startup Initialization
     window.addEventListener('DOMContentLoaded', async () => {
       await checkBackendHealth();
+      loadCustomFarms();
       await selectRegion('mandya');
       loadSavedCustomParcels();
 
