@@ -380,6 +380,10 @@
               <span class="material-symbols-outlined text-[13px] text-blue-500">public</span>
               <span>Interactive Map</span>
             </button>
+            <button class="sat-layer-btn text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high flex items-center gap-1 shrink-0 transition-all cursor-pointer" onclick="switchSatelliteLayer('trends')" id="layer-btn-trends" title="Statistical NDVI Bar Graphs & Time-Series Analytics">
+              <span class="material-symbols-outlined text-[13px] text-amber-500">bar_chart</span>
+              <span id="tab-trends-label">Statistical Graphs</span>
+            </button>
           </div>
         </div>
 
@@ -468,8 +472,95 @@
             </div>
           </div>
 
+          <!-- STATISTICAL NDVI TIME-SERIES BAR GRAPH VIEWPORT -->
+          <div id="satellite-trends-view" class="absolute inset-0 w-full h-full z-35 bg-slate-950/95 backdrop-blur-md text-white flex flex-col p-2.5 sm:p-3.5 overflow-y-auto" style="display: none;">
+            <!-- Top Header & Badges -->
+            <div class="flex items-center justify-between pb-2 border-b border-white/10 shrink-0">
+              <div class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-amber-400 text-[18px]">query_stats</span>
+                <div>
+                  <h4 class="text-xs font-bold text-white tracking-wide flex items-center gap-1.5" id="trends-chart-title">
+                    Statistical NDVI Time-Series Analytics
+                    <span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono">10m GSD</span>
+                  </h4>
+                  <p class="text-[9px] text-white/60" id="trends-chart-subtitle">Copernicus Sentinel-2 • 20-Day Orbital Revisit Cycle</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 text-[9px] font-mono">
+                <span class="flex items-center gap-1 text-emerald-400"><span class="w-2 h-0.5 bg-emerald-400"></span> Target: 0.70</span>
+                <span class="flex items-center gap-1 text-amber-400"><span class="w-2 h-0.5 border-t border-dashed border-amber-400"></span> Stress: 0.50</span>
+              </div>
+            </div>
+
+            <!-- Statistical KPI Banner -->
+            <div class="grid grid-cols-4 gap-1.5 my-2 shrink-0">
+              <div class="bg-white/5 border border-white/10 rounded-lg p-1.5 text-center">
+                <span class="text-[8px] uppercase tracking-wider text-white/50 block">Current NDVI</span>
+                <span class="text-xs font-extrabold text-amber-300 font-mono" id="stat-kpi-current">0.58</span>
+              </div>
+              <div class="bg-white/5 border border-white/10 rounded-lg p-1.5 text-center">
+                <span class="text-[8px] uppercase tracking-wider text-white/50 block">20-Day Delta</span>
+                <span class="text-xs font-extrabold text-rose-400 font-mono" id="stat-kpi-delta">-14.7%</span>
+              </div>
+              <div class="bg-white/5 border border-white/10 rounded-lg p-1.5 text-center">
+                <span class="text-[8px] uppercase tracking-wider text-white/50 block">Period Mean (μ)</span>
+                <span class="text-xs font-extrabold text-emerald-300 font-mono" id="stat-kpi-mean">0.632</span>
+              </div>
+              <div class="bg-white/5 border border-white/10 rounded-lg p-1.5 text-center">
+                <span class="text-[8px] uppercase tracking-wider text-white/50 block">Peak Vigor</span>
+                <span class="text-xs font-extrabold text-primary-fixed font-mono" id="stat-kpi-peak">0.680</span>
+              </div>
+            </div>
+
+            <!-- Statistical Bar Chart Area with Numerical Y-Axis & Benchmark Lines -->
+            <div class="relative flex-1 min-h-[140px] flex gap-2 pt-2 pb-1">
+              <!-- Y-Axis Scale -->
+              <div class="flex flex-col justify-between items-end text-[8px] font-mono text-white/50 pr-1 select-none w-6 shrink-0 h-[105px]">
+                <span>1.0</span>
+                <span class="text-emerald-400 font-bold">0.7</span>
+                <span class="text-amber-400 font-bold">0.5</span>
+                <span>0.3</span>
+                <span>0.0</span>
+              </div>
+
+              <!-- Graph Plot Area with Reference Grid & Bars -->
+              <div class="relative flex-1 h-[105px] border-l border-b border-white/20">
+                <!-- 0.70 Target Benchmark Line -->
+                <div class="absolute inset-x-0 border-b border-dashed border-emerald-400/80 z-10 flex items-center justify-end pr-1 pointer-events-none" style="bottom: 70%;">
+                  <span class="text-[8px] font-mono text-emerald-300 bg-emerald-950/80 px-1 rounded">Target 0.70</span>
+                </div>
+                <!-- 0.50 Moisture Stress Line -->
+                <div class="absolute inset-x-0 border-b border-dashed border-amber-400/70 z-10 flex items-center justify-end pr-1 pointer-events-none" style="bottom: 50%;">
+                  <span class="text-[8px] font-mono text-amber-300 bg-amber-950/80 px-1 rounded">Stress 0.50</span>
+                </div>
+                <!-- Grid Ticks (0.2, 0.4, 0.6, 0.8) -->
+                <div class="absolute inset-x-0 border-b border-white/5 pointer-events-none" style="bottom: 20%;"></div>
+                <div class="absolute inset-x-0 border-b border-white/5 pointer-events-none" style="bottom: 40%;"></div>
+                <div class="absolute inset-x-0 border-b border-white/5 pointer-events-none" style="bottom: 60%;"></div>
+                <div class="absolute inset-x-0 border-b border-white/5 pointer-events-none" style="bottom: 80%;"></div>
+
+                <!-- 5 Proportional Statistical Bars Container -->
+                <div class="absolute inset-0 flex items-end justify-around px-1 z-20" id="statistical-bars-wrapper">
+                  <!-- Generated dynamically by renderStatisticalTrendsChart() -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Interactive Pass Telemetry Diagnostic Footer / Inspector -->
+            <div id="trends-detail-callout" class="mt-2 p-2 rounded-lg bg-white/5 border border-white/10 text-white text-[10px] shrink-0 flex items-center justify-between transition-all">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-amber-400 text-[16px]" id="telemetry-icon">warning</span>
+                <div>
+                  <span class="font-bold text-white block" id="telemetry-title">Latest Pass: 24 Feb 2024</span>
+                  <span class="text-[9px] text-white/70" id="telemetry-desc">NDVI 0.58 (-12% vs benchmark). Localized moisture stress in NE quadrant.</span>
+                </div>
+              </div>
+              <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold shrink-0" id="telemetry-badge">Action Needed</span>
+            </div>
+          </div>
+
           <!-- Bottom Telemetry & Parcel Bar -->
-          <div class="absolute bottom-2 left-2 right-2 z-30 bg-inverse-surface/90 backdrop-blur-md rounded-xl p-2 px-3 text-inverse-on-surface flex items-center justify-between text-xs shadow-md">
+          <div id="sat-bottom-telemetry-bar" class="absolute bottom-2 left-2 right-2 z-30 bg-inverse-surface/90 backdrop-blur-md rounded-xl p-2 px-3 text-inverse-on-surface flex items-center justify-between text-xs shadow-md">
             <div class="flex items-center gap-2">
               <span class="material-symbols-outlined text-primary-fixed-dim text-[16px]">satellite_alt</span>
               <div class="flex flex-col">
@@ -503,51 +594,37 @@
           </div>
         </div>
 
-        <!-- HISTORICAL NDVI TIME-SERIES BAR (FEATURE B) -->
-        <div class="px-3 pt-2.5 pb-2 bg-surface-container-low border-t border-surface-variant">
-          <div class="flex items-center justify-between text-xs mb-1.5">
-            <span class="font-bold text-on-surface flex items-center gap-1">
-              <span class="material-symbols-outlined text-[16px] text-primary">show_chart</span>
-              <span id="ts-title">NDVI 20-Day Trend (Sentinel-2)</span>
-            </span>
-            <span class="text-[10px] text-secondary font-semibold" id="ts-benchmark">Seasonal Benchmark: 0.70</span>
+        <!-- SATELLITE FOOTER INTERACTIVE BAR / OPTION TOGGLE -->
+        <div id="satellite-footer-bar" class="px-3 py-2 bg-surface-container-low border-t border-surface-variant transition-all">
+          <div class="flex items-center justify-between gap-2" id="footer-standard-mode">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-[18px]">show_chart</span>
+              <div class="flex flex-col">
+                <span class="text-xs font-bold text-on-surface flex items-center gap-1.5">
+                  <span id="ts-title">NDVI 20-Day Trend (Sentinel-2)</span>
+                  <span class="text-[9px] px-1.5 py-0.2 rounded-full bg-primary/10 text-primary font-bold">Sentinel-2</span>
+                </span>
+                <span class="text-[10px] text-secondary" id="ts-benchmark">Seasonal Benchmark: 0.70</span>
+              </div>
+            </div>
+            <button onclick="toggleTrendsLayer()" id="btn-open-trends-view" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-primary text-on-primary hover:bg-primary/90 flex items-center gap-1 shadow-xs transition-all cursor-pointer shrink-0" title="Switch to Statistical Bar Graphs view">
+              <span class="material-symbols-outlined text-[14px]">bar_chart</span>
+              <span id="btn-open-trends-text">Statistical Graphs</span>
+            </button>
           </div>
-          <div class="grid grid-cols-5 gap-1.5 text-center" id="ndvi-history-bars">
-            <div class="bg-surface-container-lowest p-1 rounded-lg border border-surface-variant flex flex-col items-center">
-              <span class="text-[9px] text-secondary">04 Feb</span>
-              <div class="w-full bg-primary/20 h-7 rounded-sm flex items-end justify-center my-0.5">
-                <div class="w-full bg-primary rounded-sm" style="height: 97%;"></div>
+
+          <div class="items-center justify-between gap-2" id="footer-trends-mode" style="display: none;">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-amber-500 text-[18px]">query_stats</span>
+              <div class="flex flex-col">
+                <span class="text-xs font-bold text-on-surface">Statistical Time-Series Analytics</span>
+                <span class="text-[10px] text-secondary">Y-axis calibrated reflectance against seasonal threshold</span>
               </div>
-              <span class="text-[10px] font-bold text-primary">0.68</span>
             </div>
-            <div class="bg-surface-container-lowest p-1 rounded-lg border border-surface-variant flex flex-col items-center">
-              <span class="text-[9px] text-secondary">09 Feb</span>
-              <div class="w-full bg-primary/20 h-7 rounded-sm flex items-end justify-center my-0.5">
-                <div class="w-full bg-primary rounded-sm" style="height: 94%;"></div>
-              </div>
-              <span class="text-[10px] font-bold text-primary">0.66</span>
-            </div>
-            <div class="bg-surface-container-lowest p-1 rounded-lg border border-surface-variant flex flex-col items-center">
-              <span class="text-[9px] text-secondary">14 Feb</span>
-              <div class="w-full bg-primary/20 h-7 rounded-sm flex items-end justify-center my-0.5">
-                <div class="w-full bg-primary rounded-sm" style="height: 90%;"></div>
-              </div>
-              <span class="text-[10px] font-bold text-primary">0.63</span>
-            </div>
-            <div class="bg-surface-container-lowest p-1 rounded-lg border border-surface-variant flex flex-col items-center">
-              <span class="text-[9px] text-secondary">19 Feb</span>
-              <div class="w-full bg-primary/20 h-7 rounded-sm flex items-end justify-center my-0.5">
-                <div class="w-full bg-primary rounded-sm" style="height: 87%;"></div>
-              </div>
-              <span class="text-[10px] font-bold text-primary">0.61</span>
-            </div>
-            <div class="bg-surface-container-lowest p-1 rounded-lg border-2 border-tertiary-container flex flex-col items-center">
-              <span class="text-[9px] font-bold text-tertiary">24 Feb</span>
-              <div class="w-full bg-tertiary-container/30 h-7 rounded-sm flex items-end justify-center my-0.5">
-                <div class="w-full bg-tertiary-container rounded-sm" style="height: 82%;"></div>
-              </div>
-              <span class="text-[10px] font-bold text-tertiary">0.58</span>
-            </div>
+            <button onclick="toggleTrendsLayer()" id="btn-close-trends-view" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-surface-container-high hover:bg-surface-variant text-on-surface flex items-center gap-1 border border-surface-variant transition-all cursor-pointer shrink-0" title="Return to Satellite Imagery">
+              <span class="material-symbols-outlined text-[14px] text-primary">satellite_alt</span>
+              <span id="btn-close-trends-text">Back to Satellite</span>
+            </button>
           </div>
         </div>
 
@@ -2219,19 +2296,50 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       const leafletCont = document.getElementById('satellite-leaflet-map');
       const svgOverlay = document.getElementById('sat-svg-overlay');
       const legend = document.getElementById('ndvi-legend-bar');
+      const trendsView = document.getElementById('satellite-trends-view');
+      const radarScanline = document.getElementById('radar-scanline');
+      const pixelHud = document.getElementById('pixel-probe-hud');
+      const bottomBar = document.getElementById('sat-bottom-telemetry-bar');
+      const footerStandard = document.getElementById('footer-standard-mode');
+      const footerTrends = document.getElementById('footer-trends-mode');
       const apiBase = getApiBase();
 
-      if (layerName === 'map') {
+      if (layerName === 'trends') {
+        if (splitCompareActive) toggleCompareSplit();
         if (satImg) satImg.style.display = 'none';
         if (svgOverlay) svgOverlay.style.display = 'none';
+        if (leafletCont) leafletCont.style.display = 'none';
+        if (legend) legend.style.display = 'none';
+        if (radarScanline) radarScanline.style.display = 'none';
+        if (pixelHud) pixelHud.style.display = 'none';
+        if (bottomBar) bottomBar.style.display = 'none';
+        if (trendsView) trendsView.style.display = 'flex';
+        if (footerStandard) footerStandard.style.display = 'none';
+        if (footerTrends) footerTrends.style.display = 'flex';
+        renderStatisticalTrendsChart(currentRegionKey);
+      } else if (layerName === 'map') {
+        if (trendsView) trendsView.style.display = 'none';
+        if (satImg) satImg.style.display = 'none';
+        if (svgOverlay) svgOverlay.style.display = 'none';
+        if (radarScanline) radarScanline.style.display = 'none';
+        if (pixelHud) pixelHud.style.display = 'none';
+        if (bottomBar) bottomBar.style.display = 'flex';
         if (leafletCont) leafletCont.style.display = 'block';
         if (legend) legend.style.display = 'none';
+        if (footerStandard) footerStandard.style.display = 'flex';
+        if (footerTrends) footerTrends.style.display = 'none';
         initOrUpdateLeafletMap(currentRegionKey);
       } else {
+        if (trendsView) trendsView.style.display = 'none';
         if (leafletCont) leafletCont.style.display = 'none';
         if (satImg) satImg.style.display = 'block';
         if (svgOverlay) svgOverlay.style.display = 'block';
+        if (radarScanline) radarScanline.style.display = 'block';
+        if (pixelHud) pixelHud.style.display = 'block';
+        if (bottomBar) bottomBar.style.display = 'flex';
         if (legend) legend.style.display = (layerName === 'ndvi' || layerName === 'false-color') ? 'flex' : 'none';
+        if (footerStandard) footerStandard.style.display = 'flex';
+        if (footerTrends) footerTrends.style.display = 'none';
 
         // Load layer imagery
         const targetSrc = backendAvailable
@@ -2239,6 +2347,184 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
           : `assets/${currentRegionKey}_${layerName}.jpg`;
 
         satImg.src = targetSrc;
+      }
+    }
+
+    function toggleTrendsLayer() {
+      if (currentLayer === 'trends') {
+        switchSatelliteLayer('true-color');
+      } else {
+        switchSatelliteLayer('trends');
+      }
+    }
+
+    function renderStatisticalTrendsChart(regionKey) {
+      const data = REGIONS_DATA[regionKey] || REGIONS_DATA.mandya;
+      const history = data.history || [
+        { date: "04 Feb", ndvi: 0.68, height: "97%" },
+        { date: "09 Feb", ndvi: 0.66, height: "94%" },
+        { date: "14 Feb", ndvi: 0.63, height: "90%" },
+        { date: "19 Feb", ndvi: 0.61, height: "87%" },
+        { date: "24 Feb", ndvi: 0.58, height: "82%" }
+      ];
+
+      // Calculations
+      const currentNdvi = history[history.length - 1].ndvi;
+      const firstNdvi = history[0].ndvi;
+      const deltaPct = (((currentNdvi - firstNdvi) / firstNdvi) * 100).toFixed(1);
+      const meanNdvi = (history.reduce((sum, p) => sum + p.ndvi, 0) / history.length).toFixed(3);
+      let maxPoint = history[0];
+      history.forEach(p => {
+        if (p.ndvi > maxPoint.ndvi) maxPoint = p;
+      });
+
+      // Update KPIs
+      const kpiCurrent = document.getElementById('stat-kpi-current');
+      if (kpiCurrent) {
+        kpiCurrent.textContent = currentNdvi.toFixed(2);
+        kpiCurrent.className = `text-xs font-extrabold font-mono ${currentNdvi >= 0.65 ? 'text-emerald-400' : (currentNdvi >= 0.55 ? 'text-amber-400' : 'text-rose-400')}`;
+      }
+
+      const kpiDelta = document.getElementById('stat-kpi-delta');
+      if (kpiDelta) {
+        const deltaVal = parseFloat(deltaPct);
+        kpiDelta.textContent = (deltaVal > 0 ? '+' : '') + deltaPct + '%';
+        kpiDelta.className = `text-xs font-extrabold font-mono ${deltaVal >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+      }
+
+      const kpiMean = document.getElementById('stat-kpi-mean');
+      if (kpiMean) {
+        kpiMean.textContent = meanNdvi;
+      }
+
+      const kpiPeak = document.getElementById('stat-kpi-peak');
+      if (kpiPeak) {
+        kpiPeak.textContent = `${maxPoint.ndvi.toFixed(2)} (${maxPoint.date})`;
+      }
+
+      const titleEl = document.getElementById('trends-chart-title');
+      if (titleEl) {
+        titleEl.innerHTML = `Statistical NDVI Analytics • ${data.cropTitle || data.crop} <span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono">10m GSD</span>`;
+      }
+
+      const subEl = document.getElementById('trends-chart-subtitle');
+      if (subEl) {
+        subEl.textContent = `${data.plotTitle || data.parcel} • Sentinel-2 Multi-Temporal Orbital Pass`;
+      }
+
+      // Render Bar Columns into wrapper
+      const wrapper = document.getElementById('statistical-bars-wrapper');
+      if (wrapper) {
+        wrapper.innerHTML = history.map((pt, idx) => {
+          const isLatest = idx === history.length - 1;
+          const heightPct = Math.min(100, Math.max(12, Math.round(pt.ndvi * 100)));
+
+          let deltaStr = "Base";
+          let deltaColor = "text-white/50";
+          if (idx > 0) {
+            const prev = history[idx - 1].ndvi;
+            const stepDelta = (((pt.ndvi - prev) / prev) * 100).toFixed(1);
+            const numDelta = parseFloat(stepDelta);
+            deltaStr = (numDelta > 0 ? '+' : '') + stepDelta + '%';
+            deltaColor = numDelta >= 0 ? 'text-emerald-400' : 'text-rose-400';
+          }
+
+          let barBg = "bg-gradient-to-t from-emerald-600 via-emerald-500 to-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.3)]";
+          let valColor = "text-emerald-300";
+          if (pt.ndvi < 0.55) {
+            barBg = "bg-gradient-to-t from-rose-700 via-rose-600 to-rose-400 shadow-[0_0_8px_rgba(244,63,94,0.3)]";
+            valColor = "text-rose-300";
+          } else if (pt.ndvi < 0.65) {
+            barBg = "bg-gradient-to-t from-amber-600 via-amber-500 to-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.3)]";
+            valColor = "text-amber-300";
+          }
+
+          const highlightBorder = isLatest ? "ring-2 ring-white/90 ring-offset-1 ring-offset-slate-950 scale-105" : "hover:scale-105";
+
+          return `
+            <div class="flex-1 flex flex-col items-center h-full justify-end cursor-pointer group px-0.5" onclick="selectBarTelemetry('${regionKey}', ${idx})" title="${pt.date}: NDVI ${pt.ndvi}">
+              <!-- Value & Delta Header above bar -->
+              <div class="flex flex-col items-center mb-1 transition-transform group-hover:-translate-y-0.5">
+                <span class="text-[7.5px] font-mono font-semibold ${deltaColor}">${deltaStr}</span>
+                <span class="text-[9.5px] font-mono font-black ${valColor}">${pt.ndvi}</span>
+              </div>
+
+              <!-- Vertical Bar Track -->
+              <div class="w-full max-w-[28px] sm:max-w-[34px] flex items-end justify-center rounded-t-md transition-all duration-300 ${highlightBorder}" style="height: ${heightPct}%;">
+                <div class="w-full h-full rounded-t-md ${barBg} relative flex flex-col items-center justify-start pt-1">
+                  ${isLatest ? '<span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>' : ''}
+                </div>
+              </div>
+
+              <!-- X-Axis Labels below bar -->
+              <div class="flex flex-col items-center mt-1.5 select-none">
+                <span class="text-[8.5px] font-bold ${isLatest ? 'text-amber-300 font-extrabold' : 'text-white/80'}">${pt.date}</span>
+                <span class="text-[7px] font-mono ${isLatest ? 'text-amber-400' : 'text-white/40'}">${isLatest ? 'Latest' : `P-${idx + 1}`}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Automatically inspect the latest pass
+      selectBarTelemetry(regionKey, history.length - 1);
+    }
+
+    function selectBarTelemetry(regionKey, passIdx) {
+      const data = REGIONS_DATA[regionKey] || REGIONS_DATA.mandya;
+      const history = data.history || [];
+      if (!history[passIdx]) return;
+      const pt = history[passIdx];
+      const isLatest = passIdx === history.length - 1;
+
+      const titleEl = document.getElementById('telemetry-title');
+      const descEl = document.getElementById('telemetry-desc');
+      const badgeEl = document.getElementById('telemetry-badge');
+      const iconEl = document.getElementById('telemetry-icon');
+
+      const devFromBenchmark = (((pt.ndvi - 0.70) / 0.70) * 100).toFixed(1);
+      const devStr = devFromBenchmark >= 0 ? `+${devFromBenchmark}%` : `${devFromBenchmark}%`;
+
+      if (titleEl) {
+        titleEl.textContent = `Sentinel-2 Pass ${passIdx + 1} (${pt.date} 2024)`;
+      }
+
+      if (pt.ndvi >= 0.65) {
+        if (iconEl) {
+          iconEl.textContent = "check_circle";
+          iconEl.className = "material-symbols-outlined text-emerald-400 text-[16px]";
+        }
+        if (descEl) {
+          descEl.textContent = `NDVI ${pt.ndvi} (${devStr} vs 0.70 benchmark). Dense, vigorous vegetative canopy with balanced leaf moisture.`;
+        }
+        if (badgeEl) {
+          badgeEl.textContent = "Optimal Health";
+          badgeEl.className = "text-[9px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold shrink-0";
+        }
+      } else if (pt.ndvi >= 0.55) {
+        if (iconEl) {
+          iconEl.textContent = "warning";
+          iconEl.className = "material-symbols-outlined text-amber-400 text-[16px]";
+        }
+        if (descEl) {
+          descEl.textContent = isLatest && data.notice ? `NDVI ${pt.ndvi} (${devStr} vs benchmark). ${data.notice}` : `NDVI ${pt.ndvi} (${devStr} vs benchmark). Moderate vegetative canopy; monitor root moisture.`;
+        }
+        if (badgeEl) {
+          badgeEl.textContent = "Action Needed";
+          badgeEl.className = "text-[9px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold shrink-0";
+        }
+      } else {
+        if (iconEl) {
+          iconEl.textContent = "error";
+          iconEl.className = "material-symbols-outlined text-rose-400 text-[16px]";
+        }
+        if (descEl) {
+          descEl.textContent = `NDVI ${pt.ndvi} (${devStr} vs benchmark). High vegetative stress detected. Topsoil inspection advised immediately.`;
+        }
+        if (badgeEl) {
+          badgeEl.textContent = "High Stress";
+          badgeEl.className = "text-[9px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold shrink-0";
+        }
       }
     }
 
@@ -2901,24 +3187,13 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         alertMarker.setAttribute('transform', `translate(${data.alertMarker.cx - 210}, ${data.alertMarker.cy - 95})`);
       }
 
-      // Time series bars
-      const tsContainer = document.getElementById('ndvi-history-bars');
-      if (data.history && tsContainer) {
-        tsContainer.innerHTML = data.history.map((pt, idx) => {
-          const isCurrent = idx === data.history.length - 1;
-          const borderClass = isCurrent ? "border-2 border-tertiary-container" : "border border-surface-variant";
-          const barColor = isCurrent ? "bg-tertiary-container" : "bg-primary";
-          const textColor = isCurrent ? "text-tertiary font-bold" : "text-primary font-bold";
-          return `
-            <div class="bg-surface-container-lowest p-1 rounded-lg ${borderClass} flex flex-col items-center">
-              <span class="text-[9px] ${isCurrent ? 'font-bold text-tertiary' : 'text-secondary'}">${pt.date}</span>
-              <div class="w-full bg-primary/15 h-7 rounded-sm flex items-end justify-center my-0.5">
-                <div class="w-full ${barColor} rounded-sm" style="height: ${pt.height};"></div>
-              </div>
-              <span class="text-[10px] ${textColor}">${pt.ndvi}</span>
-            </div>
-          `;
-        }).join('');
+      // Statistical Trends Chart update
+      if (currentLayer === 'trends') {
+        renderStatisticalTrendsChart(regionKey);
+      }
+      const footerBenchmark = document.getElementById('ts-benchmark');
+      if (footerBenchmark) {
+        footerBenchmark.textContent = `Seasonal Benchmark: 0.70 • ${data.cropTitle || data.crop}`;
       }
 
       // Weather Card
