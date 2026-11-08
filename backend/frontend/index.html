@@ -58,6 +58,65 @@
       background-color: #005230 !important;
       color: #ffffff !important;
     }
+    /* Interface Mode Switching Styles (Mobile vs Desktop) */
+    .mode-desktop #header-inner {
+      max-width: 80rem !important; /* max-w-7xl */
+      padding-left: 1.5rem !important;
+      padding-right: 1.5rem !important;
+    }
+    .mode-desktop #main-content {
+      max-width: 80rem !important; /* max-w-7xl */
+      padding-left: 1.5rem !important;
+      padding-right: 1.5rem !important;
+      padding-bottom: 3.5rem !important;
+      border-left-width: 0 !important;
+      border-right-width: 0 !important;
+      box-shadow: none !important;
+    }
+    .mode-desktop #bottom-nav-bar {
+      display: none !important;
+    }
+    .mode-desktop #desktop-top-nav {
+      display: flex !important;
+    }
+    .mode-desktop #satellite-canvas {
+      height: 420px !important;
+    }
+    /* Centered Modals in Desktop Mode */
+    .mode-desktop .fixed.inset-0.z-50.flex.flex-col.justify-end {
+      justify-content: center !important;
+      align-items: center !important;
+      padding: 1.5rem !important;
+    }
+    .mode-desktop .fixed.inset-0.z-50 .rounded-t-3xl {
+      border-radius: 1.25rem !important;
+      max-width: 44rem !important;
+      max-height: 85vh !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35) !important;
+      border: 1px solid rgba(0, 82, 48, 0.15) !important;
+    }
+
+    /* Mobile Interface Mode */
+    .mode-mobile #header-inner {
+      max-width: 640px !important;
+    }
+    .mode-mobile #main-content {
+      max-width: 640px !important;
+      padding-bottom: 7rem !important; /* pb-28 */
+    }
+    @media (min-width: 768px) {
+      .mode-mobile #main-content {
+        border-left: 1px solid rgba(191, 201, 191, 0.5);
+        border-right: 1px solid rgba(191, 201, 191, 0.5);
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.08);
+      }
+    }
+    .mode-mobile #bottom-nav-bar {
+      display: block !important;
+    }
+    .mode-mobile #desktop-top-nav {
+      display: none !important;
+    }
   </style>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -163,9 +222,9 @@
 
   <!-- FIXED APP HEADER -->
   <header class="fixed top-0 inset-x-0 z-50 bg-surface/90 backdrop-blur-xl border-b border-surface-variant/60 shadow-[0_1px_6px_rgba(0,0,0,0.03)] pt-safe">
-    <div class="h-16 px-4 flex items-center justify-between gap-2 max-w-[640px] mx-auto">
+    <div id="header-inner" class="h-16 px-4 flex items-center justify-between gap-2 max-w-[640px] mx-auto transition-all duration-300">
       <!-- Brand Identity -->
-      <div class="flex items-center gap-2.5">
+      <div class="flex items-center gap-2.5 shrink-0">
         <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shrink-0 shadow-sm relative overflow-hidden">
           <svg class="w-7 h-7" fill="none" viewbox="0 0 24 24">
             <path d="M3 18 C 7 15, 12 21, 16 16 C 18 14, 20 15, 21 14" stroke="#a8f3c2" stroke-linecap="round" stroke-width="2.2"></path>
@@ -185,33 +244,65 @@
           </div>
         </div>
       </div>
-      <!-- Controls: Multi-language selector + Replay -->
-      <div class="flex items-center gap-1.5">
-        <div class="relative flex items-center">
-          <select class="appearance-none bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold pl-2.5 pr-6 py-2 rounded-full border border-surface-variant focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px] cursor-pointer" id="lang-selector" onchange="changeLanguage(this.value)">
-            <option selected="" value="en">English</option>
-            <option value="kn">ಕನ್ನಡ (Kannada)</option>
-            <option value="hi">हिन्दी (Hindi)</option>
-            <option value="te">తెలుగు (Telugu)</option>
-            <option value="ta">தமிழ் (Tamil)</option>
-            <option value="mr">मराठी (Marathi)</option>
-            <option value="bn">বাংলা (Bengali)</option>
-          </select>
-          <span class="material-symbols-outlined text-on-surface-variant text-[16px] absolute right-2 pointer-events-none">expand_more</span>
-        </div>
-        <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors min-h-[44px] min-w-[36px]" onclick="replaySplash()" title="Replay Brand Intro" type="button">
-          <span class="material-symbols-outlined text-[18px]">replay</span>
+
+      <!-- Desktop Top Nav Links (visible when in Desktop mode) -->
+      <nav id="desktop-top-nav" class="hidden items-center gap-1.5 mx-auto">
+        <button onclick="switchTab('home')" id="dtab-home" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-primary bg-surface-container transition-all cursor-pointer" type="button">
+          <span class="material-symbols-outlined text-[18px]">home</span>
+          <span>Home</span>
         </button>
+        <button onclick="switchTab('myfarm')" id="dtab-myfarm" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-secondary hover:text-primary hover:bg-surface-container transition-colors cursor-pointer" type="button">
+          <span class="material-symbols-outlined text-[18px]">agriculture</span>
+          <span>My Farm</span>
+        </button>
+        <button onclick="switchTab('advice')" id="dtab-advice" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-secondary hover:text-primary hover:bg-surface-container transition-colors cursor-pointer" type="button">
+          <span class="material-symbols-outlined text-[18px]">wb_incandescent</span>
+          <span>Advice</span>
+        </button>
+      </nav>
+
+      <!-- Center & Right Controls: Toggle Button + Language Selector + Replay -->
+      <div class="flex items-center gap-2 shrink-0">
+        <!-- Interface View Mode Toggle (Mobile vs Desktop) -->
+        <div class="flex items-center bg-surface-container/90 rounded-full p-1 border border-surface-variant shadow-xs shrink-0" id="interface-view-toggle" role="group" aria-label="Interface Mode">
+          <button id="toggle-mobile-btn" onclick="setViewMode('mobile', true)" type="button" class="flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-full text-xs font-bold transition-all bg-primary text-on-primary shadow-xs cursor-pointer" title="Switch to Mobile interface" aria-pressed="true">
+            <span class="material-symbols-outlined text-[16px]">smartphone</span>
+            <span id="label-mode-mobile" class="hidden min-[420px]:inline text-[11px] sm:text-xs">Mobile</span>
+          </button>
+          <button id="toggle-desktop-btn" onclick="setViewMode('desktop', true)" type="button" class="flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-full text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all cursor-pointer" title="Switch to Desktop interface" aria-pressed="false">
+            <span class="material-symbols-outlined text-[16px]">desktop_windows</span>
+            <span id="label-mode-desktop" class="hidden min-[420px]:inline text-[11px] sm:text-xs">Desktop</span>
+          </button>
+        </div>
+
+        <!-- Controls: Multi-language selector + Replay -->
+        <div class="flex items-center gap-1.5">
+          <div class="relative flex items-center">
+            <select class="appearance-none bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold pl-2.5 pr-6 py-2 rounded-full border border-surface-variant focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px] cursor-pointer" id="lang-selector" onchange="changeLanguage(this.value)">
+              <option selected="" value="en">English</option>
+              <option value="kn">ಕನ್ನಡ (Kannada)</option>
+              <option value="hi">हिन्दी (Hindi)</option>
+              <option value="te">తెలుగు (Telugu)</option>
+              <option value="ta">தமிழ் (Tamil)</option>
+              <option value="mr">मराठी (Marathi)</option>
+              <option value="bn">বাংলা (Bengali)</option>
+            </select>
+            <span class="material-symbols-outlined text-on-surface-variant text-[16px] absolute right-2 pointer-events-none">expand_more</span>
+          </div>
+          <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors min-h-[44px] min-w-[36px]" onclick="replaySplash()" title="Replay Brand Intro" type="button">
+            <span class="material-symbols-outlined text-[18px]">replay</span>
+          </button>
+        </div>
       </div>
     </div>
   </header>
 
   <!-- MAIN SCROLLABLE CONTENT -->
-  <main class="flex-1 flex flex-col relative w-full px-4 pt-20 pb-28 bg-surface max-w-[640px] mx-auto">
-    <div class="flex flex-col gap-4 w-full">
+  <main id="main-content" class="flex-1 flex flex-col relative w-full px-4 pt-20 pb-28 bg-surface max-w-[640px] mx-auto transition-all duration-300 sm:border-x sm:border-surface-variant/40 sm:shadow-[0_0_40px_rgba(0,0,0,0.06)]">
+    <div class="flex flex-col gap-4 w-full" id="main-sections-wrapper">
 
       <!-- TOP BANNER: HONEST PROTOTYPE DISCLOSURE -->
-      <div class="bg-surface-container-high border-l-4 border-primary rounded-r-xl p-2.5 flex items-start gap-2 shadow-sm text-xs text-on-surface-variant">
+      <div id="top-banner" class="bg-surface-container-high border-l-4 border-primary rounded-r-xl p-2.5 flex items-start gap-2 shadow-sm text-xs text-on-surface-variant">
         <span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">verified_user</span>
         <div>
           <span class="font-bold text-on-surface" id="banner-title">Prototype Demonstration Data</span>:
@@ -220,7 +311,7 @@
       </div>
 
       <!-- HERO HEADLINE & VALUE INTRO -->
-      <section class="flex flex-col gap-1 pt-1">
+      <section id="hero-section" class="flex flex-col gap-1 pt-1">
         <div class="inline-flex items-center gap-1.5 self-start px-2.5 py-0.5 rounded-full bg-surface-container text-primary text-[11px] font-semibold">
           <span class="material-symbols-outlined text-[14px]">satellite_alt</span>
           <span id="hero-tag">Space &amp; Weather Observations</span>
@@ -233,8 +324,11 @@
         </p>
       </section>
 
-      <!-- 2. DYNAMIC LIVE SATELLITE VIEWER -->
-      <div class="relative w-full rounded-2xl overflow-hidden bg-surface-container-lowest border border-surface-variant shadow-sm transition-all" id="satellite-card">
+      <!-- MOBILE SECTIONS CONTAINER (Linear Stack) -->
+      <div id="mobile-sections-container" class="flex flex-col gap-4 w-full">
+
+        <!-- 2. DYNAMIC LIVE SATELLITE VIEWER -->
+        <div class="relative w-full rounded-2xl overflow-hidden bg-surface-container-lowest border border-surface-variant shadow-sm transition-all" id="satellite-card">
         
         <!-- SATELLITE TOOLBAR: TELEMETRY & CONTROLS -->
         <div class="p-2.5 bg-surface-container-low border-b border-surface-variant flex flex-col gap-2">
@@ -473,7 +567,7 @@
       </div>
 
       <!-- 3. PAN-INDIA REACH & INTERACTIVE FARM SELECTOR -->
-      <section class="flex flex-col gap-2 bg-surface-container-low p-3.5 rounded-2xl border border-surface-variant/80">
+      <section id="farms-section" class="flex flex-col gap-2 bg-surface-container-low p-3.5 rounded-2xl border border-surface-variant/80">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="material-symbols-outlined text-primary text-[20px]">pin_drop</span>
@@ -531,7 +625,7 @@
       </section>
 
       <!-- 4. 3-STAGE EXPLAINABLE ADVISORY CARD -->
-      <section class="rounded-2xl bg-surface-container-lowest p-4 border border-tertiary-fixed shadow-sm flex flex-col gap-3">
+      <section id="advisory-section" class="rounded-2xl bg-surface-container-lowest p-4 border border-tertiary-fixed shadow-sm flex flex-col gap-3">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary-container text-on-tertiary-container text-xs font-bold" id="alert-badge-wrap">
             <span class="material-symbols-outlined text-[16px]">warning</span>
@@ -583,7 +677,7 @@
       </section>
 
       <!-- 5. THREE PRACTICAL ACTION TILES -->
-      <section class="flex flex-col gap-2.5">
+      <section id="actions-section" class="flex flex-col gap-2.5">
         <div class="flex items-center justify-between">
           <h3 class="text-base font-bold text-on-surface" id="tiles-header">Three Practical Field Actions</h3>
           <span class="text-xs text-secondary">Tap tile to inspect</span>
@@ -627,7 +721,7 @@
       </section>
 
       <!-- 6. 3-DAY WEATHER OUTLOOK -->
-      <section class="rounded-2xl bg-surface-container p-4 border border-surface-variant flex flex-col gap-3 shadow-sm">
+      <section id="weather-section" class="rounded-2xl bg-surface-container p-4 border border-surface-variant flex flex-col gap-3 shadow-sm">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-1.5">
             <span class="material-symbols-outlined text-primary text-[18px]">wb_sunny</span>
@@ -662,7 +756,7 @@
       </section>
 
       <!-- 7. FARMER CALL CENTRE SUPPORT & AUDIO ACCESS -->
-      <section class="rounded-2xl bg-surface-container-lowest p-4 border border-surface-variant shadow-sm flex flex-col gap-3">
+      <section id="support-section" class="rounded-2xl bg-surface-container-lowest p-4 border border-surface-variant shadow-sm flex flex-col gap-3">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container shrink-0">
             <span class="material-symbols-outlined text-[22px]">support_agent</span>
@@ -684,11 +778,22 @@
         </div>
       </section>
 
+      </div>
+      <!-- END MOBILE SECTIONS CONTAINER -->
+
+      <!-- DESKTOP GRID CONTAINER (2-Column Dashboard, activated in desktop mode) -->
+      <div id="desktop-grid-container" class="hidden grid-cols-1 lg:grid-cols-12 gap-6 w-full items-start">
+        <!-- Left Main Column (approx 7 of 12 cols, ~60%) -->
+        <div id="desktop-col-left" class="lg:col-span-7 xl:col-span-8 flex flex-col gap-5"></div>
+        <!-- Right Sidebar Column (approx 5 of 12 cols, ~40%) -->
+        <div id="desktop-col-right" class="lg:col-span-5 xl:col-span-4 flex flex-col gap-5"></div>
+      </div>
+
     </div>
   </main>
 
   <!-- 8. FIXED 3-ITEM BOTTOM NAVIGATION BAR -->
-  <nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface/90 backdrop-blur-xl border-t border-surface-variant shadow-[0_-2px_10px_rgba(0,0,0,0.04)]">
+  <nav id="bottom-nav-bar" class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface/90 backdrop-blur-xl border-t border-surface-variant shadow-[0_-2px_10px_rgba(0,0,0,0.04)]">
     <div class="flex justify-around items-center h-18 max-w-[480px] mx-auto px-2 py-1">
       <button class="flex flex-col items-center justify-center gap-0.5 min-w-[80px] h-14 rounded-xl font-bold text-primary bg-surface-container transition-all" id="tab-home" onclick="switchTab('home')">
         <span class="material-symbols-outlined text-[24px]">home</span>
@@ -1728,7 +1833,9 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         stage3: "3. What should I do next? (Action Steps)",
         markLand: "Mark Land",
         markingActive: "Manual Land Boundary Marking",
-        tapMap: "Tap on satellite map to place boundary corner pins for your field."
+        tapMap: "Tap on satellite map to place boundary corner pins for your field.",
+        modeMobile: "Mobile",
+        modeDesktop: "Desktop"
       },
       kn: {
         heroTitle: "ಸಮಸ್ಯೆಗಳು ಬೆಳೆಯುವ ಮುನ್ನ ನಿಮ್ಮ ಬೆಳೆಗಳನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಿ.",
@@ -1753,7 +1860,9 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         stage3: "೩. ಮುಂದೇನು ಮಾಡಬೇಕು? (ಮುಂದೇನು)",
         markLand: "ಜಮೀನು ಗುರುತಿಸಿ",
         markingActive: "ಕೈಯಾರೆ ಜಮೀನಿನ ಗಡಿ ಗುರುತಿಸುವಿಕೆ",
-        tapMap: "ನಿಮ್ಮ ಜಮೀನಿನ ಗಡಿ ಗುರುತಿಸಲು ಉಪಗ್ರಹ ನಕ್ಷೆಯ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ."
+        tapMap: "ನಿಮ್ಮ ಜಮೀನಿನ ಗಡಿ ಗುರುತಿಸಲು ಉಪಗ್ರಹ ನಕ್ಷೆಯ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ.",
+        modeMobile: "ಮೊಬೈಲ್",
+        modeDesktop: "ಡೆಸ್ಕ್‌ಟಾಪ್"
       },
       hi: {
         heroTitle: "समस्या बढ़ने से पहले अपनी फसल को समझें।",
@@ -1778,7 +1887,9 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         stage3: "3. आगे क्या करना चाहिए? (कदम)",
         markLand: "जमीन चिह्नित करें",
         markingActive: "खेत की सीमा का मैन्युअल अंकन",
-        tapMap: "अपने खेत के कोनों को चिह्नित करने के लिए मानचित्र पर टैप करें।"
+        tapMap: "अपने खेत के कोनों को चिह्नित करने के लिए मानचित्र पर टैप करें।",
+        modeMobile: "मोबाइल",
+        modeDesktop: "डेस्कटॉप"
       },
       te: {
         heroTitle: "సమస్యలు పెరగకముందే మీ పంటను అర్థం చేసుకోండి.",
@@ -1803,7 +1914,9 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         stage3: "3. తరువాత ఏమి చేయాలి? (చర్యలు)",
         markLand: "భూమిని గుర్తించండి",
         markingActive: "పొలం సరిహద్దు గుర్తింపు",
-        tapMap: "మీ పొలం సరిహద్దులను గుర్తించడానికి మ్యాప్‌పై క్లిక్ చేయండి."
+        tapMap: "మీ పొలం సరిహద్దులను గుర్తించడానికి మ్యాప్‌పై క్లిక్ చేయండి.",
+        modeMobile: "మొబైల్",
+        modeDesktop: "డెస్క్‌టాప్"
       },
       ta: {
         heroTitle: "பிரச்சனைகள் வளர்வதற்கு முன் உங்கள் பயிர்களை புரிந்து கொள்ளுங்கள்.",
@@ -1828,7 +1941,9 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         stage3: "3. அடுத்து என்ன செய்ய வேண்டும்? (நடவடிக்கை)",
         markLand: "நிலத்தை குறிக்கவும்",
         markingActive: "நில எல்லை குறித்தல்",
-        tapMap: "உங்கள் நிலத்தின் மூலைகளை குறிக்க வரைபடத்தில் தட்டவும்."
+        tapMap: "உங்கள் நிலத்தின் மூலைகளை குறிக்க வரைபடத்தில் தட்டவும்.",
+        modeMobile: "மொபைல்",
+        modeDesktop: "டெஸ்க்டாப்"
       },
       mr: {
         heroTitle: "समस्या वाढण्यापूर्वी तुमचे पीक समजून घ्या.",
@@ -1853,7 +1968,9 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         stage3: "3. पुढे काय करावे? (कृती)",
         markLand: "जमीन चिन्हांकित करा",
         markingActive: "शेत सीमा चिन्हांकन",
-        tapMap: "आपल्या शेताच्या सीमा आखण्यासाठी नकाशावर क्लिक करा."
+        tapMap: "आपल्या शेताच्या सीमा आखण्यासाठी नकाशावर क्लिक करा.",
+        modeMobile: "मोबाईल",
+        modeDesktop: "डेस्कटॉप"
       },
       bn: {
         heroTitle: "সমস্যা বাড়ার আগেই আপনার ফসলকে বুঝুন।",
@@ -1863,7 +1980,7 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         bannerText: "উপগ্রহ প্রতিফলন ও কৃষি আবহাওয়া পর্যবেক্ষণ। প্রয়োগের আগে সর্বদা মাঠের অবস্থা যাচাই করুন।",
         checkField: "আমার জমি যাচাই করুন",
         howItWorks: "এটি কীভাবে কাজ করে",
-        viewAdvice: "সম্পূর্ণ পরামর্শ দেখুন",
+        viewAdvice: "সম্পूर्ण পরামর্শ দেখুন",
         audioBtn: "ভয়েস পরামর্শ শুনুন (বাংলা)",
         tsTitle: "NDVI ২০-দিনের প্রবণতা (সেন্টিনেল-২)",
         tsBenchmark: "মৌসুমী মানদণ্ড: ০.৭০",
@@ -1878,7 +1995,9 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         stage3: "3. এরপর কী করা উচিত? (পদক্ষেপ)",
         markLand: "জমি চিহ্নিত করুন",
         markingActive: "জমির সীমানা চিহ্নিতকরণ",
-        tapMap: "আপনার জমির সীমানা চিহ্নিত করতে মানচিত্রে ক্লিক করুন।"
+        tapMap: "আপনার জমির সীমানা চিহ্নিত করতে মানচিত্রে ক্লিক করুন।",
+        modeMobile: "মোবাইল",
+        modeDesktop: "ডেস্কটপ"
       }
     };
 
@@ -2898,6 +3017,12 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       const hudTitle = document.getElementById('marker-hud-title');
       if (hudTitle) hudTitle.textContent = t.markingActive || "Manual Land Boundary Marking";
 
+      // Update Interface Mode Toggle Labels
+      const mobLabel = document.getElementById('label-mode-mobile');
+      if (mobLabel) mobLabel.textContent = t.modeMobile || "Mobile";
+      const deskLabel = document.getElementById('label-mode-desktop');
+      if (deskLabel) deskLabel.textContent = t.modeDesktop || "Desktop";
+
       // Re-trigger selectRegion to update localized advisory text
       selectRegion(currentRegionKey);
       if (typeof updateTwilioPreview === 'function') {
@@ -3262,14 +3387,28 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       const tabs = ['home', 'myfarm', 'advice'];
       tabs.forEach(t => {
         const el = document.getElementById('tab-' + t);
-        if (t === tab) {
-          el.className = "flex flex-col items-center justify-center gap-0.5 min-w-[80px] h-14 rounded-xl font-bold text-primary bg-surface-container transition-all";
-        } else {
-          el.className = "flex flex-col items-center justify-center gap-0.5 min-w-[80px] h-14 rounded-xl font-medium text-secondary hover:text-primary transition-all";
+        if (el) {
+          if (t === tab) {
+            el.className = "flex flex-col items-center justify-center gap-0.5 min-w-[80px] h-14 rounded-xl font-bold text-primary bg-surface-container transition-all";
+          } else {
+            el.className = "flex flex-col items-center justify-center gap-0.5 min-w-[80px] h-14 rounded-xl font-medium text-secondary hover:text-primary transition-all";
+          }
+        }
+        const del = document.getElementById('dtab-' + t);
+        if (del) {
+          if (t === tab) {
+            del.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-primary bg-surface-container transition-all cursor-pointer";
+          } else {
+            del.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-secondary hover:text-primary hover:bg-surface-container transition-colors cursor-pointer";
+          }
         }
       });
 
-      if (tab === 'myfarm') {
+      if (tab === 'home') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        closeModal('fieldModal');
+        closeModal('adviceModal');
+      } else if (tab === 'myfarm') {
         openModal('fieldModal');
       } else if (tab === 'advice') {
         openModal('adviceModal');
@@ -3598,8 +3737,157 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       showToast("Farm Removed", `${name} has been deleted`);
     }
 
+    // Interface Mode Switching (Mobile vs Desktop)
+    let currentViewMode = 'mobile';
+
+    function setViewMode(mode, userInitiated = false) {
+      if (mode !== 'mobile' && mode !== 'desktop') mode = 'mobile';
+      currentViewMode = mode;
+      const isDesktop = (mode === 'desktop');
+      const htmlEl = document.documentElement;
+      const bodyEl = document.body;
+
+      if (isDesktop) {
+        htmlEl.classList.remove('mode-mobile');
+        htmlEl.classList.add('mode-desktop');
+        bodyEl.classList.remove('mode-mobile');
+        bodyEl.classList.add('mode-desktop');
+      } else {
+        htmlEl.classList.remove('mode-desktop');
+        htmlEl.classList.add('mode-mobile');
+        bodyEl.classList.remove('mode-desktop');
+        bodyEl.classList.add('mode-mobile');
+      }
+
+      // Update Header Inner Container Classes
+      const headerInner = document.getElementById('header-inner');
+      if (headerInner) {
+        if (isDesktop) {
+          headerInner.className = "h-16 px-4 sm:px-6 flex items-center justify-between gap-3 max-w-7xl mx-auto transition-all duration-300";
+        } else {
+          headerInner.className = "h-16 px-4 flex items-center justify-between gap-2 max-w-[640px] mx-auto transition-all duration-300";
+        }
+      }
+
+      // Update Main Content Container Classes
+      const mainContent = document.getElementById('main-content');
+      if (mainContent) {
+        if (isDesktop) {
+          mainContent.className = "flex-1 flex flex-col relative w-full px-4 sm:px-6 pt-20 pb-12 bg-surface max-w-7xl mx-auto transition-all duration-300";
+        } else {
+          mainContent.className = "flex-1 flex flex-col relative w-full px-4 pt-20 pb-28 bg-surface max-w-[640px] mx-auto transition-all duration-300 sm:border-x sm:border-surface-variant/40 sm:shadow-[0_0_40px_rgba(0,0,0,0.06)]";
+        }
+      }
+
+      // Update Navigation Bars Visibility
+      const bottomNav = document.getElementById('bottom-nav-bar');
+      if (bottomNav) {
+        bottomNav.style.display = isDesktop ? 'none' : 'block';
+      }
+      const desktopTopNav = document.getElementById('desktop-top-nav');
+      if (desktopTopNav) {
+        if (isDesktop) {
+          desktopTopNav.classList.remove('hidden');
+          desktopTopNav.classList.add('flex');
+        } else {
+          desktopTopNav.classList.add('hidden');
+          desktopTopNav.classList.remove('flex');
+        }
+      }
+
+      // Toggle Buttons Styling & Accessibility
+      const mobileBtn = document.getElementById('toggle-mobile-btn');
+      const desktopBtn = document.getElementById('toggle-desktop-btn');
+      if (mobileBtn && desktopBtn) {
+        if (isDesktop) {
+          desktopBtn.className = "flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-full text-xs font-bold transition-all bg-primary text-on-primary shadow-xs cursor-pointer";
+          desktopBtn.setAttribute('aria-pressed', 'true');
+          mobileBtn.className = "flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-full text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all cursor-pointer";
+          mobileBtn.setAttribute('aria-pressed', 'false');
+        } else {
+          mobileBtn.className = "flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-full text-xs font-bold transition-all bg-primary text-on-primary shadow-xs cursor-pointer";
+          mobileBtn.setAttribute('aria-pressed', 'true');
+          desktopBtn.className = "flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-full text-xs font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all cursor-pointer";
+          desktopBtn.setAttribute('aria-pressed', 'false');
+        }
+      }
+
+      // Rearrange Dashboard Sections between Mobile Stack and Desktop Grid
+      const satCard = document.getElementById('satellite-card');
+      const farmsSec = document.getElementById('farms-section');
+      const advSec = document.getElementById('advisory-section');
+      const actSec = document.getElementById('actions-section');
+      const weaSec = document.getElementById('weather-section');
+      const supSec = document.getElementById('support-section');
+
+      const mobileCont = document.getElementById('mobile-sections-container');
+      const desktopCont = document.getElementById('desktop-grid-container');
+      const colLeft = document.getElementById('desktop-col-left');
+      const colRight = document.getElementById('desktop-col-right');
+
+      if (mobileCont && desktopCont && colLeft && colRight) {
+        if (isDesktop) {
+          mobileCont.classList.add('hidden');
+          mobileCont.classList.remove('flex');
+          desktopCont.classList.remove('hidden');
+          desktopCont.classList.add('grid');
+
+          if (satCard) colLeft.appendChild(satCard);
+          if (weaSec) colLeft.appendChild(weaSec);
+          if (supSec) colLeft.appendChild(supSec);
+
+          if (farmsSec) colRight.appendChild(farmsSec);
+          if (advSec) colRight.appendChild(advSec);
+          if (actSec) colRight.appendChild(actSec);
+        } else {
+          desktopCont.classList.add('hidden');
+          desktopCont.classList.remove('grid');
+          mobileCont.classList.remove('hidden');
+          mobileCont.classList.add('flex');
+
+          if (satCard) mobileCont.appendChild(satCard);
+          if (farmsSec) mobileCont.appendChild(farmsSec);
+          if (advSec) mobileCont.appendChild(advSec);
+          if (actSec) mobileCont.appendChild(actSec);
+          if (weaSec) mobileCont.appendChild(weaSec);
+          if (supSec) mobileCont.appendChild(supSec);
+        }
+      }
+
+      // Sizing for Satellite Viewport
+      const satCanvas = document.getElementById('satellite-canvas');
+      if (satCanvas) {
+        satCanvas.style.height = isDesktop ? '420px' : '';
+      }
+
+      // Invalidate Leaflet map size so it fits the new container dimensions
+      if (leafletMap) {
+        setTimeout(() => {
+          try { leafletMap.invalidateSize(); } catch (e) {}
+        }, 200);
+      }
+
+      // Persist to localStorage
+      try {
+        localStorage.setItem('earthworm_view_mode', mode);
+      } catch (e) {}
+
+      // User feedback notification
+      if (userInitiated) {
+        const title = isDesktop ? "Desktop Interface Activated" : "Mobile Interface Activated";
+        const subtitle = isDesktop 
+          ? "Switched to expansive multi-column dashboard with top navigation" 
+          : "Switched to clean single-column mobile view with bottom navigation";
+        showToast(title, subtitle);
+      }
+    }
+
     // Startup Initialization
     window.addEventListener('DOMContentLoaded', async () => {
+      // Initialize view mode from localStorage or screen width
+      const savedMode = localStorage.getItem('earthworm_view_mode') || 'mobile';
+      setViewMode(savedMode, false);
+
       await checkBackendHealth();
       loadCustomFarms();
       await selectRegion('mandya');
@@ -3614,6 +3902,17 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       } catch (e) {}
 
       setTimeout(() => { dismissSplash(); }, 1800);
+    });
+
+    // Keyboard shortcut (Alt+M / Alt+D) to switch interface mode
+    window.addEventListener('keydown', (e) => {
+      if (e.altKey && (e.key === 'm' || e.key === 'M')) {
+        e.preventDefault();
+        setViewMode('mobile', true);
+      } else if (e.altKey && (e.key === 'd' || e.key === 'D')) {
+        e.preventDefault();
+        setViewMode('desktop', true);
+      }
     });
   </script>
 </body>
