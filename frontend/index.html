@@ -3058,6 +3058,21 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       return data.sms || "[EARTHWORM-AGRI] Field advisory update.";
     }
 
+    let currentSpeechUtterance = null;
+    let speechHeartbeatTimer = null;
+
+    // Prime SpeechSynthesis voices list immediately
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.getVoices();
+        if (window.speechSynthesis.onvoiceschanged !== undefined) {
+          window.speechSynthesis.onvoiceschanged = () => {
+            try { window.speechSynthesis.getVoices(); } catch (e) {}
+          };
+        }
+      } catch (e) {}
+    }
+
     async function toggleAudioAdvice() {
       if (isSpeaking) {
         stopAudioAdvice();
@@ -3066,93 +3081,150 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
 
       const textToSpeak = getActiveVoiceTranscript();
       const langConfig = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
-      const apiBase = getApiBase();
+      const langTag = langConfig.speechLang || currentLang.toUpperCase();
 
       // Show enhanced Audio Toast bar immediately
-      showAudioBar(`Natural Human Speech • ${langConfig.speechLang || currentLang.toUpperCase()}`, textToSpeak);
-      setAudioPlayState(true);
+      showAudioBar(`Voice Advisory • ${langTag}`, textToSpeak);
 
-      const encodedText = encodeURIComponent(textToSpeak);
-      const urlCandidates = [
-        `${apiBase}/api/communications/speak?language=${currentLang}&farm_id=${currentRegionKey}&text=${encodedText}&t=${Date.now()}`,
-        `http://127.0.0.1:8080/api/communications/speak?language=${currentLang}&farm_id=${currentRegionKey}&text=${encodedText}&t=${Date.now()}`,
-        `${apiBase}/api/communications/speak?language=${currentLang}&farm_id=${currentRegionKey}&t=${Date.now()}`,
-        `http://127.0.0.1:8080/api/communications/speak?language=${currentLang}&farm_id=${currentRegionKey}&t=${Date.now()}`
-      ];
-
-      const uniqueUrls = [...new Set(urlCandidates)];
       let playedSuccessfully = false;
 
-      for (const targetUrl of uniqueUrls) {
-        try {
-          if (!audioPlayer) {
-            audioPlayer = new Audio();
-          }
-          audioPlayer.src = targetUrl;
-          audioPlayer.playbackRate = audioPlaybackRate;
+      // 1. If backend API is actively running and connected, attempt high-fidelity neural MP3 stream
+      if (backendAvailable) {
+        const apiBase = getApiBase();
+        const encodedText = encodeURIComponent(textToSpeak);
+        const urlCandidates = [
+          `${apiBase}/api/communications/speak?language=${currentLang}&farm_id=${currentRegionKey}&text=${encodedText}&t=${Date.now()}`,
+          `${apiBase}/api/communications/speak?language=${currentLang}&farm_id=${currentRegionKey}&t=${Date.now()}`
+        ];
 
-          audioPlayer.onplay = () => setAudioPlayState(true);
-          audioPlayer.onended = () => stopAudioAdvice();
+        for (const targetUrl of urlCandidates) {
+          try {
+            if (!audioPlayer) {
+              audioPlayer = new Audio();
+            }
+            audioPlayer.src = targetUrl;
+            audioPlayer.playbackRate = audioPlaybackRate;
 
-          await audioPlayer.play();
-          playedSuccessfully = true;
-          break;
-        } catch (err) {
-          if (err && err.name === 'AbortError') {
-            // User clicked pause/stop intentionally
-            return;
+            audioPlayer.onplay = () => setAudioPlayState(true);
+            audioPlayer.onended = () => stopAudioAdvice();
+            audioPlayer.onerror = () => {};
+
+            await audioPlayer.play();
+            setAudioPlayState(true);
+            playedSuccessfully = true;
+            break;
+          } catch (err) {
+            if (err && err.name === 'AbortError') return;
+            console.warn("Backend audio stream failed, falling back to local speech:", targetUrl, err);
           }
-          console.warn("Audio stream attempt failed:", targetUrl, err);
         }
       }
 
-      if (!playedSuccessfully && !isSpeaking) {
+      // 2. If backend is offline or network audio stream failed, play via Web Speech Synthesis (works 100% offline)
+      if (!playedSuccessfully) {
         fallbackWebSpeech(textToSpeak, currentLang);
-      }
-    }
-
-    function fallbackDirectAudio(text, lang) {
-      try {
-        const targetLang = lang.toLowerCase();
-        const shortText = text.length > 140 ? text.substring(0, 140) : text;
-        const directUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${targetLang}&q=${encodeURIComponent(shortText)}`;
-        if (!audioPlayer) audioPlayer = new Audio();
-        audioPlayer.src = directUrl;
-        audioPlayer.playbackRate = audioPlaybackRate;
-        audioPlayer.onended = () => stopAudioAdvice();
-        audioPlayer.onerror = () => fallbackWebSpeech(text, lang);
-        audioPlayer.play().catch(() => fallbackWebSpeech(text, lang));
-      } catch (e) {
-        fallbackWebSpeech(text, lang);
       }
     }
 
     function fallbackWebSpeech(text, lang) {
       if (!('speechSynthesis' in window)) {
-        showToast("Audio unavailable", text.substring(0, 60));
+        showToast("Audio unavailable", "Speech synthesis is not supported on this browser.");
         stopAudioAdvice();
         return;
       }
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
+
+      // Cancel any ongoing speech and ensure synthesis engine is active
+      try {
+        window.speechSynthesis.cancel();
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
+      } catch (e) {}
+
       const langConfig = TRANSLATIONS[lang] || TRANSLATIONS.en;
-      utterance.lang = langConfig.speechLang || 'en-IN';
-      utterance.rate = 0.92;
+      const targetLang = langConfig.speechLang || 'en-IN';
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = targetLang;
+      utterance.rate = audioPlaybackRate || 0.95;
       utterance.pitch = 1.0;
 
-      // Select best non-robotic voice from installed voices
-      if (speechSynthesis.onvoiceschanged !== undefined) {
-        speechSynthesis.onvoiceschanged = () => {};
-      }
-      const voices = window.speechSynthesis.getVoices();
-      const bestVoice = voices.find(v => v.lang.startsWith(lang) && !v.name.includes("Desktop"))
-                     || voices.find(v => v.lang.includes("IN"))
-                     || voices.find(v => v.lang.startsWith(lang));
-      if (bestVoice) utterance.voice = bestVoice;
+      // Select matching voice
+      const voices = window.speechSynthesis.getVoices() || [];
+      if (voices.length > 0) {
+        const langLower = lang.toLowerCase();
+        const targetLower = targetLang.toLowerCase();
 
-      utterance.onend = () => stopAudioAdvice();
-      utterance.onerror = () => stopAudioAdvice();
-      window.speechSynthesis.speak(utterance);
+        // Find best match: exact lang match > language prefix match > Indian regional match > English fallback
+        const bestVoice = voices.find(v => v.lang && v.lang.toLowerCase() === targetLower)
+                       || voices.find(v => v.lang && v.lang.toLowerCase().startsWith(langLower))
+                       || voices.find(v => v.lang && (v.lang.toLowerCase().includes("in") || v.name.toLowerCase().includes("india")))
+                       || voices.find(v => v.lang && v.lang.toLowerCase().startsWith("en"))
+                       || voices[0];
+
+        if (bestVoice) {
+          utterance.voice = bestVoice;
+        }
+      }
+
+      // Keep strong reference on window to prevent Chrome V8 garbage-collection bug
+      currentSpeechUtterance = utterance;
+      window._activeSpeechUtterance = utterance;
+
+      utterance.onstart = () => {
+        setAudioPlayState(true);
+
+        // Chrome 15-second speech synthesis pause workaround
+        clearInterval(speechHeartbeatTimer);
+        speechHeartbeatTimer = setInterval(() => {
+          if (isSpeaking && 'speechSynthesis' in window) {
+            window.speechSynthesis.pause();
+            window.speechSynthesis.resume();
+          } else {
+            clearInterval(speechHeartbeatTimer);
+          }
+        }, 12000);
+      };
+
+      utterance.onend = () => {
+        clearInterval(speechHeartbeatTimer);
+        currentSpeechUtterance = null;
+        window._activeSpeechUtterance = null;
+        stopAudioAdvice();
+      };
+
+      utterance.onerror = (e) => {
+        clearInterval(speechHeartbeatTimer);
+        console.warn("SpeechSynthesis error:", e);
+
+        // If specific regional voice is missing on the OS, retry once with default system voice
+        if (e.error === 'language-unavailable' || e.error === 'voice-unavailable' || e.error === 'not-allowed') {
+          console.info("Retrying advisory with default browser voice...");
+          try {
+            const fallbackUtterance = new SpeechSynthesisUtterance(text);
+            fallbackUtterance.rate = audioPlaybackRate || 0.95;
+            fallbackUtterance.onstart = () => setAudioPlayState(true);
+            fallbackUtterance.onend = () => stopAudioAdvice();
+            fallbackUtterance.onerror = () => stopAudioAdvice();
+            window._activeSpeechUtterance = fallbackUtterance;
+            window.speechSynthesis.speak(fallbackUtterance);
+            return;
+          } catch (retryErr) {}
+        }
+
+        currentSpeechUtterance = null;
+        window._activeSpeechUtterance = null;
+        stopAudioAdvice();
+      };
+
+      setAudioPlayState(true);
+
+      try {
+        window.speechSynthesis.speak(utterance);
+      } catch (err) {
+        console.error("speechSynthesis.speak failed:", err);
+        stopAudioAdvice();
+      }
     }
 
     function setAudioPlayState(playing) {
@@ -3173,13 +3245,20 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
     }
 
     function stopAudioAdvice() {
+      clearInterval(speechHeartbeatTimer);
       if (audioPlayer) {
-        audioPlayer.pause();
-        audioPlayer.currentTime = 0;
+        try {
+          audioPlayer.pause();
+          audioPlayer.currentTime = 0;
+        } catch (e) {}
       }
       if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
+        try {
+          window.speechSynthesis.cancel();
+        } catch (e) {}
       }
+      currentSpeechUtterance = null;
+      window._activeSpeechUtterance = null;
       setAudioPlayState(false);
       const toast = document.getElementById('audioToast');
       if (toast) toast.classList.add('hidden');
@@ -3192,6 +3271,12 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       if (audioPlayer) audioPlayer.playbackRate = audioPlaybackRate;
       const btn = document.getElementById('audioSpeedBtn');
       if (btn) btn.textContent = `${audioPlaybackRate}x`;
+
+      // If currently speaking via speechSynthesis, restart with new rate
+      if (isSpeaking && !audioPlayer?.duration && 'speechSynthesis' in window) {
+        const textToSpeak = getActiveVoiceTranscript();
+        fallbackWebSpeech(textToSpeak, currentLang);
+      }
     }
 
     function showAudioBar(title, subtitle) {
