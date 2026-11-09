@@ -703,36 +703,30 @@
         </div>
       </section>
 
-      <!-- 4. 3-STAGE EXPLAINABLE ADVISORY CARD -->
-      <section id="advisory-section" class="rounded-2xl bg-surface-container-lowest p-4 border border-tertiary-fixed shadow-sm flex flex-col gap-3">
+      <!-- 4. CONCISE ADVISORY CARD (CLEAN & ACTIONABLE PREVIEW - FULL EXPLANATION IN DEDICATED ADVICE TAB) -->
+      <section id="advisory-section" class="rounded-2xl bg-surface-container-lowest p-4 border border-surface-variant shadow-sm flex flex-col gap-3">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary-container text-on-tertiary-container text-xs font-bold" id="alert-badge-wrap">
             <span class="material-symbols-outlined text-[16px]">warning</span>
             <span id="alert-badge">ATTENTION • ACTION RECOMMENDED</span>
           </div>
-          <span class="text-[10px] font-semibold text-secondary bg-surface-container px-2 py-0.5 rounded">Reference Agromet</span>
+          <span class="text-[10px] font-semibold text-secondary bg-surface-container px-2 py-0.5 rounded">Agromet Summary</span>
         </div>
         <div class="flex flex-col gap-1">
-          <h2 class="text-lg font-bold text-on-surface" id="advisory-title">Field Needs Inspection: Canopy Moisture Change</h2>
-          <p class="text-sm text-on-surface-variant leading-relaxed" id="advisory-desc">
+          <h2 class="text-base sm:text-lg font-bold text-on-surface" id="advisory-title">Field Needs Inspection: Canopy Moisture Change</h2>
+          <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed" id="advisory-desc">
             Status: Possible change in vegetative reflectance detected in the North-East zone. Requires physical ground verification before scheduling irrigation or chemical treatments.
           </p>
         </div>
 
-        <!-- 3-STAGE BREAKDOWN RIGHT ON THE CARD -->
-        <div class="space-y-2 bg-surface-container-low p-3 rounded-xl border border-surface-variant text-xs">
-          <div>
-            <span class="font-bold text-primary block" id="card-stage1-header">1. What did we notice? (Observation)</span>
-            <span class="text-on-surface-variant" id="card-notice">Vegetation index (NDVI) shows a localized drop of 12% in the North-East quarter.</span>
-          </div>
-          <div>
-            <span class="font-bold text-secondary block" id="card-stage2-header">2. What could it mean? (Interpretation)</span>
-            <span class="text-on-surface-variant" id="card-meaning">Possible uneven subsoil water percolation or clogged drip line.</span>
-          </div>
-          <div>
-            <span class="font-bold text-tertiary block" id="card-stage3-header">3. What should I do next? (Action Steps)</span>
-            <span class="text-on-surface-variant" id="card-action">Walk along NE boundary and press soil by hand to check moisture depth.</span>
-          </div>
+        <!-- Hidden container preserving ID bindings for scripts & language switches -->
+        <div class="hidden" aria-hidden="true">
+          <span id="card-stage1-header"></span>
+          <span id="card-notice"></span>
+          <span id="card-stage2-header"></span>
+          <span id="card-meaning"></span>
+          <span id="card-stage3-header"></span>
+          <span id="card-action"></span>
         </div>
 
         <div class="flex items-center gap-3 p-2.5 rounded-xl bg-surface-container text-xs text-on-surface">
@@ -748,7 +742,7 @@
             <span class="material-symbols-outlined text-[18px]">fact_check</span>
             <span id="btn-view-advice">View Full Advice</span>
           </button>
-          <button class="min-h-[48px] px-4 rounded-xl bg-surface-container hover:bg-surface-variant text-primary font-semibold text-sm flex items-center justify-center gap-1.5 transition-colors" id="btn-audio-voice" onclick="toggleAudioAdvice()" type="button">
+          <button class="min-h-[48px] px-4 rounded-xl bg-surface-container hover:bg-surface-variant text-primary font-semibold text-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer" id="btn-audio-voice" onclick="toggleAudioAdvice()" type="button">
             <span class="material-symbols-outlined text-[18px]" id="audio-icon">volume_up</span>
             <span id="btn-audio-listen">Listen Voice Advice</span>
           </button>
@@ -1018,7 +1012,7 @@
               1
             </div>
             <div>
-              <h3 class="text-sm sm:text-base font-bold text-on-surface" id="adv-section1-title">What Did the Satellite Detect? — Detailed Spectral Physics</h3>
+              <h3 class="text-sm sm:text-base font-bold text-on-surface" id="adv-section1-title">What Did the Satellite Detect? — Canopy Vigor Analysis</h3>
               <p class="text-[11px] text-secondary">Copernicus Sentinel-2 Band 8 (NIR) &amp; Band 4 (Red) Reflectance Diagnostics</p>
             </div>
           </div>
@@ -1078,8 +1072,8 @@
               2
             </div>
             <div>
-              <h3 class="text-sm sm:text-base font-bold text-on-surface" id="adv-section2-title">Why Is This Happening? — Soil Hydrology &amp; Diagnostic Hypotheses</h3>
-              <p class="text-[11px] text-secondary">Agronomic Root-Zone Physics &amp; Ranked Probability Assessment</p>
+              <h3 class="text-sm sm:text-base font-bold text-on-surface" id="adv-section2-title">Why Is This Happening? — Root-Zone &amp; Field Cause Analysis</h3>
+              <p class="text-[11px] text-secondary">Agronomic Root-Zone Assessment &amp; Practical Field Causes</p>
             </div>
           </div>
 
