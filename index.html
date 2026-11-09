@@ -738,9 +738,9 @@
         </div>
 
         <div class="flex flex-col sm:flex-row gap-2 pt-1">
-          <button class="flex-1 min-h-[48px] rounded-xl bg-primary text-on-primary font-semibold text-sm flex items-center justify-center gap-2 active:bg-primary-container shadow-sm transition-colors cursor-pointer" onclick="switchTab('advice')" type="button">
-            <span class="material-symbols-outlined text-[18px]">fact_check</span>
-            <span id="btn-view-advice">View Full Advice</span>
+          <button class="flex-1 min-h-[48px] rounded-xl bg-primary text-on-primary font-semibold text-sm flex items-center justify-center gap-2 active:bg-primary-container shadow-sm transition-colors cursor-pointer" onclick="openBriefAdviceModal()" type="button" id="btn-brief-advice-trigger">
+            <span class="material-symbols-outlined text-[18px]">summarize</span>
+            <span id="btn-view-advice">View Advice (Brief)</span>
           </button>
           <button class="min-h-[48px] px-4 rounded-xl bg-surface-container hover:bg-surface-variant text-primary font-semibold text-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer" id="btn-audio-voice" onclick="toggleAudioAdvice()" type="button">
             <span class="material-symbols-outlined text-[18px]" id="audio-icon">volume_up</span>
@@ -1741,50 +1741,92 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
 
   <!-- Modal: Full Advisory Details -->
   <div class="fixed inset-0 z-50 bg-inverse-surface/50 backdrop-blur-xs flex flex-col justify-end hidden opacity-0 transition-opacity duration-200" id="adviceModal">
-    <div class="w-full max-w-[640px] mx-auto bg-surface-container-lowest rounded-t-3xl p-5 flex flex-col gap-4 max-h-[88vh] overflow-y-auto">
+    <div class="w-full max-w-[640px] mx-auto bg-surface-container-lowest rounded-t-3xl p-5 flex flex-col gap-4 max-h-[88vh] overflow-y-auto shadow-2xl">
+      <!-- Modal Header -->
       <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-primary text-[24px]">assignment</span>
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[24px]">summarize</span>
+          </div>
           <div>
-            <h3 class="text-base font-bold text-on-surface">Agronomic Advisory Notice</h3>
-            <p class="text-[11px] text-secondary">Demonstration Advisory Protocol</p>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <h3 class="text-base font-bold text-on-surface">Field Advice (Brief Summary)</h3>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-surface-container text-secondary border border-surface-variant">Quick Brief</span>
+            </div>
+            <p class="text-[11px] text-secondary">Immediate field-level key takeaways &amp; actions</p>
           </div>
         </div>
-        <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface" onclick="closeModal('adviceModal')" type="button">
+        <button class="w-9 h-9 rounded-full bg-surface-container hover:bg-surface-variant flex items-center justify-center text-on-surface transition-colors cursor-pointer" onclick="closeModal('adviceModal')" type="button">
           <span class="material-symbols-outlined text-[20px]">close</span>
         </button>
       </div>
+
+      <!-- Active Field Badge -->
+      <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-low border border-surface-variant text-xs">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-[18px]">agriculture</span>
+          <span class="font-bold text-on-surface" id="advice-modal-field-tag">Mandya (Paddy) • Parcel #142/A</span>
+        </div>
+        <span class="text-[11px] font-bold text-amber-600 bg-amber-500/10 px-2 py-0.5 rounded" id="advice-modal-metric-tag">NDVI: 0.58</span>
+      </div>
+
+      <!-- 3 Brief Takeaways -->
       <div class="space-y-2.5">
         <div class="p-3 bg-surface-container-low rounded-xl border border-surface-variant">
-          <span class="text-xs font-bold text-primary block mb-1" id="advice-stage1-header">1. What did we notice? (Observation)</span>
-          <p class="text-xs text-on-surface-variant leading-relaxed" id="advice-notice-body">
+          <span class="text-xs font-bold text-primary flex items-center gap-1.5 mb-1" id="advice-stage1-header">
+            <span class="w-2 h-2 rounded-full bg-primary"></span>
+            <span>1. What did we notice? (Observation)</span>
+          </span>
+          <p class="text-xs text-on-surface-variant leading-relaxed pl-3.5" id="advice-notice-body">
             Canopy moisture index reflectance anomaly in North-East quadrant. Vegetative baseline index: 0.58 vs 0.70 benchmark.
           </p>
         </div>
         <div class="p-3 bg-surface-container-low rounded-xl border border-surface-variant">
-          <span class="text-xs font-bold text-primary block mb-1" id="advice-stage2-header">2. What could it mean? (Interpretation)</span>
-          <p class="text-xs text-on-surface-variant leading-relaxed" id="advice-meaning-body">
+          <span class="text-xs font-bold text-secondary flex items-center gap-1.5 mb-1" id="advice-stage2-header">
+            <span class="w-2 h-2 rounded-full bg-secondary"></span>
+            <span>2. What could it mean? (Interpretation)</span>
+          </span>
+          <p class="text-xs text-on-surface-variant leading-relaxed pl-3.5" id="advice-meaning-body">
             Topsoil drying due to sunny 31°C afternoon exposure and lack of surface mulch, or potential root aeration blockage.
           </p>
         </div>
         <div class="p-3 bg-surface-container-low rounded-xl border border-surface-variant">
-          <span class="text-xs font-bold text-primary block mb-1" id="advice-stage3-header">3. What should I do next? (Action Steps)</span>
-          <ul class="text-xs text-on-surface-variant list-disc pl-4 space-y-1" id="advice-steps-list">
+          <span class="text-xs font-bold text-tertiary flex items-center gap-1.5 mb-1" id="advice-stage3-header">
+            <span class="w-2 h-2 rounded-full bg-tertiary"></span>
+            <span>3. What should I do next? (Action Steps)</span>
+          </span>
+          <ul class="text-xs text-on-surface-variant list-disc pl-7 space-y-1" id="advice-steps-list">
             <li>Walk to the North-East boundary and press soil by hand to check moisture depth.</li>
             <li>Inspect crop stems for yellowing or fungal lesions.</li>
             <li>If top 5 cm is dry, irrigate in late afternoon when evaporation drops.</li>
           </ul>
         </div>
       </div>
-      <div class="flex items-center gap-2 p-2.5 bg-surface-container rounded-xl text-xs text-on-surface">
-        <span class="material-symbols-outlined text-primary shrink-0">verified</span>
-        <span id="advice-disclaimer">Standard ICAR / State Agricultural University Demonstration Protocol.</span>
+
+      <!-- Bridge to Explanatory Advice Section -->
+      <div class="p-3.5 rounded-2xl bg-primary/10 border border-primary/20 flex flex-col gap-2">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-1.5 text-xs font-bold text-primary">
+            <span class="material-symbols-outlined text-[18px]">psychology_alt</span>
+            <span>Want Full In-Depth Explanatory Advice?</span>
+          </div>
+          <span class="text-[10px] uppercase font-bold text-primary/80">Explanatory View</span>
+        </div>
+        <p class="text-[11px] text-on-surface-variant leading-tight">
+          Access complete biophysical canopy physics, root-zone hydrology models, 4-step precision protocol, SMS dispatch &amp; helpline.
+        </p>
+        <button class="w-full min-h-[42px] rounded-xl bg-primary text-on-primary font-bold text-xs flex items-center justify-center gap-2 shadow-xs hover:bg-primary/90 active:scale-[0.99] transition-all cursor-pointer" onclick="closeModal('adviceModal'); switchTab('advice')" type="button">
+          <span class="material-symbols-outlined text-[16px]">menu_book</span>
+          <span>Open Explanatory Advice Part →</span>
+        </button>
       </div>
+
+      <!-- Action Buttons -->
       <div class="flex items-center gap-2">
-        <button class="flex-1 min-h-[48px] rounded-xl bg-primary text-on-primary font-bold text-sm" onclick="closeModal('adviceModal')" type="button">
+        <button class="flex-1 min-h-[46px] rounded-xl bg-surface-container hover:bg-surface-variant text-on-surface font-bold text-xs transition-colors cursor-pointer" onclick="closeModal('adviceModal')" type="button">
           Understood &amp; Close
         </button>
-        <button class="min-h-[48px] px-3 rounded-xl bg-surface-container text-primary font-semibold text-xs flex items-center justify-center gap-1" onclick="toggleAudioAdvice()" type="button">
+        <button class="min-h-[46px] px-4 rounded-xl bg-surface-container hover:bg-surface-variant text-primary font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer" onclick="toggleAudioAdvice()" type="button">
           <span class="material-symbols-outlined text-[18px]">volume_up</span>
           <span>Voice Readout</span>
         </button>
@@ -2323,7 +2365,7 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         bannerText: "Satellite reflectance & agromet observations. Always verify ground conditions before applying treatments.",
         checkField: "Check My Field",
         howItWorks: "How It Works",
-        viewAdvice: "View Full Advice",
+        viewAdvice: "View Advice (Brief)",
         audioBtn: "Listen Voice Advice",
         tsTitle: "NDVI 20-Day Trend (Sentinel-2)",
         tsBenchmark: "Seasonal Benchmark: 0.70",
@@ -2350,7 +2392,7 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         bannerText: "ಉಪಗ್ರಹ ಪ್ರತಿಫಲನ ಮತ್ತು ಹವಾಮಾನ ಮಾಹಿತಿ. ಚಿಕಿತ್ಸೆ ನೀಡುವ ಮುನ್ನ ಹೊಲದಲ್ಲಿ ಪರಿಶೀಲಿಸಿ.",
         checkField: "ನನ್ನ ಹೊಲ ಪರಿಶೀಲಿಸಿ",
         howItWorks: "ಇದು ಹೇಗೆ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತದೆ",
-        viewAdvice: "ಸಂಪೂರ್ಣ ಸಲಹೆ ನೋಡಿ",
+        viewAdvice: "ಸಲಹೆ ನೋಡಿ (ಸಂಕ್ಷಿಪ್ತ)",
         audioBtn: "ಧ್ವನಿ ಸಲಹೆ ಕೇಳಿ (ಕನ್ನಡ)",
         tsTitle: "ಎನ್‌ಡಿವಿಐ 20-ದಿನಗಳ ಪ್ರವೃತ್ತಿ (ಸೆಂಟಿನೆಲ್-2)",
         tsBenchmark: "ಋತುವಿನ ಮಾನದಂಡ: 0.70",
@@ -2377,7 +2419,7 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         bannerText: "उपग्रह परावर्तन और मौसम संबंधी डेटा। उपचार लागू करने से पहले खेत में जांचें।",
         checkField: "मेरा खेत जांचें",
         howItWorks: "यह कैसे काम करता है",
-        viewAdvice: "पूरी सलाह देखें",
+        viewAdvice: "सलाह देखें (संक्षिप्त)",
         audioBtn: "सलाह सुनें (हिन्दी)",
         tsTitle: "NDVI 20-दिवसीय रुझान (सेंटिनल-2)",
         tsBenchmark: "मौसमी बेंचमार्क: 0.70",
@@ -2404,7 +2446,7 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         bannerText: "ఉపగ్రహ పరావర్తన మరియు వ్యవసాయ వాతావరణ పరిశీలనలు. చికిత్సలు వర్తించే ముందు నేల పరిస్థితులను పరిశీలించండి.",
         checkField: "నా పొలాన్ని తనిఖీ చేయండి",
         howItWorks: "ఇది ఎలా పని చేస్తుంది",
-        viewAdvice: "పూర్తి సలహాను చూడండి",
+        viewAdvice: "సలహా చూడండి (సంక్షిప్తం)",
         audioBtn: "వాయిస్ సలహా వినండి (తెలుగు)",
         tsTitle: "NDVI 20 రోజుల పోకడ (సెంటినెల్-2)",
         tsBenchmark: "సీజనల్ ప్రమాణం: 0.70",
@@ -2431,7 +2473,7 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         bannerText: "செயற்கைக்கோள் மற்றும் வேளாண்-வானிலை அவதானிப்புகள். மருந்து தெளிக்கும் முன் நிலத்தை நேரடியாகப் பரிசோதிக்கவும்.",
         checkField: "எனது வயலை சோதிக்கவும்",
         howItWorks: "இது எவ்வாறு செயல்படுகிறது",
-        viewAdvice: "முழு ஆலோசனையை காண்க",
+        viewAdvice: "ஆலோசனையை காண்க (சுருக்கம்)",
         audioBtn: "குரல் ஆலோசனையை கேட்கவும் (தமிழ்)",
         tsTitle: "NDVI 20-நாள் போக்கு (சென்டினல்-2)",
         tsBenchmark: "பருவகால அளவுகோல்: 0.70",
@@ -2458,7 +2500,7 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         bannerText: "उपग्रह परावर्तन आणि कृषी हवामान निरीक्षणे. फवारणीपूर्वी प्रत्यक्ष शेतात जाऊन खात्री करा.",
         checkField: "माझे शेत तपासा",
         howItWorks: "हे कसे कार्य करते",
-        viewAdvice: "संपूर्ण सल्ला पहा",
+        viewAdvice: "सल्ला पहा (संक्षिप्त)",
         audioBtn: "ध्वनी सल्ला ऐका (मराठी)",
         tsTitle: "NDVI २०-दिवसीय कल (सेंटिनेल-२)",
         tsBenchmark: "हंगामी मानक: ०.७०",
@@ -4302,6 +4344,60 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
 
 
         // Modal Helpers
+    
+    function updateBriefAdviceModalContent(regionKey) {
+      const data = REGIONS_DATA[regionKey] || REGIONS_DATA.mandya;
+      const tagEl = document.getElementById('advice-modal-field-tag');
+      if (tagEl) {
+        tagEl.textContent = `${data.cropTitle || data.crop} • ${data.plotTitle || data.parcel} (${data.location || ''})`;
+      }
+      const metricTag = document.getElementById('advice-modal-metric-tag');
+      if (metricTag) {
+        metricTag.textContent = `NDVI: ${data.metric ? data.metric.split(' ')[0] : '0.58'}`;
+      }
+      const noticeEl = document.getElementById('advice-notice-body');
+      if (noticeEl) noticeEl.textContent = data.notice || "Canopy reflectance monitored across parcel.";
+      const meaningEl = document.getElementById('advice-meaning-body');
+      if (meaningEl) meaningEl.textContent = data.meaning || "Possible uneven soil moisture or localized stress.";
+
+      const stepsList = document.getElementById('advice-steps-list');
+      if (stepsList) {
+        const defaultSteps = {
+          mandya: [
+            "Conduct perimeter walk along the North-East ridge border.",
+            "Check top 10 cm soil moisture depth by hand-feel before running pump.",
+            "Maintain 2-hour drip runs in late afternoon to minimize evaporative loss."
+          ],
+          ludhiana: [
+            "Verify crown root initiation zone moisture depth in north quadrant.",
+            "Delay urea top-dressing until evening to prevent ammonia volatilization.",
+            "Survey lower canopy for initial signs of yellow rust stripes."
+          ],
+          varanasi: [
+            "Inspect flowering twigs and upper siliquae for aphid clustering.",
+            "Install 4–6 yellow sticky traps per acre at canopy height.",
+            "Apply organic neem seed extract (NSKE 5%) before 9:00 AM."
+          ],
+          nashik: [
+            "Examine onion bulb shoulders for uniform expansion and firm neck.",
+            "Verify drip lateral emitters are free of mineral scaling.",
+            "Run alternate-day 2-hour drip schedule to protect outer bulb skins."
+          ]
+        };
+        const s = defaultSteps[regionKey] || [
+          data.action || "Conduct ground walk along parcel boundary.",
+          "Check root zone soil moisture depth (10 cm) before running irrigation.",
+          "Follow regional schedule to protect crop vigor."
+        ];
+        stepsList.innerHTML = s.map(step => `<li>${step}</li>`).join('');
+      }
+    }
+
+    function openBriefAdviceModal() {
+      updateBriefAdviceModalContent(currentRegionKey);
+      openModal('adviceModal');
+    }
+
     function openModal(id) {
       if (id === 'healthModal') {
         document.getElementById('info-modal-title').textContent = "1. Crop Health Inspector";
