@@ -29,18 +29,93 @@
     @media (prefers-reduced-motion: reduce) {
       .motion-animated, #splash-worm, .sprout-anim { animation: none !important; transition: none !important; }
     }
-    @keyframes crawlWorm {
-      0% { transform: translate(-20px, 34px) scale(0.85); opacity: 0; }
-      15% { opacity: 1; }
-      50% { transform: translate(52px, 25px) scale(1.02); }
-      100% { transform: translate(114px, 18px) scale(0.96); opacity: 1; }
+    /* Earthworm Animated Splash Screen Styles */
+    @keyframes wormCrawlMotion {
+      0% {
+        transform: translate(15px, 156px) rotate(-12deg) scale(0.8);
+        opacity: 0;
+      }
+      8% {
+        transform: translate(32px, 152px) rotate(-10deg) scaleX(1.15) scaleY(0.88);
+        opacity: 1;
+      }
+      22% {
+        transform: translate(75px, 148px) rotate(6deg) scaleX(0.88) scaleY(1.16);
+      }
+      40% {
+        transform: translate(130px, 168px) rotate(-8deg) scaleX(1.18) scaleY(0.86);
+      }
+      60% {
+        transform: translate(190px, 136px) rotate(-14deg) scaleX(0.88) scaleY(1.16);
+      }
+      80% {
+        transform: translate(240px, 136px) rotate(2deg) scaleX(1.12) scaleY(0.92);
+      }
+      100% {
+        transform: translate(255px, 133px) rotate(0deg) scale(1);
+        opacity: 1;
+      }
     }
-    @keyframes sproutBloom {
-      0% { transform: scale(0); opacity: 0; }
-      55% { transform: scale(1.22); opacity: 1; }
-      100% { transform: scale(1); opacity: 1; }
+
+    .worm-crawler {
+      transform-origin: center center;
+      animation: wormCrawlMotion 4s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards;
     }
-    .sprout-anim { animation: sproutBloom 0.8s cubic-bezier(0.17, 0.89, 0.32, 1.28) 0.55s forwards; transform-origin: bottom center; }
+
+    @keyframes sproutUnfurl {
+      0% {
+        transform: translate(280px, 142px) scale(0);
+        opacity: 0;
+      }
+      55% {
+        transform: translate(280px, 142px) scale(0);
+        opacity: 0;
+      }
+      72% {
+        transform: translate(280px, 142px) scale(1.28);
+        opacity: 1;
+      }
+      85% {
+        transform: translate(280px, 142px) scale(0.94);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(280px, 142px) scale(1);
+        opacity: 1;
+      }
+    }
+
+    #splash-sprout {
+      transform-origin: bottom center;
+      animation: sproutUnfurl 4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes satFloatSlow {
+      0%, 100% { transform: translate(44px, 28px) rotate(-3deg); }
+      50% { transform: translate(48px, 23px) rotate(3deg); }
+    }
+
+    .satellite-orbit {
+      animation: satFloatSlow 4.5s ease-in-out infinite;
+    }
+
+    @keyframes beamPulseSlow {
+      0%, 100% { opacity: 0.15; }
+      50% { opacity: 0.65; }
+    }
+
+    .satellite-beam {
+      animation: beamPulseSlow 2.2s ease-in-out infinite;
+    }
+
+    @keyframes splashBarFill {
+      0% { width: 0%; }
+      100% { width: 100%; }
+    }
+
+    .splash-bar-anim {
+      animation: splashBarFill 4.4s linear forwards;
+    }
     @keyframes radarSweep {
       0% { top: 0%; opacity: 0; }
       15% { opacity: 0.9; }
@@ -176,51 +251,187 @@
 <body class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen selection:bg-primary-container selection:text-on-primary antialiased">
 
   <!-- 1. MEMORABLE LIGHTWEIGHT OPENING ANIMATION OVERLAY -->
-  <div class="fixed inset-0 z-[100] bg-surface flex flex-col items-center justify-center p-6 text-center transition-opacity duration-500 pointer-events-auto" id="intro-splash">
-    <div class="relative w-64 h-32 mb-2 flex items-center justify-center">
-      <svg class="w-full h-full overflow-visible" fill="none" viewbox="0 0 160 80" xmlns="http://www.w3.org/2000/svg">
-        <!-- Deep rich soil furrow wave -->
-        <path d="M10 58 C 45 36, 75 70, 114 42 C 132 30, 146 38, 154 36" stroke="#d5e7da" stroke-linecap="round" stroke-width="8"></path>
-        <path d="M10 58 C 45 36, 75 70, 114 42 C 132 30, 146 38, 154 36" stroke="#216b45" stroke-dasharray="5 7" stroke-linecap="round" stroke-width="3"></path>
-        <!-- Friendly realistic earthworm traversing soil furrow -->
-        <g id="splash-worm" style="animation: crawlWorm 1.4s ease-in-out forwards;">
-          <ellipse cx="0" cy="0" fill="#a45d22" rx="9" ry="5.8" transform="rotate(-15)"></ellipse>
-          <ellipse cx="-6" cy="3" fill="#8d4a15" rx="7" ry="5" transform="rotate(-8)"></ellipse>
-          <ellipse cx="-13" cy="5" fill="#783c0f" rx="5.5" ry="4"></ellipse>
-          <circle cx="5.5" cy="-1.5" fill="#ffffff" r="1.8"></circle>
-          <circle cx="6.2" cy="-1.5" fill="#25342b" r="0.9"></circle>
-          <path d="M5.5 2 Q 7 3.5 8 1" stroke="#ffddb5" stroke-linecap="round" stroke-width="1.2"></path>
+  <div class="fixed inset-0 z-[100] bg-gradient-to-b from-[#eef8f2] via-[#e4f3ea] to-[#d8ede0] flex flex-col items-center justify-between p-6 sm:p-8 text-center transition-all duration-700 pointer-events-auto select-none overflow-hidden" id="intro-splash">
+    
+    <!-- Ambient Floating Sunbeams & Agricultural Background Elements -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden opacity-40">
+      <div class="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-gradient-to-br from-emerald-300/40 via-teal-200/20 to-transparent blur-3xl animate-pulse"></div>
+      <div class="absolute top-1/3 -right-24 w-80 h-80 rounded-full bg-gradient-to-br from-amber-300/30 via-orange-200/20 to-transparent blur-2xl"></div>
+      <div class="absolute bottom-0 inset-x-0 h-48 bg-gradient-to-t from-emerald-900/10 to-transparent"></div>
+    </div>
+
+    <!-- Top Pill: Space & Earth Connection -->
+    <div class="relative z-10 pt-2 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/85 backdrop-blur-md border border-emerald-600/25 shadow-xs">
+      <span class="w-2 h-2 rounded-full bg-emerald-600 animate-ping"></span>
+      <span class="text-xs font-bold text-emerald-950">National Agri-Sat Prototype • ISRO &amp; Copernicus Data</span>
+    </div>
+
+    <!-- Central Illustrated Scene: Satellite + Soil Furrow + Cute Animated Earthworm + Blooming Sprout -->
+    <div class="relative z-10 w-full max-w-[360px] sm:max-w-[420px] h-[220px] sm:h-[250px] my-auto flex items-center justify-center">
+      <svg class="w-full h-full overflow-visible" viewBox="0 0 360 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+        
+        <!-- Definitions: Gradients & Filters -->
+        <defs>
+          <linearGradient id="soilGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#8d5b4c" />
+            <stop offset="50%" stop-color="#6e3d2e" />
+            <stop offset="100%" stop-color="#4e271c" />
+          </linearGradient>
+          <linearGradient id="grassGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#38a169" />
+            <stop offset="50%" stop-color="#2f855a" />
+            <stop offset="100%" stop-color="#276749" />
+          </linearGradient>
+          <linearGradient id="wormSkin" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#f28482" />
+            <stop offset="40%" stop-color="#e07a5f" />
+            <stop offset="100%" stop-color="#c95d3b" />
+          </linearGradient>
+          <linearGradient id="clitellumGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#f7a399" />
+            <stop offset="50%" stop-color="#f28482" />
+            <stop offset="100%" stop-color="#d96b68" />
+          </linearGradient>
+          <linearGradient id="scanBeam" x1="50%" y1="0%" x2="50%" y2="100%">
+            <stop offset="0%" stop-color="#10b981" stop-opacity="0.45" />
+            <stop offset="100%" stop-color="#10b981" stop-opacity="0.0" />
+          </linearGradient>
+        </defs>
+
+        <!-- Satellite Orbiting at Top Left with Scanning Waves -->
+        <g transform="translate(44, 28)" class="satellite-orbit">
+          <!-- Radar Scan Beam -->
+          <polygon points="0,0 85,145 175,145" fill="url(#scanBeam)" class="satellite-beam" />
+          <!-- Satellite Body -->
+          <rect x="-10" y="-8" width="20" height="16" rx="3" fill="#2d3748" stroke="#4a5568" stroke-width="1.5" />
+          <rect x="-7" y="-5" width="14" height="10" rx="1.5" fill="#e2e8f0" />
+          <!-- Gold Foil Core -->
+          <circle cx="0" cy="0" r="3" fill="#ecc94b" />
+          <!-- Solar Wings Left & Right -->
+          <g fill="#3182ce" stroke="#2b6cb0" stroke-width="1">
+            <rect x="-30" y="-6" width="17" height="12" rx="1.5" />
+            <line x1="-21" y1="-6" x2="-21" y2="6" stroke="#90cdf4" stroke-width="1" />
+            <rect x="13" y="-6" width="17" height="12" rx="1.5" />
+            <line x1="22" y1="-6" x2="22" y2="6" stroke="#90cdf4" stroke-width="1" />
+          </g>
+          <!-- Antenna Dish -->
+          <path d="M-4 9 Q 0 13 4 9" stroke="#cbd5e0" stroke-width="1.5" fill="none" />
+          <line x1="0" y1="8" x2="0" y2="12" stroke="#cbd5e0" stroke-width="1.5" />
+          <!-- Blinking Telemetry Light -->
+          <circle cx="0" cy="13" r="1.5" fill="#48bb78" class="animate-ping" />
         </g>
-        <!-- Fresh vibrant sprout emerging at top right furrow -->
-        <g class="sprout-anim" style="opacity: 0;" transform="translate(116, 22)">
-          <path d="M0 16 Q 2 6 0 0" stroke="#005230" stroke-linecap="round" stroke-width="2.5"></path>
-          <path d="M0 5 Q 7 1 8 -5 Q 2 -4 0 4" fill="#216b45"></path>
-          <path d="M-1 9 Q -8 5 -7 -1 Q -2 -1 -1 7" fill="#8dd6a8"></path>
+
+        <!-- Subterranean Soil Furrow Cross-Section -->
+        <path d="M10 160 C 60 135, 120 185, 190 145 C 240 115, 290 155, 350 135 L 350 215 L 10 215 Z" fill="url(#soilGrad)" />
+        <!-- Top Fertile Grass/Loam Border -->
+        <path d="M10 160 C 60 135, 120 185, 190 145 C 240 115, 290 155, 350 135" stroke="url(#grassGrad)" stroke-width="7" stroke-linecap="round" fill="none" />
+        <!-- Dotted Moisture Capillary Line -->
+        <path d="M15 162 C 60 137, 120 187, 190 147 C 240 117, 290 157, 345 137" stroke="#86efac" stroke-width="2.5" stroke-dasharray="4 6" stroke-linecap="round" fill="none" />
+        
+        <!-- Subterranean Soil Pebbles & Burrow Texture -->
+        <g opacity="0.35" fill="#f7fafc">
+          <circle cx="50" cy="185" r="2.5" />
+          <circle cx="120" cy="195" r="3" />
+          <circle cx="210" cy="180" r="2" />
+          <circle cx="280" cy="190" r="3.5" />
+          <circle cx="320" cy="175" r="2" />
+        </g>
+
+        <!-- Fresh Seedling / Sprout Blooming at the Ridge (x=280, y=142) -->
+        <g id="splash-sprout" transform="translate(280, 142)">
+          <!-- Stem -->
+          <path d="M0 0 Q 3 -18 0 -36" stroke="#22543d" stroke-width="3.5" stroke-linecap="round" />
+          <!-- Left Leaf -->
+          <path d="M0 -22 C -14 -28, -20 -15, 0 -12 Z" fill="#38a169" stroke="#22543d" stroke-width="1.2" />
+          <!-- Right Leaf with Morning Sun Glow -->
+          <path d="M0 -28 C 16 -36, 22 -20, 0 -16 Z" fill="#48bb78" stroke="#22543d" stroke-width="1.2" />
+          <!-- Dew Droplet -->
+          <circle cx="10" cy="-28" r="2" fill="#e6fffa" opacity="0.9" class="animate-pulse" />
+        </g>
+
+        <!-- THE DELIGHTFUL ANIMATED EARTHWORM -->
+        <g id="splash-worm" class="worm-crawler">
+          <!-- Tail Tip Segment -->
+          <ellipse cx="-42" cy="0" rx="6" ry="4.5" fill="#b85434" />
+          <!-- Posterior Segment 1 -->
+          <ellipse cx="-33" cy="-1" rx="7.5" ry="5.8" fill="url(#wormSkin)" />
+          <ellipse cx="-23" cy="-2" rx="8.5" ry="6.8" fill="url(#wormSkin)" />
+          <!-- Clitellum (The Worm's Distinctive Velvet Saddle Band) -->
+          <ellipse cx="-12" cy="-3" rx="9" ry="8.2" fill="url(#clitellumGrad)" stroke="#f7a399" stroke-width="1" />
+          <!-- Anterior Segment 2 -->
+          <ellipse cx="1" cy="-2" rx="8.8" ry="7.2" fill="url(#wormSkin)" />
+          <!-- Anterior Segment 1 -->
+          <ellipse cx="12" cy="-1" rx="8.2" ry="6.8" fill="url(#wormSkin)" />
+          <!-- Head -->
+          <ellipse cx="23" cy="0" rx="9" ry="7.8" fill="url(#wormSkin)" />
+          
+          <!-- Segment Contour Rings (Realistic Ridges) -->
+          <path d="M-33 -6 Q -31 0 -33 5" stroke="#9c4126" stroke-width="1.2" stroke-linecap="round" fill="none" />
+          <path d="M-23 -8 Q -21 0 -23 6" stroke="#9c4126" stroke-width="1.2" stroke-linecap="round" fill="none" />
+          <path d="M1 -9 Q 3 0 1 7" stroke="#9c4126" stroke-width="1.2" stroke-linecap="round" fill="none" />
+          <path d="M12 -8 Q 14 0 12 6" stroke="#9c4126" stroke-width="1.2" stroke-linecap="round" fill="none" />
+
+          <!-- Cute Big Shiny Eyes -->
+          <!-- Left Eye (Back) -->
+          <circle cx="24" cy="-3.5" r="3.2" fill="#ffffff" stroke="#9c4126" stroke-width="0.8" />
+          <circle cx="25.2" cy="-3.5" r="1.8" fill="#1a202c" />
+          <circle cx="26" cy="-4.2" r="0.8" fill="#ffffff" />
+          <!-- Right Eye (Front) -->
+          <circle cx="29" cy="-2" r="3.4" fill="#ffffff" stroke="#9c4126" stroke-width="0.8" />
+          <circle cx="30.2" cy="-2" r="2" fill="#1a202c" />
+          <circle cx="31.2" cy="-2.8" r="0.9" fill="#ffffff" />
+
+          <!-- Rosy Cheek Blush -->
+          <ellipse cx="27" cy="3" rx="2.8" ry="1.8" fill="#f7a399" opacity="0.85" />
+
+          <!-- Playful Happy Smile -->
+          <path d="M26 2.5 Q 29 5.5 32 1.5" stroke="#78350f" stroke-width="1.6" stroke-linecap="round" fill="none" />
         </g>
       </svg>
     </div>
-    <div class="flex flex-col items-center">
+
+    <!-- Branding & Mission Statement -->
+    <div class="relative z-10 flex flex-col items-center gap-1.5 max-w-sm">
       <div class="flex items-center gap-2">
-        <span class="text-3xl font-extrabold tracking-tight text-primary font-headline-xl">EARTHWORM</span>
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-800 text-white flex items-center justify-center shadow-sm">
+          <span class="material-symbols-outlined text-[20px]">agriculture</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-black tracking-tight bg-gradient-to-r from-emerald-900 via-teal-800 to-emerald-950 bg-clip-text text-transparent">
+          EARTHWORM
+        </h1>
       </div>
-      <p class="text-[12px] font-bold text-secondary tracking-wider uppercase mt-0.5">National Agri-Sat Prototype</p>
-      <p class="text-sm font-semibold text-on-surface-variant mt-2 max-w-xs">See Your Fields. Understand Your Crops.</p>
+      
+      <span class="px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-950 font-extrabold text-[11px] tracking-wider uppercase border border-emerald-300 shadow-xs">
+        National Agri-Sat Intelligence
+      </span>
+      
+      <p class="text-xs sm:text-sm text-slate-700 font-semibold mt-1">
+        See Your Fields from Space. Understand Your Soil.
+      </p>
+
+      <!-- Animated Smooth Transition Progress Bar -->
+      <div class="w-full max-w-[280px] flex flex-col gap-1.5 mt-3">
+        <div class="w-full h-2 rounded-full bg-emerald-200/70 overflow-hidden p-0.5 shadow-inner">
+          <div id="splash-progress-bar" class="h-full rounded-full bg-gradient-to-r from-emerald-500 via-teal-500 to-amber-500 splash-bar-anim" style="width: 0%;"></div>
+        </div>
+        <div class="flex items-center justify-between text-[10px] font-mono text-emerald-900 font-bold px-1">
+          <span id="splash-progress-status">Connecting Sentinel-2 MSI Orbit...</span>
+          <span id="splash-countdown">4s</span>
+        </div>
+      </div>
     </div>
-    <div class="mt-4 flex items-center gap-1.5 px-3 py-1 bg-surface-container rounded-full text-on-surface-variant text-xs">
-      <span class="w-2 h-2 rounded-full bg-primary"></span>
-      <span>Reference Space Agromet Data • ISRO &amp; ESA</span>
-    </div>
-    <div class="mt-6 flex items-center gap-3">
-      <button class="px-5 py-2.5 rounded-full bg-primary-container text-on-primary font-semibold text-sm shadow-sm active:scale-95 transition-all" onclick="dismissSplash()" type="button">
-        Enter Advisory Dashboard →
+
+    <!-- Action CTA Buttons -->
+    <div class="relative z-10 flex flex-col sm:flex-row items-center gap-3 pt-2 pb-2">
+      <button class="px-7 py-3 rounded-2xl bg-gradient-to-r from-emerald-700 via-emerald-800 to-teal-800 hover:from-emerald-800 hover:to-teal-900 text-white font-extrabold text-sm shadow-lg hover:shadow-xl active:scale-[0.98] transition-all cursor-pointer flex items-center gap-2 group" onclick="dismissSplash()" type="button">
+        <span>Enter Advisory Dashboard</span>
+        <span class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
       </button>
-      <button class="px-3.5 py-2 text-on-surface-variant text-xs underline decoration-dotted" onclick="dismissSplash()" type="button">
+      <button class="px-4 py-2 text-slate-600 hover:text-emerald-950 font-bold text-xs underline decoration-dotted transition-colors cursor-pointer" onclick="dismissSplash()" type="button">
         Skip intro
       </button>
     </div>
-  </div>
-
-  <!-- FIXED APP HEADER -->
+  </div><!-- FIXED APP HEADER -->
   <header class="fixed top-0 inset-x-0 z-50 bg-surface/90 backdrop-blur-xl border-b border-surface-variant/60 shadow-[0_1px_6px_rgba(0,0,0,0.03)] pt-safe">
     <div id="header-inner" class="h-16 px-4 flex items-center justify-between gap-2 max-w-[640px] mx-auto transition-all duration-300">
       <!-- Brand Identity -->
@@ -4993,12 +5204,63 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
     }
 
     // Splash Intro Handling
+    let splashTimer = null;
+    let splashStatusInterval = null;
+
+    function startSplashSequence() {
+      if (splashTimer) clearTimeout(splashTimer);
+      if (splashStatusInterval) clearInterval(splashStatusInterval);
+
+      const statusEl = document.getElementById('splash-progress-status');
+      const countEl = document.getElementById('splash-countdown');
+      const barEl = document.getElementById('splash-progress-bar');
+
+      if (barEl) {
+        barEl.classList.remove('splash-bar-anim');
+        void barEl.offsetWidth;
+        barEl.classList.add('splash-bar-anim');
+      }
+
+      let elapsedMs = 0;
+      const totalMs = 4500;
+
+      splashStatusInterval = setInterval(() => {
+        elapsedMs += 250;
+        const remainingSec = Math.max(0, Math.ceil((totalMs - elapsedMs) / 1000));
+        if (countEl) countEl.textContent = `${remainingSec}s`;
+
+        if (statusEl) {
+          if (elapsedMs < 1200) {
+            statusEl.textContent = "Connecting Sentinel-2 MSI Orbit...";
+          } else if (elapsedMs < 2400) {
+            statusEl.textContent = "Scanning Soil Moisture & Vigor...";
+          } else if (elapsedMs < 3500) {
+            statusEl.textContent = "Synthesizing Regional Agronomic Advisory...";
+          } else {
+            statusEl.textContent = "Ready! Entering Advisory Dashboard...";
+          }
+        }
+
+        if (elapsedMs >= totalMs) {
+          clearInterval(splashStatusInterval);
+          dismissSplash();
+        }
+      }, 250);
+    }
+
     function dismissSplash() {
+      if (splashTimer) clearTimeout(splashTimer);
+      if (splashStatusInterval) clearInterval(splashStatusInterval);
+
       const splash = document.getElementById('intro-splash');
       if (splash) {
         splash.style.opacity = '0';
+        splash.style.transform = 'scale(1.03)';
+        splash.style.filter = 'blur(6px)';
         splash.style.pointerEvents = 'none';
-        setTimeout(() => { splash.style.display = 'none'; }, 500);
+        setTimeout(() => { 
+          splash.style.display = 'none'; 
+        }, 700);
       }
       try { sessionStorage.setItem('earthworm_splash_shown', 'true'); } catch (e) {}
     }
@@ -5007,14 +5269,26 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       const splash = document.getElementById('intro-splash');
       if (splash) {
         splash.style.display = 'flex';
+        splash.style.transform = 'scale(1)';
+        splash.style.filter = 'none';
         splash.style.pointerEvents = 'auto';
         setTimeout(() => { splash.style.opacity = '1'; }, 10);
+        
         const worm = document.getElementById('splash-worm');
         if (worm) {
           worm.style.animation = 'none';
           void worm.offsetWidth;
-          worm.style.animation = 'crawlWorm 1.4s ease-in-out forwards';
+          worm.style.animation = 'wormCrawlMotion 4s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards';
         }
+
+        const sprout = document.getElementById('splash-sprout');
+        if (sprout) {
+          sprout.style.animation = 'none';
+          void sprout.offsetWidth;
+          sprout.style.animation = 'sproutUnfurl 4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+        }
+
+        startSplashSequence();
       }
     }
 
@@ -5457,7 +5731,7 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         }
       } catch (e) {}
 
-      setTimeout(() => { dismissSplash(); }, 1800);
+      startSplashSequence();
     });
 
     // Keyboard shortcut (Alt+M / Alt+D) to switch interface mode
