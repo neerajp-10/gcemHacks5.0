@@ -301,7 +301,9 @@
   <main id="main-content" class="flex-1 flex flex-col relative w-full px-4 pt-20 pb-28 bg-surface max-w-[640px] mx-auto transition-all duration-300 sm:border-x sm:border-surface-variant/40 sm:shadow-[0_0_40px_rgba(0,0,0,0.06)]">
     <div class="flex flex-col gap-4 w-full" id="main-sections-wrapper">
 
-      <!-- TOP BANNER: HONEST PROTOTYPE DISCLOSURE -->
+      <!-- VIEW: HOME (Main Satellite & Agro-Met Dashboard) -->
+      <div id="view-home" class="flex flex-col gap-4 w-full">
+        <!-- TOP BANNER: HONEST PROTOTYPE DISCLOSURE -->
       <div id="top-banner" class="bg-surface-container-high border-l-4 border-primary rounded-r-xl p-2.5 flex items-start gap-2 shadow-sm text-xs text-on-surface-variant">
         <span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">verified_user</span>
         <div>
@@ -742,7 +744,7 @@
         </div>
 
         <div class="flex flex-col sm:flex-row gap-2 pt-1">
-          <button class="flex-1 min-h-[48px] rounded-xl bg-primary text-on-primary font-semibold text-sm flex items-center justify-center gap-2 active:bg-primary-container shadow-sm transition-colors" onclick="openModal('adviceModal')" type="button">
+          <button class="flex-1 min-h-[48px] rounded-xl bg-primary text-on-primary font-semibold text-sm flex items-center justify-center gap-2 active:bg-primary-container shadow-sm transition-colors cursor-pointer" onclick="switchTab('advice')" type="button">
             <span class="material-symbols-outlined text-[18px]">fact_check</span>
             <span id="btn-view-advice">View Full Advice</span>
           </button>
@@ -914,6 +916,339 @@
         <!-- Right Sidebar Column (approx 5 of 12 cols, ~40%) -->
         <div id="desktop-col-right" class="lg:col-span-5 xl:col-span-4 flex flex-col gap-5"></div>
       </div>
+
+      </div>
+      <!-- END VIEW: HOME -->
+
+      <!-- ======================================================== -->
+      <!-- VIEW: ADVICE (DEDICATED EXPLANATORY AGRONOMIC INTELLIGENCE) -->
+      <!-- ======================================================== -->
+      <div id="view-advice" class="hidden flex-col gap-4 w-full animate-fadeIn pb-6">
+        
+        <!-- Top Sticky Action Bar / Header -->
+        <div class="rounded-2xl bg-surface-container-lowest p-4 sm:p-5 border border-surface-variant shadow-sm flex flex-col gap-3.5">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <button onclick="switchTab('home')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container hover:bg-surface-variant text-primary font-bold text-xs transition-colors cursor-pointer" type="button">
+              <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+              <span>Back to Dashboard</span>
+            </button>
+            <div class="flex items-center gap-1.5">
+              <span class="inline-flex items-center gap-1 text-[11px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-800 border border-emerald-500/20">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                Sentinel-2 MSI Verified
+              </span>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <div class="inline-flex items-center gap-1.5 self-start px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[11px] font-semibold">
+              <span class="material-symbols-outlined text-[14px]">psychology_alt</span>
+              <span>Agronomic Diagnostic Intelligence &amp; Field Prescription</span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-black text-on-surface leading-tight tracking-tight" id="deep-advice-headline">
+              Field Needs Inspection: Canopy Moisture Change
+            </h2>
+            <p class="text-xs text-on-surface-variant leading-relaxed" id="deep-advice-sub">
+              Biophysical vegetation index analysis and agrometeorological interpretation for Parcel #142/A (Mandya, Karnataka).
+            </p>
+          </div>
+
+          <!-- Quick Farm Switcher Tabs inside Advice View -->
+          <div class="flex items-center gap-1.5 overflow-x-auto pb-1 pt-1 no-scrollbar">
+            <span class="text-[10px] uppercase font-bold text-secondary shrink-0 mr-1">Switch Field:</span>
+            <button onclick="selectRegion('mandya')" id="adv-pill-mandya" class="adv-region-pill text-[11px] font-bold px-3 py-1 rounded-full bg-primary text-on-primary shrink-0 transition-all cursor-pointer">
+              Mandya (Paddy)
+            </button>
+            <button onclick="selectRegion('ludhiana')" id="adv-pill-ludhiana" class="adv-region-pill text-[11px] font-medium px-3 py-1 rounded-full bg-surface-container text-on-surface hover:bg-surface-variant shrink-0 transition-all cursor-pointer">
+              Ludhiana (Wheat)
+            </button>
+            <button onclick="selectRegion('varanasi')" id="adv-pill-varanasi" class="adv-region-pill text-[11px] font-medium px-3 py-1 rounded-full bg-surface-container text-on-surface hover:bg-surface-variant shrink-0 transition-all cursor-pointer">
+              Varanasi (Mustard)
+            </button>
+            <button onclick="selectRegion('nashik')" id="adv-pill-nashik" class="adv-region-pill text-[11px] font-medium px-3 py-1 rounded-full bg-surface-container text-on-surface hover:bg-surface-variant shrink-0 transition-all cursor-pointer">
+              Nashik (Onion)
+            </button>
+          </div>
+
+          <!-- Audio & Direct Telephony Trigger Buttons -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 border-t border-surface-variant/60">
+            <button onclick="toggleAudioAdvice()" id="btn-deep-audio" class="min-h-[42px] px-3 rounded-xl bg-surface-container hover:bg-surface-variant text-primary font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer" type="button">
+              <span class="material-symbols-outlined text-[18px]" id="deep-audio-icon">volume_up</span>
+              <span id="btn-deep-audio-label">Listen Spoken Advice</span>
+            </button>
+            <button onclick="promptAndSendFarmerSms()" class="min-h-[42px] px-3 rounded-xl bg-primary text-on-primary font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs hover:bg-primary/90 transition-colors cursor-pointer" type="button">
+              <span class="material-symbols-outlined text-[18px]">sms</span>
+              <span>Send SMS to Phone</span>
+            </button>
+            <a href="tel:18001801551" class="min-h-[42px] px-3 rounded-xl bg-surface-container hover:bg-surface-variant text-on-surface font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors border border-surface-variant/80">
+              <span class="material-symbols-outlined text-[18px] text-emerald-600">call</span>
+              <span>Helpline: 1800-180-1551</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- KPI Diagnostics Strip -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div class="p-3 bg-surface-container-lowest rounded-xl border border-surface-variant flex flex-col gap-0.5">
+            <span class="text-[10px] uppercase font-bold text-secondary">Observed NDVI</span>
+            <span class="text-base font-black text-tertiary font-mono" id="kpi-adv-ndvi">0.58</span>
+            <span class="text-[9.5px] text-rose-500 font-semibold" id="kpi-adv-diff">-17.1% vs 0.70 Target</span>
+          </div>
+          <div class="p-3 bg-surface-container-lowest rounded-xl border border-surface-variant flex flex-col gap-0.5">
+            <span class="text-[10px] uppercase font-bold text-secondary">Crop Stage</span>
+            <span class="text-xs font-bold text-on-surface truncate" id="kpi-adv-crop">Paddy (Sona Masoori)</span>
+            <span class="text-[9.5px] text-secondary font-mono" id="kpi-adv-stage">Active Tillering (35 DAT)</span>
+          </div>
+          <div class="p-3 bg-surface-container-lowest rounded-xl border border-surface-variant flex flex-col gap-0.5">
+            <span class="text-[10px] uppercase font-bold text-secondary">Root-Zone Soil</span>
+            <span class="text-xs font-bold text-on-surface truncate" id="kpi-adv-soil">Sandy Clay Loam</span>
+            <span class="text-[9.5px] text-amber-600 font-semibold" id="kpi-adv-depletion">Top 10cm Drying Fast</span>
+          </div>
+          <div class="p-3 bg-surface-container-lowest rounded-xl border border-surface-variant flex flex-col gap-0.5">
+            <span class="text-[10px] uppercase font-bold text-secondary">72-Hr Weather Risk</span>
+            <span class="text-xs font-bold text-on-surface truncate" id="kpi-adv-weather">31°C • Zero Rain</span>
+            <span class="text-[9.5px] text-primary font-semibold" id="kpi-adv-evap">ET: ~4.2 mm/day</span>
+          </div>
+        </div>
+
+        <!-- 1. BIOPHYSICAL OBSERVATION (IN-DEPTH SPECTRAL PHYSICS) -->
+        <div class="p-4 sm:p-5 bg-surface-container-lowest rounded-2xl border border-surface-variant shadow-sm flex flex-col gap-3">
+          <div class="flex items-center gap-2 pb-2 border-b border-surface-variant">
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-bold text-base">
+              1
+            </div>
+            <div>
+              <h3 class="text-sm sm:text-base font-bold text-on-surface" id="adv-section1-title">What Did the Satellite Detect? — Detailed Spectral Physics</h3>
+              <p class="text-[11px] text-secondary">Copernicus Sentinel-2 Band 8 (NIR) &amp; Band 4 (Red) Reflectance Diagnostics</p>
+            </div>
+          </div>
+
+          <div class="text-xs text-on-surface leading-relaxed space-y-2.5">
+            <p id="adv-spectral-p1">
+              Copernicus Sentinel-2 multispectral instrument (MSI) acquired 10-meter ground resolution surface reflectance data for your parcel. The Normalized Difference Vegetation Index (NDVI) was computed using the formula:
+            </p>
+            <div class="p-2.5 rounded-xl bg-surface-container-low font-mono text-center text-xs text-primary font-bold border border-surface-variant select-all">
+              NDVI = (NIR Band 8 - Red Band 4) / (NIR Band 8 + Red Band 4)
+            </div>
+            <p id="adv-spectral-p2">
+              <strong>How this relates to your crop canopy:</strong> Healthy, turgid leaves contain spongy mesophyll cells filled with water. These cells strongly reflect 40%–50% of incoming Near-Infrared radiation (842 nm) while chlorophyll-a and chlorophyll-b pigments absorb 85%–90% of visible Red light (665 nm) for photosynthesis.
+            </p>
+            <p id="adv-spectral-p3">
+              <strong>Why the index dropped in the affected zone:</strong> When root moisture declines, leaf guard cells close stomata to prevent dehydration. This triggers a drop in leaf cellular turgor pressure and causes the spongy mesophyll internal cell walls to compress. As a result, Near-Infrared reflectance drops measurable days <em>before human eyes can detect visible leaf curling or yellowing</em>.
+            </p>
+
+            <!-- Visual Vigor Calibration Bar -->
+            <div class="p-3 bg-surface-container-low rounded-xl border border-surface-variant mt-1 flex flex-col gap-2">
+              <div class="flex items-center justify-between text-[10px] font-bold text-secondary">
+                <span>Vigor Scale</span>
+                <span>Calibrated Canopy Reflectance</span>
+              </div>
+              <div class="h-3 w-full rounded-full bg-gradient-to-r from-red-600 via-amber-400 via-lime-400 to-emerald-700 relative shadow-inner">
+                <!-- Current Zone Pin -->
+                <div id="adv-gauge-current-pin" class="absolute -top-1 bottom-1 w-1.5 bg-black rounded-full shadow-md" style="left: 58%;" title="Current Field (0.58)"></div>
+                <!-- Benchmark Target Pin -->
+                <div id="adv-gauge-target-pin" class="absolute -top-1 bottom-1 w-1.5 bg-white border border-black rounded-full shadow-md" style="left: 70%;" title="Target Benchmark (0.70)"></div>
+              </div>
+              <div class="flex items-center justify-between text-[9px] font-mono text-secondary">
+                <span>0.0 Water</span>
+                <span>0.3 Sparse</span>
+                <span class="text-amber-600 font-bold" id="adv-gauge-current-label">▲ Current: 0.58</span>
+                <span class="text-emerald-700 font-bold" id="adv-gauge-target-label">▲ Target: 0.70</span>
+                <span>0.9 Dense</span>
+              </div>
+            </div>
+
+            <!-- Spatial Distribution Note -->
+            <div class="p-3 rounded-xl bg-surface-container flex items-start gap-2 text-xs">
+              <span class="material-symbols-outlined text-amber-500 text-[18px] shrink-0 mt-0.5">location_on</span>
+              <div class="flex flex-col gap-0.5">
+                <span class="font-bold text-on-surface">Spatial Variation in Your Parcel</span>
+                <span class="text-[11px] text-on-surface-variant" id="adv-spatial-desc">
+                  North-East ridge zone shows 0.58 NDVI (12% localized dip). In contrast, the southern and central zones maintain steady canopy vigor at 0.67–0.70.
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. ROOT-ZONE HYDROLOGY & CAUSE ANALYSIS (WHAT COULD IT MEAN?) -->
+        <div class="p-4 sm:p-5 bg-surface-container-lowest rounded-2xl border border-surface-variant shadow-sm flex flex-col gap-3">
+          <div class="flex items-center gap-2 pb-2 border-b border-surface-variant">
+            <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 flex items-center justify-center font-bold text-base">
+              2
+            </div>
+            <div>
+              <h3 class="text-sm sm:text-base font-bold text-on-surface" id="adv-section2-title">Why Is This Happening? — Soil Hydrology &amp; Diagnostic Hypotheses</h3>
+              <p class="text-[11px] text-secondary">Agronomic Root-Zone Physics &amp; Ranked Probability Assessment</p>
+            </div>
+          </div>
+
+          <div class="text-xs text-on-surface leading-relaxed space-y-3">
+            <p id="adv-hydrology-desc">
+              Your field's Sandy Clay Loam holds moderate water capacity. Active feeding roots during this vegetative stage occupy the upper 0–15 cm zone. With dry 31°C daytime heat and gentle 12 km/h winds, surface evapotranspiration reaches 4.2 mm/day. The top 5 cm is drying out 3 times faster than deeper subsoil layers.
+            </p>
+
+            <!-- 3 Ranked Hypotheses Cards -->
+            <div class="space-y-2">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-secondary block">Differential Agronomic Hypotheses:</span>
+              
+              <!-- Hypothesis 1 -->
+              <div class="p-3 rounded-xl bg-surface-container-low border border-surface-variant flex flex-col gap-1">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-primary flex items-center gap-1.5" id="hypo1-title">
+                    <span class="w-2 h-2 rounded-full bg-primary"></span>
+                    <span>1. Uneven Irrigation Infiltration &amp; Emitter Clogging</span>
+                  </span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-mono" id="hypo1-prob">65% Probability</span>
+                </div>
+                <p class="text-[11px] text-on-surface-variant" id="hypo1-desc">
+                  <strong>Agronomic Mechanism:</strong> Slight elevation gradient along the north-eastern ridge causes water runoff rather than vertical percolation, or drip lateral emitters in rows 12–18 are partially clogged with silt/carbonate deposits.
+                </p>
+                <div class="text-[10px] text-secondary bg-surface-container p-1.5 rounded-lg font-mono" id="hypo1-check">
+                  Field Check: Dig 10cm down. If topsoil is powdery dry but lower soil retains slight moisture, irrigation distribution is the primary cause.
+                </div>
+              </div>
+
+              <!-- Hypothesis 2 -->
+              <div class="p-3 rounded-xl bg-surface-container-low border border-surface-variant flex flex-col gap-1">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-amber-700 flex items-center gap-1.5" id="hypo2-title">
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    <span>2. Microclimate Humidity &amp; Early Sheath Fungal Lesions</span>
+                  </span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-mono" id="hypo2-prob">20% Probability</span>
+                </div>
+                <p class="text-[11px] text-on-surface-variant" id="hypo2-desc">
+                  <strong>Agronomic Mechanism:</strong> Dense canopy tillering combined with high morning relative humidity (80%+) and warm 31°C afternoons can foster early sheath blight (Rhizoctonia solani) or leaf spot fungal spores on lower foliage.
+                </p>
+                <div class="text-[10px] text-secondary bg-surface-container p-1.5 rounded-lg font-mono" id="hypo2-check">
+                  Field Check: Part the canopy stems at 8 AM. Look for water-soaked greenish-grey lesions near the waterline or leaf sheath base.
+                </div>
+              </div>
+
+              <!-- Hypothesis 3 -->
+              <div class="p-3 rounded-xl bg-surface-container-low border border-surface-variant flex flex-col gap-1">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-secondary flex items-center gap-1.5" id="hypo3-title">
+                    <span class="w-2 h-2 rounded-full bg-secondary"></span>
+                    <span>3. Transient Nitrogen Uptake Restriction</span>
+                  </span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-mono" id="hypo3-prob">15% Probability</span>
+                </div>
+                <p class="text-[11px] text-on-surface-variant" id="hypo3-desc">
+                  <strong>Agronomic Mechanism:</strong> When root zone moisture drops below 40% Field Capacity, mass flow of dissolved nitrate (NO3-) ions to roots ceases, producing localized mild chlorosis that mimics nitrogen deficiency.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. CHRONOLOGICAL STEP-BY-STEP ACTION PROTOCOL (WHAT SHOULD I DO NEXT?) -->
+        <div class="p-4 sm:p-5 bg-surface-container-lowest rounded-2xl border border-surface-variant shadow-sm flex flex-col gap-3">
+          <div class="flex items-center gap-2 pb-2 border-b border-surface-variant">
+            <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-base">
+              3
+            </div>
+            <div>
+              <h3 class="text-sm sm:text-base font-bold text-on-surface" id="adv-section3-title">What Should You Do Next? — Step-by-Step Field Plan</h3>
+              <p class="text-[11px] text-secondary">Chronological Agronomic Intervention Protocol (ICAR Guidelines)</p>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            
+            <!-- Step 1 Card -->
+            <div class="p-3.5 rounded-xl bg-surface-container-low border-l-4 border-primary flex flex-col gap-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-xs text-primary flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[16px]">directions_walk</span>
+                  <span id="adv-step1-title">Step 1: Ground Truth Perimeter Walk</span>
+                </span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-primary/10 text-primary font-mono" id="adv-step1-time">Tomorrow 7:30 – 9:00 AM</span>
+              </div>
+              <ul class="text-xs text-on-surface-variant space-y-1 list-disc pl-4" id="adv-step1-items">
+                <li>Conduct perimeter walk specifically along the North-East ridge border.</li>
+                <li>Perform the <strong>Hand-Feel Soil Ball Test</strong>: Dig 10 cm into root zone and squeeze a handful of soil. If it crumbles without holding shape, available moisture is below 40% Field Capacity.</li>
+                <li>Inspect lower 10 cm of crop stems for water-soaked discolored lesions or rust pustules.</li>
+              </ul>
+            </div>
+
+            <!-- Step 2 Card -->
+            <div class="p-3.5 rounded-xl bg-surface-container-low border-l-4 border-amber-500 flex flex-col gap-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-xs text-amber-800 flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[16px]">water_drop</span>
+                  <span id="adv-step2-title">Step 2: Calibrated Irrigation Correction</span>
+                </span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/10 text-amber-800 font-mono" id="adv-step2-time">Tomorrow Evening 5:00 – 7:00 PM</span>
+              </div>
+              <ul class="text-xs text-on-surface-variant space-y-1 list-disc pl-4" id="adv-step2-items">
+                <li><strong>Irrigate during late afternoon / evening:</strong> Avoid midday watering which loses 30%–35% of volume to atmospheric evaporative heat and shocks delicate root hairs.</li>
+                <li>Apply 25–30 mm equivalent water depth (run drip system for ~2.5 hours) with priority distribution to rows along the eastern lateral line.</li>
+                <li>Flush lateral end-caps and clean sub-main filters to clear silt clogging.</li>
+              </ul>
+            </div>
+
+            <!-- Step 3 Card -->
+            <div class="p-3.5 rounded-xl bg-surface-container-low border-l-4 border-emerald-600 flex flex-col gap-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-xs text-emerald-800 flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[16px]">spa</span>
+                  <span id="adv-step3-title">Step 3: Crop Nutrition &amp; Protective Foliar Spray</span>
+                </span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-600/10 text-emerald-800 font-mono" id="adv-step3-time">Day 2 Morning 8:00 AM</span>
+              </div>
+              <ul class="text-xs text-on-surface-variant space-y-1 list-disc pl-4" id="adv-step3-items">
+                <li>Spray 1% Potassium Nitrate (KNO3 @ 10g/L) or 1% soluble urea in early morning to stimulate stomatal osmotic adjustment and prevent drought-induced leaf drop.</li>
+                <li>If fungal sheath lesions exceed 5% tiller threshold, prepare recommended organic neem seed formulation (Azadirachtin 0.03% @ 5ml/L) or consult Kisan helpline.</li>
+              </ul>
+            </div>
+
+            <!-- Step 4 Card -->
+            <div class="p-3.5 rounded-xl bg-surface-container-low border-l-4 border-blue-500 flex flex-col gap-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-xs text-blue-800 flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[16px]">satellite_alt</span>
+                  <span id="adv-step4-title">Step 4: Satellite Revisit Cycle &amp; Recovery Tracking</span>
+                </span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/10 text-blue-800 font-mono" id="adv-step4-time">Sentinel-2 In 5 Days</span>
+              </div>
+              <ul class="text-xs text-on-surface-variant space-y-1 list-disc pl-4" id="adv-step4-items">
+                <li>Copernicus Sentinel-2 pass revisit scheduled in 5 days over Mandya orbital track (Orbit R019).</li>
+                <li>Expected vegetative recovery: Rebound from 0.58 toward ≥ 0.65 within 5–7 days following irrigation and nutrient correction.</li>
+                <li>Earthworm will automatically process the new multispectral reflectances and notify you of the recovery status.</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 4. BOTTOM TELECOMMUNICATIONS & EXPORT STRIP -->
+        <div class="rounded-2xl bg-surface-container-lowest p-4 border border-surface-variant shadow-sm flex flex-col gap-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-[20px]">mark_email_read</span>
+              <span class="text-xs font-bold text-on-surface">Dispatch This Detailed Advisory to Handset</span>
+            </div>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+              Free SMS Delivery
+            </span>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-2">
+            <button onclick="promptAndSendFarmerSms()" class="flex-1 min-h-[44px] rounded-xl bg-primary text-on-primary font-bold text-xs flex items-center justify-center gap-2 shadow-sm hover:bg-primary/90 transition-all cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]">sms</span>
+              <span>Send 4-Step Checklist via Cellular SMS</span>
+            </button>
+            <button onclick="toggleAudioAdvice()" class="min-h-[44px] px-4 rounded-xl bg-surface-container hover:bg-surface-variant text-primary font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]">volume_up</span>
+              <span>Hear Voice Explanation</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+      <!-- END VIEW: ADVICE -->
 
     </div>
   </main>
@@ -3345,6 +3680,12 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         document.getElementById('sat-modal-b8').textContent = spec.bands.b8;
         document.getElementById('sat-modal-b11').textContent = spec.bands.b11;
       }
+
+      // Update detailed explanatory advice if advice view is active
+      const advView = document.getElementById('view-advice');
+      if (advView && !advView.classList.contains('hidden') && typeof renderDetailedExplanatoryAdvice === 'function') {
+        renderDetailedExplanatoryAdvice(regionKey);
+      }
     }
 
     function changeLanguage(langCode) {
@@ -3608,6 +3949,12 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       const icon = document.getElementById('audio-icon');
       const btnTxt = document.getElementById('btn-audio-listen');
       const toastWave = document.getElementById('audioToastWave');
+      const deepIcon = document.getElementById('deep-audio-icon');
+      const deepBtnTxt = document.getElementById('btn-deep-audio-label');
+
+      if (deepIcon) deepIcon.textContent = playing ? "pause" : "volume_up";
+      if (deepBtnTxt) deepBtnTxt.textContent = playing ? "Pause Spoken Advice" : "Listen Spoken Advice";
+
       if (playing) {
         if (icon) icon.textContent = "pause";
         if (btnTxt) btnTxt.textContent = "Pause Voice Advice";
@@ -4005,6 +4352,448 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       }
     }
 
+    const DEEP_ADVICE_PROFILES = {
+      mandya: {
+        stage: "Active Tillering (35 DAT)",
+        soil: "Sandy Clay Loam (Medium Retentive)",
+        depletion: "Top 10cm Drying Fast (3x vs subsoil)",
+        weather: "31°C Heat • 12 km/h Wind • 0mm Rain",
+        spectralP1: "Copernicus Sentinel-2 multispectral instrument (MSI Level-2A) acquired 10-meter ground resolution surface reflectance for Parcel #142/A. The Normalized Difference Vegetation Index (NDVI) was computed using Band 8 (NIR at 842nm) and Band 4 (Red at 665nm):",
+        spectralP2: "<strong>How this relates to your paddy canopy:</strong> Healthy, turgid rice leaves contain spongy mesophyll cells filled with water. These cells strongly reflect 40%–50% of incoming Near-Infrared radiation while chlorophyll-a and chlorophyll-b pigments absorb 85%–90% of visible Red light for photosynthesis.",
+        spectralP3: "<strong>Why the index dropped to 0.58 in the North-East quarter:</strong> When root moisture declines, rice leaf guard cells close stomata to conserve water. This triggers a drop in leaf cellular turgor pressure and causes the spongy mesophyll cell walls to compress. As a result, Near-Infrared reflectance drops measurable days <em>before human eyes can detect visible leaf curling or yellowing</em>.",
+        spatialDesc: "North-East ridge zone shows 0.58 NDVI (12% localized dip). In contrast, the southern and central zones maintain steady canopy vigor at 0.67–0.70.",
+        hydrologyDesc: "Your field's Sandy Clay Loam holds moderate water capacity. Active feeding roots during this vegetative stage occupy the upper 0–15 cm zone. With dry 31°C daytime heat and gentle 12 km/h winds, surface evapotranspiration reaches 4.2 mm/day. The top 5 cm is drying out 3 times faster than deeper subsoil layers.",
+        gaugeCurrent: 0.58,
+        gaugeTarget: 0.70,
+        hypo1: {
+          title: "1. Uneven Irrigation Infiltration & Emitter Clogging",
+          prob: "65% Probability",
+          desc: "<strong>Agronomic Mechanism:</strong> Slight elevation gradient along the north-eastern ridge causes water runoff rather than vertical percolation, or drip lateral emitters in rows 12–18 are partially clogged with silt/carbonate deposits.",
+          check: "Field Check: Dig 10cm down. If topsoil is powdery dry but lower soil retains slight moisture, irrigation distribution is the primary cause."
+        },
+        hypo2: {
+          title: "2. Microclimate Humidity & Early Sheath Fungal Lesions",
+          prob: "20% Probability",
+          desc: "<strong>Agronomic Mechanism:</strong> Dense canopy tillering combined with high morning relative humidity (80%+) and warm 31°C afternoons can foster early sheath blight (Rhizoctonia solani) or leaf spot fungal spores on lower foliage.",
+          check: "Field Check: Part the canopy stems at 8 AM. Look for water-soaked greenish-grey lesions near the waterline or leaf sheath base."
+        },
+        hypo3: {
+          title: "3. Transient Nitrogen Uptake Restriction",
+          prob: "15% Probability",
+          desc: "<strong>Agronomic Mechanism:</strong> When root zone moisture drops below 40% Field Capacity, mass flow of dissolved nitrate (NO3-) ions to roots ceases, producing localized mild chlorosis that mimics nitrogen deficiency."
+        },
+        step1: {
+          title: "Step 1: Ground Truth Perimeter Walk",
+          time: "Tomorrow 7:30 – 9:00 AM",
+          items: [
+            "Conduct perimeter walk specifically along the North-East ridge border.",
+            "Perform the <strong>Hand-Feel Soil Ball Test</strong>: Dig 10 cm into root zone and squeeze a handful of soil. If it crumbles without holding shape, available moisture is below 40% Field Capacity.",
+            "Inspect lower 10 cm of crop stems for water-soaked discolored lesions or rust pustules."
+          ]
+        },
+        step2: {
+          title: "Step 2: Calibrated Irrigation Correction",
+          time: "Tomorrow Evening 5:00 – 7:00 PM",
+          items: [
+            "<strong>Irrigate during late afternoon / evening:</strong> Avoid midday watering which loses 30%–35% of volume to atmospheric evaporative heat and shocks delicate root hairs.",
+            "Apply 25–30 mm equivalent water depth (run drip system for ~2.5 hours) with priority distribution to rows along the eastern lateral line.",
+            "Flush lateral end-caps and clean sub-main filters to clear silt clogging."
+          ]
+        },
+        step3: {
+          title: "Step 3: Crop Nutrition & Protective Foliar Spray",
+          time: "Day 2 Morning 8:00 AM",
+          items: [
+            "Spray 1% Potassium Nitrate (KNO3 @ 10g/L) or 1% soluble urea in early morning to stimulate stomatal osmotic adjustment and prevent drought-induced leaf drop.",
+            "If fungal sheath lesions exceed 5% tiller threshold, prepare recommended organic neem seed formulation (Azadirachtin 0.03% @ 5ml/L) or consult Kisan helpline."
+          ]
+        },
+        step4: {
+          title: "Step 4: Satellite Revisit Cycle & Recovery Tracking",
+          time: "Sentinel-2 In 5 Days",
+          items: [
+            "Copernicus Sentinel-2 pass revisit scheduled in 5 days over Mandya orbital track (Orbit R019).",
+            "Expected vegetative recovery: Rebound from 0.58 toward ≥ 0.65 within 5–7 days following irrigation and nutrient correction.",
+            "Earthworm will automatically process the new multispectral reflectances and notify you of the recovery status."
+          ]
+        }
+      },
+      ludhiana: {
+        stage: "Late Tillering / Jointing (CRI Complete)",
+        soil: "Alluvial Loam (High Silt Fraction)",
+        depletion: "Optimal Subsoil Moisture Envelope",
+        weather: "24°C Mild • Clear Skies • 8 km/h NW Wind",
+        spectralP1: "Sentinel-2 multispectral sensors measured Band 8 (842nm) reflectance of 48% across Parcel #89/C in Ludhiana, producing an NDVI of 0.72 (above the 0.70 seasonal baseline).",
+        spectralP2: "<strong>Crop physiological state:</strong> High vegetative reflectance indicates active chlorophyll synthesis in the wheat tillering canopy. High tillering density provides uniform ground shading, keeping the root crown cool.",
+        spectralP3: "<strong>Agronomic timing:</strong> The wheat crop has successfully passed the critical Crown Root Initiation (CRI) stage. Nitrogen uptake capacity is at its seasonal peak during this jointing transition.",
+        spatialDesc: "Entire field parcel shows high, uniform green vigor across all 2.4 hectares with no dry canopy anomalies.",
+        hydrologyDesc: "Alluvial loam retains excellent moisture in the 15–30 cm subsoil profile. Evaporation is minimal (2.1 mm/day) due to dense canopy cover and cool 24°C daytime temperatures.",
+        gaugeCurrent: 0.72,
+        gaugeTarget: 0.70,
+        hypo1: {
+          title: "1. Peak Nitrogen Demand Window Open",
+          prob: "80% Probability",
+          desc: "<strong>Agronomic Mechanism:</strong> Rapid vegetative elongation requires nitrogen top-dressing to sustain spikelet differentiation before the daytime temperature begins to climb next week.",
+          check: "Field Check: Inspect lower leaf tips for yellowing. If tillering density is dense, proceed with scheduled second split of urea."
+        },
+        hypo2: {
+          title: "2. Yellow Rust (Puccinia striiformis) Early Surveillance",
+          prob: "15% Probability",
+          desc: "<strong>Agronomic Mechanism:</strong> Morning dews and cool 10°–12°C nights in the Punjab plains favor stripe rust spore germination on upper flag leaves.",
+          check: "Field Check: Run fingers along upper leaf blades. If yellow powdery spores rub off on fingers, immediate fungicidal intervention is required."
+        },
+        hypo3: {
+          title: "3. Micro-lodging Risk from Excess Foliage",
+          prob: "5% Probability",
+          desc: "<strong>Agronomic Mechanism:</strong> Over-fertilization during jointing combined with spring gusts can cause basal stem bending."
+        },
+        step1: {
+          title: "Step 1: Stripe Rust Canopy Scouting",
+          time: "Tomorrow 8:00 – 9:30 AM",
+          items: [
+            "Walk diagonal transect across plot #89/C looking for linear yellow stripe pustules.",
+            "Confirm absence of rust spores before scheduling canal run."
+          ]
+        },
+        step2: {
+          title: "Step 2: Nitrogen Top-Dressing Application",
+          time: "Tomorrow Afternoon Ahead of Canal Run",
+          items: [
+            "Broadcast recommended second split of Urea (65 kg/hectare) uniformly across the parcel.",
+            "Coordinate timing with scheduled light canal run to dissolve urea directly into root zone without volatilization losses."
+          ]
+        },
+        step3: {
+          title: "Step 3: Light Intercultural Operations",
+          time: "Day 3 Morning",
+          items: [
+            "Conduct light weeding along headlands and bunds to maintain airflow.",
+            "Avoid heavy machinery across soft alluvial soil to prevent subsoil pan compaction."
+          ]
+        },
+        step4: {
+          title: "Step 4: Sentinel-2 Heading Phase Revisit",
+          time: "Sentinel-2 In 5 Days",
+          items: [
+            "Next Sentinel-2 pass will monitor canopy transition toward the flag leaf / heading stage.",
+            "Target NDVI benchmark: Maintain ≥ 0.72 through boot stage."
+          ]
+        }
+      },
+      varanasi: {
+        stage: "Pod Siliquae Formation / Flowering",
+        soil: "Gangetic Loam (High Fertility)",
+        depletion: "Foliar Density Trapping Furrow Humidity",
+        weather: "28°C Warm • Dry Air • Clear Skies",
+        spectralP1: "Copernicus Sentinel-2 imagery records dense biomass reflectance (NDVI 0.64) across Parcel #214/B in Varanasi, indicating extensive flowering canopy with high relative density.",
+        spectralP2: "<strong>Biophysical impact:</strong> Dense yellow-flowering mustard canopy alters the Red-Edge reflection profile (705nm and 740nm). The thick foliage forms a humid microclimate in the central furrows.",
+        spectralP3: "<strong>Microclimate warning:</strong> Morning dews trapped under the dense foliage combined with 28°C afternoon warmth create an optimal breeding ground for mustard aphids (Lipaphis erysimi).",
+        spatialDesc: "High canopy density centered in the central furrows where humidity retention is highest.",
+        hydrologyDesc: "Gangetic alluvial loam retains adequate moisture. Excessive irrigation during peak flowering should be strictly avoided to prevent flower drop and Sclerotinia stem rot.",
+        gaugeCurrent: 0.64,
+        gaugeTarget: 0.65,
+        hypo1: {
+          title: "1. Mustard Aphid (Lipaphis erysimi) Infestation Threat",
+          prob: "70% Probability",
+          desc: "<strong>Agronomic Mechanism:</strong> Aphid colonies multiply rapidly on tender inflorescences and young siliquae (pods), sucking plant sap and stunting oil-seed filling.",
+          check: "Field Check: Inspect 20 plants randomly. Check top 10 cm of central floral twigs for tiny green/black aphids."
+        },
+        hypo2: {
+          title: "2. Flower Abortion Risk from Over-Watering",
+          prob: "20% Probability",
+          desc: "<strong>Agronomic Mechanism:</strong> Excessive furrow flooding during flowering shocks the root zone and causes premature petal and pod abortion.",
+          check: "Field Check: Ensure furrow soil remains moist but not standing with free water."
+        },
+        hypo3: {
+          title: "3. Alternaria Blight on Lower Pods",
+          prob: "10% Probability",
+          desc: "<strong>Agronomic Mechanism:</strong> Dark concentric rings on lower leaves or pods indicate Alternaria blight infection."
+        },
+        step1: {
+          title: "Step 1: Aphid Threshold Scouting",
+          time: "Tomorrow 8:00 AM",
+          items: [
+            "Scout central rows at 8:00 AM. Check 10 cm top twig shoots.",
+            "If aphid count exceeds Economic Threshold Level (ETL: 10–15 aphids per twig on 20% of plants), prepare bio-intervention immediately."
+          ]
+        },
+        step2: {
+          title: "Step 2: Install Yellow Sticky Traps",
+          time: "Tomorrow Morning",
+          items: [
+            "Place 4–6 yellow sticky traps per acre at crop canopy height to monitor and trap winged alate aphids.",
+            "Helps suppress incoming migratory aphid swarms without toxic chemical residue."
+          ]
+        },
+        step3: {
+          title: "Step 3: Organic Neem / Bio-Spray Protocol",
+          time: "Day 2 Early Morning",
+          items: [
+            "Spray Neem Seed Kernel Extract (NSKE 5%) or 10,000 ppm Azadirachtin @ 2 ml/L directed toward flowering twigs.",
+            "Ensure spray is applied before 9 AM to avoid disrupting honeybee pollinators."
+          ]
+        },
+        step4: {
+          title: "Step 4: Sentinel-2 Seed Filling Tracking",
+          time: "Sentinel-2 In 5 Days",
+          items: [
+            "Next Sentinel-2 pass will monitor the spectral transition from peak yellow bloom to green siliquae development.",
+            "Expected NDVI target: 0.65–0.68."
+          ]
+        }
+      },
+      nashik: {
+        stage: "Late Kharif Onion: Active Bulb Swelling",
+        soil: "Black Cotton Soil / Medium Clay Loam",
+        depletion: "Sensitive to Waterlogging & Clay Cracking",
+        weather: "30°C Dry • 14 km/h Wind • 0mm Rain",
+        spectralP1: "Copernicus Sentinel-2 reflectance registers an NDVI of 0.61 across Parcel #56/D in Dindori (Nashik), consistent with the spectral transition from foliar vegetative growth into underground bulb expansion.",
+        spectralP2: "<strong>Biophysical bulb dynamics:</strong> As photosynthates translocate from green tubular leaves downward into onion bulb rings, the canopy reflectance stabilizes. Water regulation is critical to prevent neck rot and skin splitting.",
+        spectralP3: "<strong>Moisture stress sensitivity:</strong> Black cotton soils shrink and crack rapidly in 30°C dry heat. Deep soil cracking tears delicate lateral feeder roots, causing immediate stress.",
+        spatialDesc: "Uniform bulb development signature across the parcel. Lateral drip lines indicate steady delivery.",
+        hydrologyDesc: "Black cotton soil requires light, frequent micro-irrigation. Deep flood irrigation causes anaerobic waterlogging and triggers basal bulb rot (Fusarium).",
+        gaugeCurrent: 0.61,
+        gaugeTarget: 0.62,
+        hypo1: {
+          title: "1. Critical Bulb Swelling Moisture Window",
+          prob: "75% Probability",
+          desc: "<strong>Agronomic Mechanism:</strong> Alternate-day 2-hour drip runs maintain optimal soil moisture tension in the root zone without causing anaerobic standing water.",
+          check: "Field Check: Check drip laterals for calcium carbonate scaling. Inspect top 10 cm around bulb shoulders."
+        },
+        hypo2: {
+          title: "2. Purple Blotch (Alternaria porri) & Thrips Watch",
+          prob: "15% Probability",
+          desc: "<strong>Agronomic Mechanism:</strong> Onion thrips (Thrips tabaci) scrape leaf surfaces, allowing purple blotch spores to penetrate inner leaf tubes.",
+          check: "Field Check: Inspect leaf axils for tiny yellow thrips nymphs."
+        },
+        hypo3: {
+          title: "3. Pre-Harvest Curing Preparation",
+          prob: "10% Probability",
+          desc: "<strong>Agronomic Mechanism:</strong> Withholding irrigation 10–12 days before harvest is necessary to cure bulb skins and prevent storage rots."
+        },
+        step1: {
+          title: "Step 1: Check Bulb Shoulders & Lateral Emitters",
+          time: "Tomorrow 8:00 AM",
+          items: [
+            "Examine bulb shoulders for uniform expansion and absence of neck softness.",
+            "Verify all drip micro-emitters are discharging clear water without mineral clogging."
+          ]
+        },
+        step2: {
+          title: "Step 2: Maintain Alternate-Day Drip Schedule",
+          time: "Tomorrow Evening 5:00 – 7:00 PM",
+          items: [
+            "Run drip irrigation for exactly 2 hours in late afternoon.",
+            "Avoid over-irrigation to protect bulb skins and prevent basal plate rot."
+          ]
+        },
+        step3: {
+          title: "Step 3: Micronutrient Foliar Nourishment",
+          time: "Day 2 Morning",
+          items: [
+            "Spray 0.2% Boron (Solubor @ 2g/L) to strengthen onion outer scales and improve storage shelf-life.",
+            "Add agricultural sticker (0.5 ml/L) so spray adheres to waxy onion foliage."
+          ]
+        },
+        step4: {
+          title: "Step 4: Sentinel-2 Neck Fall Tracking",
+          time: "Sentinel-2 In 5 Days",
+          items: [
+            "Next Sentinel-2 pass will monitor the beginning of physiological maturity (neck fall).",
+            "Prepare for pre-harvest water cutoff when 50% neck fall is reached."
+          ]
+        }
+      }
+    };
+
+    function renderDetailedExplanatoryAdvice(regionKey) {
+      const data = REGIONS_DATA[regionKey] || REGIONS_DATA.mandya;
+      const profile = DEEP_ADVICE_PROFILES[regionKey] || {
+        stage: `${data.crop} • Active Vegetative Stage`,
+        soil: "Agricultural Loam with Medium Drainage",
+        depletion: "Active Root Zone (0-15cm)",
+        weather: data.weatherOutlook || "Warm • Dry conditions",
+        spectralP1: `Copernicus Sentinel-2 multispectral sensors acquired 10-meter ground resolution surface reflectance data for ${data.plotTitle || data.parcel}. The Normalized Difference Vegetation Index (NDVI) was computed using Band 8 (NIR at 842nm) and Band 4 (Red at 665nm):`,
+        spectralP2: `<strong>How this relates to ${data.crop}:</strong> Turgid leaves with healthy moisture reflect near-infrared radiation strongly from spongy mesophyll tissue while absorbing red light for active photosynthesis.`,
+        spectralP3: `<strong>Biophysical insight:</strong> ${data.notice || 'Vegetative reflectance indicates crop moisture response in the parcel.'}`,
+        spatialDesc: data.notice || "Canopy reflectance monitored across all field parcel boundaries.",
+        hydrologyDesc: `Soil conditions in ${data.location} require balanced irrigation scheduling to sustain active ${data.crop} root depth without causing surface crusting.`,
+        gaugeCurrent: parseFloat(data.metric) || 0.65,
+        gaugeTarget: 0.70,
+        hypo1: {
+          title: "1. Irrigation Percolation Distribution",
+          prob: "65% Probability",
+          desc: `<strong>Agronomic Mechanism:</strong> ${data.meaning || 'Soil moisture variation affects nutrient uptake.'}`,
+          check: "Field Check: Inspect root zone moisture 10cm below ground level."
+        },
+        hypo2: {
+          title: "2. Microclimate Humidity & Leaf Health",
+          prob: "25% Probability",
+          desc: "<strong>Agronomic Mechanism:</strong> Morning moisture and afternoon heat require leaf and stem inspection.",
+          check: "Field Check: Inspect lower foliage for early fungal or leaf spot lesions."
+        },
+        hypo3: {
+          title: "3. Nutrient Assimilation Window",
+          prob: "10% Probability",
+          desc: "<strong>Agronomic Mechanism:</strong> Adequate soil moisture is required for active nitrogen and potassium diffusion."
+        },
+        step1: {
+          title: "Step 1: Ground Truth Field Inspection",
+          time: "Tomorrow 7:30 – 9:00 AM",
+          items: [
+            data.action || "Inspect parcel boundaries and check top 10 cm soil moisture.",
+            "Verify plant turgor and check for leaf lesion symptoms."
+          ]
+        },
+        step2: {
+          title: "Step 2: Scheduled Irrigation Management",
+          time: "Tomorrow Evening 5:00 – 7:00 PM",
+          items: [
+            "Irrigate in late afternoon / evening to reduce atmospheric evaporative loss.",
+            "Maintain uniform water application across all field furrows or drip laterals."
+          ]
+        },
+        step3: {
+          title: "Step 3: Crop Health & Nutrition Support",
+          time: "Day 2 Morning",
+          items: [
+            "Apply recommended agricultural university nutrition or foliar spray if needed.",
+            "Consult Kisan Call Centre at 1800-180-1551 for regional advice."
+          ]
+        },
+        step4: {
+          title: "Step 4: Sentinel-2 Satellite Revisit",
+          time: "Sentinel-2 In 5 Days",
+          items: [
+            "Sentinel-2 will re-observe this parcel in 5 days.",
+            "Earthworm will process updated NDVI vigor metrics automatically."
+          ]
+        }
+      };
+
+      // Update Header & Subtitle
+      const headline = document.getElementById('deep-advice-headline');
+      if (headline) headline.textContent = data.advisoryTitle;
+      const sub = document.getElementById('deep-advice-sub');
+      if (sub) sub.textContent = `Biophysical vegetation index analysis and agrometeorological interpretation for ${data.plotTitle || data.parcel}.`;
+
+      // Update KPI Strip
+      const ndviVal = parseFloat(data.metric) || 0.58;
+      const kpiNdvi = document.getElementById('kpi-adv-ndvi');
+      if (kpiNdvi) {
+        kpiNdvi.textContent = ndviVal.toFixed(2);
+        kpiNdvi.className = `text-base font-black font-mono ${ndviVal >= 0.65 ? 'text-emerald-400' : (ndviVal >= 0.55 ? 'text-amber-400' : 'text-rose-400')}`;
+      }
+      const kpiDiff = document.getElementById('kpi-adv-diff');
+      if (kpiDiff) kpiDiff.textContent = data.metric;
+      const kpiCrop = document.getElementById('kpi-adv-crop');
+      if (kpiCrop) kpiCrop.textContent = data.cropTitle || data.crop;
+      const kpiStage = document.getElementById('kpi-adv-stage');
+      if (kpiStage) kpiStage.textContent = profile.stage;
+      const kpiSoil = document.getElementById('kpi-adv-soil');
+      if (kpiSoil) kpiSoil.textContent = profile.soil;
+      const kpiDepletion = document.getElementById('kpi-adv-depletion');
+      if (kpiDepletion) kpiDepletion.textContent = profile.depletion;
+      const kpiWeather = document.getElementById('kpi-adv-weather');
+      if (kpiWeather) kpiWeather.textContent = (data.days && data.days[0]) ? `${data.days[0].temp} • ${data.days[0].rain}` : "31°C • 0mm rain";
+
+      // Update Spectral Physics Section
+      const p1 = document.getElementById('adv-spectral-p1');
+      if (p1) p1.innerHTML = profile.spectralP1;
+      const p2 = document.getElementById('adv-spectral-p2');
+      if (p2) p2.innerHTML = profile.spectralP2;
+      const p3 = document.getElementById('adv-spectral-p3');
+      if (p3) p3.innerHTML = profile.spectralP3;
+
+      // Update Vigor Gauge
+      const curPin = document.getElementById('adv-gauge-current-pin');
+      if (curPin) {
+        const curPct = Math.min(95, Math.max(5, Math.round(profile.gaugeCurrent * 100)));
+        curPin.style.left = `${curPct}%`;
+      }
+      const curLabel = document.getElementById('adv-gauge-current-label');
+      if (curLabel) curLabel.textContent = `▲ Current: ${profile.gaugeCurrent.toFixed(2)}`;
+      const targetPin = document.getElementById('adv-gauge-target-pin');
+      if (targetPin) {
+        const tgtPct = Math.min(95, Math.max(5, Math.round(profile.gaugeTarget * 100)));
+        targetPin.style.left = `${tgtPct}%`;
+      }
+      const targetLabel = document.getElementById('adv-gauge-target-label');
+      if (targetLabel) targetLabel.textContent = `▲ Target: ${profile.gaugeTarget.toFixed(2)}`;
+
+      // Update Spatial Variation
+      const spatialDesc = document.getElementById('adv-spatial-desc');
+      if (spatialDesc) spatialDesc.textContent = profile.spatialDesc;
+
+      // Update Soil Hydrology
+      const hydroDesc = document.getElementById('adv-hydrology-desc');
+      if (hydroDesc) hydroDesc.textContent = profile.hydrologyDesc;
+
+      // Update Hypotheses
+      const h1t = document.getElementById('hypo1-title');
+      if (h1t) h1t.innerHTML = `<span class="w-2 h-2 rounded-full bg-primary"></span><span>${profile.hypo1.title}</span>`;
+      const h1p = document.getElementById('hypo1-prob');
+      if (h1p) h1p.textContent = profile.hypo1.prob;
+      const h1d = document.getElementById('hypo1-desc');
+      if (h1d) h1d.innerHTML = profile.hypo1.desc;
+      const h1c = document.getElementById('hypo1-check');
+      if (h1c) h1c.textContent = profile.hypo1.check || '';
+
+      const h2t = document.getElementById('hypo2-title');
+      if (h2t) h2t.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500"></span><span>${profile.hypo2.title}</span>`;
+      const h2p = document.getElementById('hypo2-prob');
+      if (h2p) h2p.textContent = profile.hypo2.prob;
+      const h2d = document.getElementById('hypo2-desc');
+      if (h2d) h2d.innerHTML = profile.hypo2.desc;
+      const h2c = document.getElementById('hypo2-check');
+      if (h2c) h2c.textContent = profile.hypo2.check || '';
+
+      const h3t = document.getElementById('hypo3-title');
+      if (h3t) h3t.innerHTML = `<span class="w-2 h-2 rounded-full bg-secondary"></span><span>${profile.hypo3.title}</span>`;
+      const h3p = document.getElementById('hypo3-prob');
+      if (h3p) h3p.textContent = profile.hypo3.prob;
+      const h3d = document.getElementById('hypo3-desc');
+      if (h3d) h3d.innerHTML = profile.hypo3.desc;
+
+      // Update 4 Step Action Cards
+      const s1t = document.getElementById('adv-step1-title');
+      if (s1t) s1t.textContent = profile.step1.title;
+      const s1tm = document.getElementById('adv-step1-time');
+      if (s1tm) s1tm.textContent = profile.step1.time;
+      const s1i = document.getElementById('adv-step1-items');
+      if (s1i) s1i.innerHTML = profile.step1.items.map(it => `<li>${it}</li>`).join('');
+
+      const s2t = document.getElementById('adv-step2-title');
+      if (s2t) s2t.textContent = profile.step2.title;
+      const s2tm = document.getElementById('adv-step2-time');
+      if (s2tm) s2tm.textContent = profile.step2.time;
+      const s2i = document.getElementById('adv-step2-items');
+      if (s2i) s2i.innerHTML = profile.step2.items.map(it => `<li>${it}</li>`).join('');
+
+      const s3t = document.getElementById('adv-step3-title');
+      if (s3t) s3t.textContent = profile.step3.title;
+      const s3tm = document.getElementById('adv-step3-time');
+      if (s3tm) s3tm.textContent = profile.step3.time;
+      const s3i = document.getElementById('adv-step3-items');
+      if (s3i) s3i.innerHTML = profile.step3.items.map(it => `<li>${it}</li>`).join('');
+
+      const s4t = document.getElementById('adv-step4-title');
+      if (s4t) s4t.textContent = profile.step4.title;
+      const s4tm = document.getElementById('adv-step4-time');
+      if (s4tm) s4tm.textContent = profile.step4.time;
+      const s4i = document.getElementById('adv-step4-items');
+      if (s4i) s4i.innerHTML = profile.step4.items.map(it => `<li>${it}</li>`).join('');
+
+      // Update Active Farm Pills inside Advice View
+      document.querySelectorAll('.adv-region-pill').forEach(btn => {
+        btn.className = "adv-region-pill text-[11px] font-medium px-3 py-1 rounded-full bg-surface-container text-on-surface hover:bg-surface-variant shrink-0 transition-all cursor-pointer";
+      });
+      const activeAdvPill = document.getElementById(`adv-pill-${regionKey}`);
+      if (activeAdvPill) {
+        activeAdvPill.className = "adv-region-pill text-[11px] font-bold px-3 py-1 rounded-full bg-primary text-on-primary shrink-0 transition-all cursor-pointer shadow-xs";
+      }
+    }
+
     function switchTab(tab) {
       const tabs = ['home', 'myfarm', 'advice'];
       tabs.forEach(t => {
@@ -4026,14 +4815,36 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         }
       });
 
+      const viewHome = document.getElementById('view-home');
+      const viewAdvice = document.getElementById('view-advice');
+
       if (tab === 'home') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
         closeModal('fieldModal');
         closeModal('adviceModal');
+        if (viewAdvice) {
+          viewAdvice.classList.add('hidden');
+          viewAdvice.classList.remove('flex');
+        }
+        if (viewHome) {
+          viewHome.classList.remove('hidden');
+          viewHome.classList.add('flex');
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } else if (tab === 'myfarm') {
         openModal('fieldModal');
       } else if (tab === 'advice') {
-        openModal('adviceModal');
+        closeModal('fieldModal');
+        closeModal('adviceModal');
+        if (viewHome) {
+          viewHome.classList.add('hidden');
+          viewHome.classList.remove('flex');
+        }
+        if (viewAdvice) {
+          viewAdvice.classList.remove('hidden');
+          viewAdvice.classList.add('flex');
+        }
+        renderDetailedExplanatoryAdvice(currentRegionKey);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
 
