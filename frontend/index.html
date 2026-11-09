@@ -703,18 +703,22 @@
         </div>
       </section>
 
-      <!-- 4. CONCISE ADVISORY CARD (CLEAN & ACTIONABLE PREVIEW - FULL EXPLANATION IN DEDICATED ADVICE TAB) -->
-      <section id="advisory-section" class="rounded-2xl bg-surface-container-lowest p-4 border border-surface-variant shadow-sm flex flex-col gap-3">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary-container text-on-tertiary-container text-xs font-bold" id="alert-badge-wrap">
-            <span class="material-symbols-outlined text-[16px]">warning</span>
+      <!-- 4. CONCISE ADVISORY CARD (CLEAN, VIBRANT & ACTIONABLE PREVIEW) -->
+      <section id="advisory-section" class="rounded-3xl bg-gradient-to-br from-surface-container-lowest via-emerald-50/30 to-surface-container-lowest p-4 sm:p-5 border-2 border-emerald-600/30 shadow-md flex flex-col gap-3.5 relative overflow-hidden">
+        <!-- Top decorative color accent bar -->
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-amber-500"></div>
+
+        <div class="flex items-center justify-between pt-1">
+          <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 text-white text-xs font-black shadow-xs" id="alert-badge-wrap">
+            <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
             <span id="alert-badge">ATTENTION • ACTION RECOMMENDED</span>
           </div>
-          <span class="text-[10px] font-semibold text-secondary bg-surface-container px-2 py-0.5 rounded">Agromet Summary</span>
+          <span class="text-[11px] font-bold text-emerald-900 bg-emerald-100/90 border border-emerald-300 px-2.5 py-0.5 rounded-full">Agromet Summary</span>
         </div>
+
         <div class="flex flex-col gap-1">
-          <h2 class="text-base sm:text-lg font-bold text-on-surface" id="advisory-title">Field Needs Inspection: Canopy Moisture Change</h2>
-          <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed" id="advisory-desc">
+          <h2 class="text-base sm:text-lg font-black text-on-surface tracking-tight" id="advisory-title">Field Needs Inspection: Canopy Moisture Change</h2>
+          <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed font-medium" id="advisory-desc">
             Status: Possible change in vegetative reflectance detected in the North-East zone. Requires physical ground verification before scheduling irrigation or chemical treatments.
           </p>
         </div>
@@ -729,66 +733,76 @@
           <span id="card-action"></span>
         </div>
 
-        <div class="flex items-center gap-3 p-2.5 rounded-xl bg-surface-container text-xs text-on-surface">
-          <span class="material-symbols-outlined text-primary text-[20px]">analytics</span>
+        <!-- Rich Health Metric Pill -->
+        <div class="flex items-center gap-3 p-3 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-sky-50 border border-emerald-200/90 text-xs shadow-xs">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex items-center justify-center shrink-0 shadow-xs">
+            <span class="material-symbols-outlined text-[20px]">analytics</span>
+          </div>
           <div class="flex flex-col">
-            <span class="text-on-surface-variant text-[11px]">Vegetative Health Index (NDVI Reference)</span>
-            <span class="font-bold text-primary" id="advisory-metric">0.58 (Dip of 12% vs. healthy benchmark 0.70)</span>
+            <span class="text-emerald-900/80 text-[11px] font-bold">Vegetative Health Index (NDVI Reference)</span>
+            <span class="font-black text-emerald-900 text-sm tracking-tight" id="advisory-metric">0.58 (Dip of 12% vs. healthy benchmark 0.70)</span>
           </div>
         </div>
 
-        <div class="flex flex-col sm:flex-row gap-2 pt-1">
-          <button class="flex-1 min-h-[48px] rounded-xl bg-primary text-on-primary font-semibold text-sm flex items-center justify-center gap-2 active:bg-primary-container shadow-sm transition-colors cursor-pointer" onclick="openBriefAdviceModal()" type="button" id="btn-brief-advice-trigger">
+        <!-- Action Buttons with Enhanced Color & Contrast -->
+        <div class="flex flex-col sm:flex-row gap-2.5 pt-1">
+          <button class="flex-1 min-h-[48px] rounded-xl bg-gradient-to-r from-emerald-700 via-emerald-800 to-teal-800 hover:from-emerald-800 hover:to-teal-900 text-white font-bold text-sm flex items-center justify-center gap-2 active:scale-[0.99] shadow-md hover:shadow-lg transition-all cursor-pointer" onclick="openBriefAdviceModal()" type="button" id="btn-brief-advice-trigger">
             <span class="material-symbols-outlined text-[18px]">summarize</span>
             <span id="btn-view-advice">View Advice (Brief)</span>
           </button>
-          <button class="min-h-[48px] px-4 rounded-xl bg-surface-container hover:bg-surface-variant text-primary font-semibold text-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer" id="btn-audio-voice" onclick="toggleAudioAdvice()" type="button">
-            <span class="material-symbols-outlined text-[18px]" id="audio-icon">volume_up</span>
+          <button class="min-h-[48px] px-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 text-amber-950 border border-amber-300 font-bold text-sm flex items-center justify-center gap-1.5 shadow-xs active:scale-[0.99] transition-all cursor-pointer" id="btn-audio-voice" onclick="toggleAudioAdvice()" type="button">
+            <span class="material-symbols-outlined text-[18px] text-amber-700" id="audio-icon">volume_up</span>
             <span id="btn-audio-listen">Listen Voice Advice</span>
           </button>
         </div>
       </section>
 
-      <!-- 5. THREE PRACTICAL ACTION TILES -->
+      <!-- 5. THREE PRACTICAL ACTION TILES WITH VIBRANT THEMES -->
       <section id="actions-section" class="flex flex-col gap-2.5">
         <div class="flex items-center justify-between">
-          <h3 class="text-base font-bold text-on-surface" id="tiles-header">Three Practical Field Actions</h3>
-          <span class="text-xs text-secondary">Tap tile to inspect</span>
+          <h3 class="text-base font-black text-on-surface tracking-tight" id="tiles-header">Three Practical Field Actions</h3>
+          <span class="text-xs font-semibold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">Tap tile to inspect</span>
         </div>
-        <button class="w-full p-3.5 rounded-2xl bg-surface-container-lowest border border-surface-variant shadow-sm flex items-start gap-3.5 text-left hover:bg-surface-container-low active:bg-surface-container transition-all min-h-[48px]" onclick="openModal('healthModal')" type="button">
-          <div class="w-11 h-11 rounded-xl bg-primary-fixed flex items-center justify-center shrink-0 text-on-primary-fixed">
+        
+        <!-- Tile 1: Emerald Theme -->
+        <button class="w-full p-3.5 rounded-2xl bg-gradient-to-r from-emerald-50/50 via-surface-container-lowest to-surface-container-lowest border border-emerald-200/90 shadow-sm flex items-start gap-3.5 text-left hover:border-emerald-400 hover:shadow-md active:bg-emerald-50/30 transition-all min-h-[48px] cursor-pointer group" onclick="openModal('healthModal')" type="button">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shrink-0 text-white shadow-md group-hover:scale-105 transition-transform">
             <span class="material-symbols-outlined text-[24px]">eco</span>
           </div>
           <div class="flex flex-col flex-1 min-w-0">
             <div class="flex items-center justify-between">
               <span class="text-sm font-bold text-on-surface" id="tile1-title">1. Check Crop Health</span>
-              <span class="material-symbols-outlined text-secondary text-[20px]">chevron_right</span>
+              <span class="material-symbols-outlined text-emerald-700 group-hover:translate-x-1 transition-transform text-[20px]">chevron_right</span>
             </div>
-            <p class="text-xs text-on-surface-variant mt-0.5 leading-normal" id="action-health-desc">Inspect vigor map with clear green, yellow, and dry soil alert parcels.</p>
+            <p class="text-xs text-on-surface-variant mt-0.5 leading-normal font-medium" id="action-health-desc">Inspect vigor map with clear green, yellow, and dry soil alert parcels.</p>
           </div>
         </button>
-        <button class="w-full p-3.5 rounded-2xl bg-surface-container-lowest border border-surface-variant shadow-sm flex items-start gap-3.5 text-left hover:bg-surface-container-low active:bg-surface-container transition-all min-h-[48px]" onclick="openModal('waterModal')" type="button">
-          <div class="w-11 h-11 rounded-xl bg-secondary-container flex items-center justify-center shrink-0 text-on-secondary-container">
+
+        <!-- Tile 2: Sky/Azure Blue Theme -->
+        <button class="w-full p-3.5 rounded-2xl bg-gradient-to-r from-sky-50/50 via-surface-container-lowest to-surface-container-lowest border border-sky-200/90 shadow-sm flex items-start gap-3.5 text-left hover:border-sky-400 hover:shadow-md active:bg-sky-50/30 transition-all min-h-[48px] cursor-pointer group" onclick="openModal('waterModal')" type="button">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-700 flex items-center justify-center shrink-0 text-white shadow-md group-hover:scale-105 transition-transform">
             <span class="material-symbols-outlined text-[24px]">water_drop</span>
           </div>
           <div class="flex flex-col flex-1 min-w-0">
             <div class="flex items-center justify-between">
               <span class="text-sm font-bold text-on-surface" id="tile2-title">2. Should I Water?</span>
-              <span class="material-symbols-outlined text-secondary text-[20px]">chevron_right</span>
+              <span class="material-symbols-outlined text-sky-700 group-hover:translate-x-1 transition-transform text-[20px]">chevron_right</span>
             </div>
-            <p class="text-xs text-on-surface-variant mt-0.5 leading-normal" id="action-water-desc">Check root-zone moisture estimate &amp; evaporation window before turning pumps on.</p>
+            <p class="text-xs text-on-surface-variant mt-0.5 leading-normal font-medium" id="action-water-desc">Check root-zone moisture estimate &amp; evaporation window before turning pumps on.</p>
           </div>
         </button>
-        <button class="w-full p-3.5 rounded-2xl bg-surface-container-lowest border border-surface-variant shadow-sm flex items-start gap-3.5 text-left hover:bg-surface-container-low active:bg-surface-container transition-all min-h-[48px]" onclick="openModal('weatherModal')" type="button">
-          <div class="w-11 h-11 rounded-xl bg-tertiary-fixed flex items-center justify-center shrink-0 text-tertiary">
+
+        <!-- Tile 3: Warm Amber/Sunburst Theme -->
+        <button class="w-full p-3.5 rounded-2xl bg-gradient-to-r from-amber-50/50 via-surface-container-lowest to-surface-container-lowest border border-amber-200/90 shadow-sm flex items-start gap-3.5 text-left hover:border-amber-400 hover:shadow-md active:bg-amber-50/30 transition-all min-h-[48px] cursor-pointer group" onclick="openModal('weatherModal')" type="button">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shrink-0 text-white shadow-md group-hover:scale-105 transition-transform">
             <span class="material-symbols-outlined text-[24px]">partly_cloudy_day</span>
           </div>
           <div class="flex flex-col flex-1 min-w-0">
             <div class="flex items-center justify-between">
               <span class="text-sm font-bold text-on-surface" id="tile3-title">3. View Weather Forecast</span>
-              <span class="material-symbols-outlined text-secondary text-[20px]">chevron_right</span>
+              <span class="material-symbols-outlined text-amber-700 group-hover:translate-x-1 transition-transform text-[20px]">chevron_right</span>
             </div>
-            <p class="text-xs text-on-surface-variant mt-0.5 leading-normal" id="action-weather-desc">Regional 3-Day Outlook: Mandya (31°C, 0mm rain expected).</p>
+            <p class="text-xs text-on-surface-variant mt-0.5 leading-normal font-medium" id="action-weather-desc">Regional 3-Day Outlook: Mandya (31°C, 0mm rain expected).</p>
           </div>
         </button>
       </section>
@@ -1740,20 +1754,21 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
   </div>
 
   <!-- Modal: Full Advisory Details -->
-  <div class="fixed inset-0 z-50 bg-inverse-surface/50 backdrop-blur-xs flex flex-col justify-end hidden opacity-0 transition-opacity duration-200" id="adviceModal">
-    <div class="w-full max-w-[640px] mx-auto bg-surface-container-lowest rounded-t-3xl p-5 flex flex-col gap-4 max-h-[88vh] overflow-y-auto shadow-2xl">
+  <div class="fixed inset-0 z-50 bg-inverse-surface/60 backdrop-blur-sm flex flex-col justify-end hidden opacity-0 transition-opacity duration-200" id="adviceModal">
+    <div class="w-full max-w-[640px] mx-auto bg-surface-container-lowest rounded-t-3xl p-5 sm:p-6 flex flex-col gap-4 max-h-[90vh] overflow-y-auto shadow-2xl border-t border-emerald-500/20">
+      
       <!-- Modal Header -->
       <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white flex items-center justify-center shadow-md shrink-0">
             <span class="material-symbols-outlined text-[24px]">summarize</span>
           </div>
           <div>
-            <div class="flex items-center gap-1.5 flex-wrap">
-              <h3 class="text-base font-bold text-on-surface">Field Advice (Brief Summary)</h3>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-surface-container text-secondary border border-surface-variant">Quick Brief</span>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h3 class="text-base sm:text-lg font-black text-on-surface tracking-tight">Field Advice (Brief Summary)</h3>
+              <span class="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 shadow-xs">Quick Brief</span>
             </div>
-            <p class="text-[11px] text-secondary">Immediate field-level key takeaways &amp; actions</p>
+            <p class="text-xs text-secondary font-medium">Immediate field-level key takeaways &amp; today's actions</p>
           </div>
         </div>
         <button class="w-9 h-9 rounded-full bg-surface-container hover:bg-surface-variant flex items-center justify-center text-on-surface transition-colors cursor-pointer" onclick="closeModal('adviceModal')" type="button">
@@ -1761,55 +1776,85 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         </button>
       </div>
 
-      <!-- Active Field Badge -->
-      <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-low border border-surface-variant text-xs">
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-primary text-[18px]">agriculture</span>
-          <span class="font-bold text-on-surface" id="advice-modal-field-tag">Mandya (Paddy) • Parcel #142/A</span>
+      <!-- Active Field Gradient Banner -->
+      <div class="flex items-center justify-between p-3.5 rounded-2xl bg-gradient-to-r from-emerald-800 via-teal-800 to-emerald-900 text-white shadow-md">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-white/15 backdrop-blur-xs flex items-center justify-center text-emerald-200 shrink-0">
+            <span class="material-symbols-outlined text-[20px]">agriculture</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-extrabold text-xs sm:text-sm tracking-tight text-white" id="advice-modal-field-tag">Mandya (Paddy) • Parcel #142/A</span>
+            <span class="text-[10px] text-emerald-200 font-medium">Sentinel-2 MSI Verified Observation</span>
+          </div>
         </div>
-        <span class="text-[11px] font-bold text-amber-600 bg-amber-500/10 px-2 py-0.5 rounded" id="advice-modal-metric-tag">NDVI: 0.58</span>
+        <span class="text-xs font-black text-emerald-950 bg-emerald-300 px-3 py-1 rounded-full shadow-xs tracking-wide shrink-0" id="advice-modal-metric-tag">NDVI: 0.58</span>
       </div>
 
-      <!-- 3 Brief Takeaways -->
-      <div class="space-y-2.5">
-        <div class="p-3 bg-surface-container-low rounded-xl border border-surface-variant">
-          <span class="text-xs font-bold text-primary flex items-center gap-1.5 mb-1" id="advice-stage1-header">
-            <span class="w-2 h-2 rounded-full bg-primary"></span>
-            <span>1. What did we notice? (Observation)</span>
-          </span>
-          <p class="text-xs text-on-surface-variant leading-relaxed pl-3.5" id="advice-notice-body">
+      <!-- 3 Distinctly Colored Takeaways -->
+      <div class="space-y-3">
+        
+        <!-- 1. Observation (Lush Emerald / Mint Theme) -->
+        <div class="p-4 bg-gradient-to-br from-emerald-50 via-teal-50/50 to-emerald-50/20 rounded-2xl border border-emerald-200/90 shadow-xs flex flex-col gap-2">
+          <div class="flex items-center justify-between">
+            <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-700 text-white font-extrabold text-[11px] shadow-xs">
+              <span class="material-symbols-outlined text-[15px]">satellite_alt</span>
+              <span id="advice-stage1-header">1. What did we notice? (Observation)</span>
+            </span>
+            <span class="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300">Space Telemetry</span>
+          </div>
+          <p class="text-xs text-emerald-950 leading-relaxed font-medium pl-1" id="advice-notice-body">
             Canopy moisture index reflectance anomaly in North-East quadrant. Vegetative baseline index: 0.58 vs 0.70 benchmark.
           </p>
         </div>
-        <div class="p-3 bg-surface-container-low rounded-xl border border-surface-variant">
-          <span class="text-xs font-bold text-secondary flex items-center gap-1.5 mb-1" id="advice-stage2-header">
-            <span class="w-2 h-2 rounded-full bg-secondary"></span>
-            <span>2. What could it mean? (Interpretation)</span>
-          </span>
-          <p class="text-xs text-on-surface-variant leading-relaxed pl-3.5" id="advice-meaning-body">
+
+        <!-- 2. Interpretation (Warm Golden Amber / Sunburst Theme) -->
+        <div class="p-4 bg-gradient-to-br from-amber-50 via-orange-50/40 to-amber-50/15 rounded-2xl border border-amber-200/90 shadow-xs flex flex-col gap-2">
+          <div class="flex items-center justify-between">
+            <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-700 text-white font-extrabold text-[11px] shadow-xs">
+              <span class="material-symbols-outlined text-[15px]">psychology</span>
+              <span id="advice-stage2-header">2. What could it mean? (Interpretation)</span>
+            </span>
+            <span class="text-[10px] font-bold text-amber-900 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300">Agronomic Cause</span>
+          </div>
+          <p class="text-xs text-amber-950 leading-relaxed font-medium pl-1" id="advice-meaning-body">
             Topsoil drying due to sunny 31°C afternoon exposure and lack of surface mulch, or potential root aeration blockage.
           </p>
         </div>
-        <div class="p-3 bg-surface-container-low rounded-xl border border-surface-variant">
-          <span class="text-xs font-bold text-tertiary flex items-center gap-1.5 mb-1" id="advice-stage3-header">
-            <span class="w-2 h-2 rounded-full bg-tertiary"></span>
-            <span>3. What should I do next? (Action Steps)</span>
-          </span>
-          <ul class="text-xs text-on-surface-variant list-disc pl-7 space-y-1" id="advice-steps-list">
-            <li>Walk to the North-East boundary and press soil by hand to check moisture depth.</li>
-            <li>Inspect crop stems for yellowing or fungal lesions.</li>
-            <li>If top 5 cm is dry, irrigate in late afternoon when evaporation drops.</li>
+
+        <!-- 3. Action Steps (Crisp Sky / Azure Blue Theme) -->
+        <div class="p-4 bg-gradient-to-br from-sky-50 via-blue-50/40 to-indigo-50/20 rounded-2xl border border-sky-200/90 shadow-xs flex flex-col gap-2.5">
+          <div class="flex items-center justify-between">
+            <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-sky-700 text-white font-extrabold text-[11px] shadow-xs">
+              <span class="material-symbols-outlined text-[15px]">task_alt</span>
+              <span id="advice-stage3-header">3. What should I do next? (Action Steps)</span>
+            </span>
+            <span class="text-[10px] font-bold text-sky-900 bg-sky-100 px-2 py-0.5 rounded-full border border-sky-300">Today's Priority</span>
+          </div>
+          <ul class="text-xs text-slate-800 space-y-2 font-medium pl-1" id="advice-steps-list">
+            <li class="flex items-start gap-2.5">
+              <span class="w-4 h-4 rounded-full bg-sky-200 text-sky-900 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-black">✓</span>
+              <span class="text-xs text-slate-800 leading-normal font-medium">Walk to the North-East boundary and press soil by hand to check moisture depth.</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="w-4 h-4 rounded-full bg-sky-200 text-sky-900 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-black">✓</span>
+              <span class="text-xs text-slate-800 leading-normal font-medium">Inspect crop stems for yellowing or fungal lesions.</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="w-4 h-4 rounded-full bg-sky-200 text-sky-900 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-black">✓</span>
+              <span class="text-xs text-slate-800 leading-normal font-medium">If top 5 cm is dry, irrigate in late afternoon when evaporation drops.</span>
+            </li>
           </ul>
         </div>
       </div>
 
       <!-- Action Buttons -->
-      <div class="flex items-center gap-2">
-        <button class="flex-1 min-h-[46px] rounded-xl bg-primary hover:bg-primary/90 text-on-primary font-bold text-xs transition-colors cursor-pointer" onclick="closeModal('adviceModal')" type="button">
-          Understood &amp; Close
+      <div class="flex items-center gap-2.5 pt-1">
+        <button class="flex-1 min-h-[48px] rounded-xl bg-gradient-to-r from-emerald-700 via-emerald-800 to-teal-800 hover:from-emerald-800 hover:to-teal-900 text-white font-bold text-xs shadow-md hover:shadow-lg active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2" onclick="closeModal('adviceModal')" type="button">
+          <span class="material-symbols-outlined text-[18px]">check_circle</span>
+          <span>Understood &amp; Close</span>
         </button>
-        <button class="min-h-[46px] px-4 rounded-xl bg-surface-container hover:bg-surface-variant text-primary font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer" onclick="toggleAudioAdvice()" type="button">
-          <span class="material-symbols-outlined text-[18px]">volume_up</span>
+        <button class="min-h-[48px] px-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 text-amber-950 border border-amber-300 font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs active:scale-[0.99] transition-all cursor-pointer" onclick="toggleAudioAdvice()" type="button">
+          <span class="material-symbols-outlined text-[18px] text-amber-700" id="modal-voice-icon">volume_up</span>
           <span>Voice Readout</span>
         </button>
       </div>
@@ -4371,7 +4416,12 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
           "Check root zone soil moisture depth (10 cm) before running irrigation.",
           "Follow regional schedule to protect crop vigor."
         ];
-        stepsList.innerHTML = s.map(step => `<li>${step}</li>`).join('');
+        stepsList.innerHTML = s.map(step => `
+          <li class="flex items-start gap-2.5">
+            <span class="w-4 h-4 rounded-full bg-sky-200 text-sky-900 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-black shadow-xs">✓</span>
+            <span class="text-xs text-slate-800 leading-normal font-medium">${step}</span>
+          </li>
+        `).join('');
       }
     }
 
