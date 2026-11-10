@@ -165,7 +165,92 @@
       background-color: #005230 !important;
       color: #ffffff !important;
     }
-    /* Interface Mode Switching Styles (Mobile vs Desktop) */
+        /* ===================================================
+       PROFESSIONAL THEME ENGINE: EXECUTIVE SAGE & SPACE DARK
+       =================================================== */
+    /* Light Mode: Mineral Sage Slate Canvas (Glare-Free, High-Definition) */
+    body {
+      background-color: #E2EAE4 !important;
+      color: #112318;
+    }
+    #main-content {
+      background-color: #E2EAE4 !important;
+    }
+    header {
+      background-color: rgba(226, 234, 228, 0.92) !important;
+      border-bottom: 1px solid rgba(0, 82, 48, 0.12) !important;
+    }
+    #bottom-nav-bar {
+      background-color: rgba(226, 234, 228, 0.94) !important;
+      border-top: 1px solid rgba(0, 82, 48, 0.12) !important;
+    }
+    .bg-surface-container-lowest {
+      background-color: #ffffff !important;
+      border: 1px solid rgba(0, 82, 48, 0.10) !important;
+      box-shadow: 0 2px 12px rgba(0, 40, 20, 0.04);
+    }
+    .bg-surface-container-low {
+      background-color: #D7E4DC !important;
+    }
+    .bg-surface-container {
+      background-color: #CCE0D2 !important;
+    }
+
+    /* Dark Mode: Space-to-Soil Aerospace Command Console */
+    html.dark body {
+      background-color: #0b140f !important;
+      color: #edf5f0 !important;
+    }
+    html.dark #main-content {
+      background-color: #0b140f !important;
+      border-color: rgba(16, 185, 129, 0.15) !important;
+    }
+    html.dark header {
+      background-color: rgba(11, 20, 15, 0.92) !important;
+      border-bottom: 1px solid rgba(16, 185, 129, 0.16) !important;
+    }
+    html.dark #bottom-nav-bar {
+      background-color: rgba(11, 20, 15, 0.94) !important;
+      border-top: 1px solid rgba(16, 185, 129, 0.16) !important;
+    }
+    html.dark .bg-surface-container-lowest {
+      background-color: #122119 !important;
+      border: 1px solid rgba(16, 185, 129, 0.16) !important;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    }
+    html.dark .bg-surface-container-low {
+      background-color: #172a1f !important;
+      border-color: rgba(16, 185, 129, 0.14) !important;
+    }
+    html.dark .bg-surface-container {
+      background-color: #1d3427 !important;
+      color: #edf5f0 !important;
+    }
+    html.dark .bg-surface-container-high {
+      background-color: #234030 !important;
+    }
+    html.dark .text-on-surface {
+      color: #edf5f0 !important;
+    }
+    html.dark .text-on-surface-variant {
+      color: #9cb5a5 !important;
+    }
+    html.dark .text-secondary {
+      color: #8da496 !important;
+    }
+    html.dark .border-surface-variant {
+      border-color: rgba(16, 185, 129, 0.16) !important;
+    }
+    html.dark select, html.dark input {
+      background-color: #172a1f !important;
+      color: #edf5f0 !important;
+      border-color: rgba(16, 185, 129, 0.22) !important;
+    }
+    html.dark .leaflet-container {
+      background: #060e09 !important;
+    }
+
+/* Interface Mode Switching Styles (Mobile vs Desktop) */
     .mode-desktop #header-inner {
       max-width: 80rem !important; /* max-w-7xl */
       padding-left: 1.5rem !important;
@@ -252,16 +337,16 @@
             "on-primary-container": "#9fe9b9",
             "primary-fixed": "#a8f3c2",
             "primary-fixed-dim": "#8dd6a8",
-            "surface": "#FAFAF6",
+            "surface": "#E2EAE4",
             "surface-container-lowest": "#ffffff",
-            "surface-container-low": "#EAF4EC",
-            "surface-container": "#e1f2e5",
-            "surface-container-high": "#dbeddf",
-            "surface-container-highest": "#d5e7da",
-            "surface-variant": "#d5e7da",
-            "on-surface": "#26352C",
-            "on-surface-variant": "#404942",
-            "secondary": "#57615b",
+            "surface-container-low": "#D7E4DC",
+            "surface-container": "#CCE0D2",
+            "surface-container-high": "#C0D8C8",
+            "surface-container-highest": "#B4D0BD",
+            "surface-variant": "#B4D0BD",
+            "on-surface": "#112318",
+            "on-surface-variant": "#2E4436",
+            "secondary": "#495D50",
             "secondary-container": "#dbe5dd",
             "on-secondary": "#ffffff",
             "on-secondary-container": "#5d6761",
@@ -770,8 +855,13 @@
           </button>
         </div>
 
-        <!-- Controls: Multi-language selector + Replay -->
+        <!-- Controls: Theme Switcher + Multi-language selector + Replay -->
         <div class="flex items-center gap-1.5">
+          <!-- 1-Click Theme Switcher (Executive Sage <-> Space Dark Console) -->
+          <button class="w-9 h-9 rounded-full bg-surface-container hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors min-h-[44px] min-w-[36px] border border-surface-variant cursor-pointer" onclick="toggleThemeMode()" id="theme-toggle-btn" title="Switch Theme (Executive Sage / Space Dark)" type="button">
+            <span class="material-symbols-outlined text-[18px]" id="theme-toggle-icon">dark_mode</span>
+          </button>
+
           <div class="relative flex items-center">
             <select class="appearance-none bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold pl-2.5 pr-6 py-2 rounded-full border border-surface-variant focus:outline-none focus:ring-1 focus:ring-primary min-h-[44px] cursor-pointer" id="lang-selector" onchange="changeLanguage(this.value)">
               <option selected="" value="en">English</option>
@@ -784,7 +874,7 @@
             </select>
             <span class="material-symbols-outlined text-on-surface-variant text-[16px] absolute right-2 pointer-events-none">expand_more</span>
           </div>
-          <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors min-h-[44px] min-w-[36px]" onclick="replaySplash()" title="Replay Brand Intro" type="button">
+          <button class="w-9 h-9 rounded-full bg-surface-container hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors min-h-[44px] min-w-[36px] border border-surface-variant cursor-pointer" onclick="replaySplash()" title="Replay Brand Intro" type="button">
             <span class="material-symbols-outlined text-[18px]">replay</span>
           </button>
         </div>
@@ -8672,6 +8762,38 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       }, 250);
     }
 
+    
+    // ==========================================
+    // THEME ENGINE: EXECUTIVE SAGE & SPACE DARK
+    // ==========================================
+    let currentThemeMode = localStorage.getItem('earthworm_theme') || 'sage';
+
+    function applyThemeMode(theme) {
+      currentThemeMode = theme;
+      const htmlEl = document.documentElement;
+      const icon = document.getElementById('theme-toggle-icon');
+      const btn = document.getElementById('theme-toggle-btn');
+      
+      if (theme === 'dark') {
+        htmlEl.classList.add('dark');
+        if (icon) icon.textContent = 'light_mode';
+        if (btn) btn.title = "Switch to Executive Sage Theme";
+      } else {
+        htmlEl.classList.remove('dark');
+        if (icon) icon.textContent = 'dark_mode';
+        if (btn) btn.title = "Switch to Space Dark Console Theme";
+      }
+      try { localStorage.setItem('earthworm_theme', theme); } catch (e) {}
+    }
+
+    function toggleThemeMode() {
+      const newTheme = (currentThemeMode === 'dark') ? 'sage' : 'dark';
+      applyThemeMode(newTheme);
+      const title = (newTheme === 'dark') ? "Space Dark Console Activated" : "Executive Sage Theme Activated";
+      const desc = (newTheme === 'dark') ? "Deep orbital contrast optimized for satellite telemetry" : "Glare-free architectural mineral-sage canvas";
+      showToast(title, desc);
+    }
+
     function dismissSplash() {
       if (splashTimer) clearTimeout(splashTimer);
       if (splashStatusInterval) clearInterval(splashStatusInterval);
@@ -9147,6 +9269,7 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         initialMode = (window.innerWidth >= 1024) ? 'desktop' : 'mobile';
       }
       setViewMode(initialMode, false);
+      applyThemeMode(currentThemeMode);
 
       // Listen for window resize to auto-adapt if user hasn't explicitly locked preference
       window.addEventListener('resize', () => {
