@@ -203,7 +203,7 @@
       border: 1px solid rgba(0, 82, 48, 0.15) !important;
     }
 
-    /* Mobile Interface Mode */
+    /* Mobile Interface Mode Strict Isolation */
     .mode-mobile #header-inner {
       max-width: 640px !important;
     }
@@ -223,6 +223,18 @@
     }
     .mode-mobile #desktop-top-nav {
       display: none !important;
+    }
+    .mode-mobile .grid-cols-12 {
+      grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+    }
+    .mode-mobile .lg\:col-span-7,
+    .mode-mobile .lg\:col-span-5,
+    .mode-mobile .lg\:col-span-8,
+    .mode-mobile .lg\:col-span-4 {
+      grid-column: span 1 / span 1 !important;
+    }
+    .mode-mobile .lg\:sticky {
+      position: static !important;
     }
   </style>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -1503,7 +1515,12 @@
         </div>
 
         <!-- 1. BIOPHYSICAL OBSERVATION (IN-DEPTH SPECTRAL PHYSICS) -->
-        <div class="p-4 sm:p-5 bg-surface-container-lowest rounded-2xl border border-surface-variant shadow-sm flex flex-col gap-3">
+                <!-- ADVICE CONTENT: 2-COLUMN DESKTOP GRID / 1-COLUMN MOBILE STACK -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 w-full items-start mt-1">
+          
+          <!-- LEFT COLUMN: DIAGNOSTIC INTELLIGENCE (7 of 12 cols, ~58%) -->
+          <div class="lg:col-span-7 flex flex-col gap-4">
+<div class="p-4 sm:p-5 bg-surface-container-lowest rounded-2xl border border-surface-variant shadow-sm flex flex-col gap-3">
           <div class="flex items-center gap-2 pb-2 border-b border-surface-variant">
             <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-bold text-base">
               1
@@ -1635,7 +1652,11 @@
         </div>
 
         <!-- 3. CHRONOLOGICAL STEP-BY-STEP ACTION PROTOCOL (WHAT SHOULD I DO NEXT?) -->
-        <div class="p-4 sm:p-5 bg-surface-container-lowest rounded-2xl border border-surface-variant shadow-sm flex flex-col gap-3">
+                  </div>
+
+          <!-- RIGHT COLUMN: 4-STAGE ACTION PLAN & CELLULAR DISPATCH (5 of 12 cols, ~42%) -->
+          <div class="lg:col-span-5 flex flex-col gap-4 lg:sticky lg:top-20">
+<div class="p-4 sm:p-5 bg-surface-container-lowest rounded-2xl border border-surface-variant shadow-sm flex flex-col gap-3">
           <div class="flex items-center gap-2 pb-2 border-b border-surface-variant">
             <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-base">
               3
@@ -1738,7 +1759,10 @@
           </div>
         </div>
 
-      </div>
+                </div>
+
+        </div>
+
       <!-- END VIEW: ADVICE -->
 
     </div>
@@ -9099,6 +9123,9 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       // Persist to localStorage
       try {
         localStorage.setItem('earthworm_view_mode', mode);
+        if (userInitiated) {
+          localStorage.setItem('earthworm_user_set_mode', 'true');
+        }
       } catch (e) {}
 
       // User feedback notification
@@ -9113,9 +9140,24 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
 
     // Startup Initialization
     window.addEventListener('DOMContentLoaded', async () => {
-      // Initialize view mode from localStorage or screen width
-      const savedMode = localStorage.getItem('earthworm_view_mode') || 'mobile';
-      setViewMode(savedMode, false);
+      // Smart auto-detect view mode based on screen width unless user previously chose manually
+      const userExplicit = localStorage.getItem('earthworm_user_set_mode') === 'true';
+      let initialMode = localStorage.getItem('earthworm_view_mode');
+      if (!userExplicit || !initialMode) {
+        initialMode = (window.innerWidth >= 1024) ? 'desktop' : 'mobile';
+      }
+      setViewMode(initialMode, false);
+
+      // Listen for window resize to auto-adapt if user hasn't explicitly locked preference
+      window.addEventListener('resize', () => {
+        const isManual = localStorage.getItem('earthworm_user_set_mode') === 'true';
+        if (!isManual) {
+          const targetMode = (window.innerWidth >= 1024) ? 'desktop' : 'mobile';
+          if (targetMode !== currentViewMode) {
+            setViewMode(targetMode, false);
+          }
+        }
+      });
 
       await checkBackendHealth();
       loadCustomFarms();
