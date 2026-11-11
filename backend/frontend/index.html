@@ -944,7 +944,7 @@
               </button>
               <button id="btn-refresh-sat" onclick="refreshSatellitePass()" class="text-[10px] font-semibold px-2 py-1 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary flex items-center gap-1 transition-all cursor-pointer" title="Fetch Latest Sentinel-2 Pass">
                 <span class="material-symbols-outlined text-[13px] transition-transform duration-500" id="refresh-icon">sync</span>
-                <span>Refresh</span>
+                <span id="sat-refresh-text">Refresh</span>
               </button>
             </div>
           </div>
@@ -953,7 +953,7 @@
           <div class="flex items-center gap-1 overflow-x-auto pb-0.5 no-scrollbar">
             <button class="sat-layer-btn active text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-primary text-on-primary shadow-sm flex items-center gap-1 shrink-0 transition-all cursor-pointer" onclick="switchSatelliteLayer('true-color')" id="layer-btn-true-color">
               <span class="material-symbols-outlined text-[13px]">palette</span>
-              <span>Natural RGB</span>
+              <span id="sat-layer-rgb-text">Natural RGB</span>
             </button>
             <button class="sat-layer-btn text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high flex items-center gap-1 shrink-0 transition-all cursor-pointer" onclick="switchSatelliteLayer('ndvi')" id="layer-btn-ndvi">
               <span class="material-symbols-outlined text-[13px] text-emerald-600">grass</span>
@@ -1886,8 +1886,8 @@
             <span class="material-symbols-outlined text-[20px]">satellite_alt</span>
           </div>
           <div>
-            <h3 class="text-base font-bold text-on-surface">Satellite Multispectral Inspector</h3>
-            <p class="text-[11px] text-secondary">Copernicus Sentinel-2 • Multispectral Earth Observation</p>
+            <h3 class="text-base font-bold text-on-surface" id="sat-modal-title">Satellite Multispectral Inspector</h3>
+            <p class="text-[11px] text-secondary" id="sat-modal-subtitle">Copernicus Sentinel-2 • Multispectral Earth Observation</p>
           </div>
         </div>
         <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface hover:bg-surface-variant cursor-pointer transition-colors" onclick="closeModal('satelliteModal')" type="button">
@@ -1897,21 +1897,21 @@
 
       <!-- Orbital Telemetry & Parcel Header -->
       <div class="p-3 bg-surface-container-low rounded-xl text-xs space-y-1.5 border border-surface-variant">
-        <div class="flex justify-between items-center">
-          <strong>Field Parcel:</strong>
-          <span class="font-bold text-primary" id="sat-modal-plot">Plot #142/A • Mandya (Karnataka)</span>
+        <div class="flex justify-between items-center gap-2">
+          <strong id="sat-lbl-parcel">Field Parcel:</strong>
+          <span class="font-bold text-primary text-right" id="sat-modal-plot">Plot #142/A • Mandya (Karnataka)</span>
         </div>
-        <div class="flex justify-between items-center">
-          <strong>Sensor &amp; Orbit:</strong>
-          <span class="font-medium text-on-surface" id="sat-modal-sensor">Copernicus Sentinel-2B (MSI Level-2A BOA)</span>
+        <div class="flex justify-between items-center gap-2">
+          <strong id="sat-lbl-sensor">Sensor &amp; Orbit:</strong>
+          <span class="font-medium text-on-surface text-right" id="sat-modal-sensor">Copernicus Sentinel-2B (MSI Level-2A BOA)</span>
         </div>
-        <div class="flex justify-between items-center">
-          <strong>Geo Coordinates &amp; Elev:</strong>
-          <span class="font-mono text-[11px] text-secondary" id="sat-modal-coords">12°31'05" N, 76°53'06" E • Elev: 662m</span>
+        <div class="flex justify-between items-center gap-2">
+          <strong id="sat-lbl-coords">Geo Coordinates &amp; Elev:</strong>
+          <span class="font-mono text-[11px] text-secondary text-right" id="sat-modal-coords">12°31'05" N, 76°53'06" E • Elev: 662m</span>
         </div>
-        <div class="flex justify-between items-center">
-          <strong>Acquisition Orbit Pass:</strong>
-          <span class="text-emerald-700 font-semibold" id="sat-modal-pass">24 Feb 2024 • 10:48 UTC (Cloud: 0.8%)</span>
+        <div class="flex justify-between items-center gap-2">
+          <strong id="sat-lbl-pass">Acquisition Orbit Pass:</strong>
+          <span class="text-emerald-700 font-semibold text-right" id="sat-modal-pass">24 Feb 2024 • 10:48 UTC (Cloud: 0.8%)</span>
         </div>
       </div>
 
@@ -1920,10 +1920,10 @@
         
         <!-- 1. NDVI Heatmap Analysis -->
         <div class="p-3.5 bg-surface-container rounded-xl border-l-4 border-emerald-600 flex flex-col gap-1.5">
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between gap-2 flex-wrap">
             <div class="flex items-center gap-1.5 font-bold text-xs text-on-surface">
               <span class="material-symbols-outlined text-emerald-600 text-[18px]">grass</span>
-              <span>1. NDVI Heatmap (Vegetation Health Index)</span>
+              <span id="sat-sec1-title">1. NDVI Heatmap (Vegetation Health Index)</span>
             </div>
             <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800" id="sat-modal-ndvi">0.58 (Benchmark 0.70 • -17%)</span>
           </div>
@@ -1931,16 +1931,16 @@
             Multi-spectral vegetation index indicates localized canopy stress in the North-East quarter. Rest of parcel maintains standard canopy vigor.
           </p>
           <div class="text-[11px] text-secondary bg-surface-container-lowest p-2 rounded-lg border border-surface-variant">
-            <strong class="text-on-surface">Spectral Signal:</strong> <span id="sat-modal-ndvi-signal">Red light (665 nm) absorption decreased; NIR (842 nm) reflectance reduced due to early moisture stress.</span>
+            <strong class="text-on-surface" id="sat-lbl-signal">Spectral Signal:</strong> <span id="sat-modal-ndvi-signal">Red light (665 nm) absorption decreased; NIR (842 nm) reflectance reduced due to early moisture stress.</span>
           </div>
         </div>
 
         <!-- 2. Infrared (CIR - Color Infrared) Data -->
         <div class="p-3.5 bg-surface-container rounded-xl border-l-4 border-rose-500 flex flex-col gap-1.5">
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between gap-2 flex-wrap">
             <div class="flex items-center gap-1.5 font-bold text-xs text-on-surface">
               <span class="material-symbols-outlined text-rose-500 text-[18px]">filter_vintage</span>
-              <span>2. Infrared (CIR - Color Infrared) Data</span>
+              <span id="sat-sec2-title">2. Infrared (CIR - Color Infrared) Data</span>
             </div>
             <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 font-mono" id="sat-modal-cir">NIR (B08): 0.42 • Red (B04): 0.14</span>
           </div>
@@ -1948,16 +1948,16 @@
             Color Infrared (CIR) false-color return reveals lowered cellular turgor in the NE zone; western quadrants exhibit dense crimson foliage.
           </p>
           <div class="text-[11px] text-secondary bg-surface-container-lowest p-2 rounded-lg border border-surface-variant">
-            <strong class="text-on-surface">Biophysical Meaning:</strong> <span id="sat-modal-cir-signal">Healthy leaf mesophyll reflects 40–50% NIR. Cell dehydration reduces internal scattering, dampening CIR brightness.</span>
+            <strong class="text-on-surface" id="sat-lbl-bio">Biophysical Meaning:</strong> <span id="sat-modal-cir-signal">Healthy leaf mesophyll reflects 40–50% NIR. Cell dehydration reduces internal scattering, dampening CIR brightness.</span>
           </div>
         </div>
 
         <!-- 3. NDMI / Canopy Moisture Index Data -->
         <div class="p-3.5 bg-surface-container rounded-xl border-l-4 border-teal-600 flex flex-col gap-1.5">
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between gap-2 flex-wrap">
             <div class="flex items-center gap-1.5 font-bold text-xs text-on-surface">
               <span class="material-symbols-outlined text-teal-600 text-[18px]">water_drop</span>
-              <span>3. NDMI (Canopy Moisture &amp; Soil Water)</span>
+              <span id="sat-sec3-title">3. NDMI (Canopy Moisture &amp; Soil Water)</span>
             </div>
             <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-teal-800 font-mono" id="sat-modal-moisture">NDMI: +0.20 • SWIR (B11): 0.28</span>
           </div>
@@ -1970,23 +1970,23 @@
         <div class="p-3 bg-surface-container-low rounded-xl border border-surface-variant flex flex-col gap-2">
           <span class="text-[11px] font-bold text-on-surface flex items-center gap-1">
             <span class="material-symbols-outlined text-[15px] text-primary">analytics</span>
-            <span>Raw Spectral Band Readings (Copernicus MSI 10m/20m)</span>
+            <span id="sat-sec4-title">Raw Spectral Band Readings (Copernicus MSI 10m/20m)</span>
           </span>
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-center font-mono text-[10px]">
             <div class="bg-surface-container-lowest p-1.5 rounded border border-surface-variant">
-              <span class="text-secondary block">B03 (Green)</span>
+              <span class="text-secondary block" id="sat-lbl-b3">B03 (Green)</span>
               <span class="font-bold text-on-surface" id="sat-modal-b3">0.08 (Peak)</span>
             </div>
             <div class="bg-surface-container-lowest p-1.5 rounded border border-surface-variant">
-              <span class="text-secondary block">B04 (Red)</span>
+              <span class="text-secondary block" id="sat-lbl-b4">B04 (Red)</span>
               <span class="font-bold text-on-surface" id="sat-modal-b4">0.14 (Absorb)</span>
             </div>
             <div class="bg-surface-container-lowest p-1.5 rounded border border-surface-variant">
-              <span class="text-secondary block">B08 (NIR)</span>
+              <span class="text-secondary block" id="sat-lbl-b8">B08 (NIR)</span>
               <span class="font-bold text-emerald-700" id="sat-modal-b8">0.42 (Scatter)</span>
             </div>
             <div class="bg-surface-container-lowest p-1.5 rounded border border-surface-variant">
-              <span class="text-secondary block">B11 (SWIR)</span>
+              <span class="text-secondary block" id="sat-lbl-b11">B11 (SWIR)</span>
               <span class="font-bold text-teal-700" id="sat-modal-b11">0.28 (Water)</span>
             </div>
           </div>
@@ -1997,15 +1997,15 @@
       <!-- Action Buttons -->
       <div class="flex items-center gap-2 pt-1">
         <button class="flex-1 min-h-[44px] rounded-xl bg-primary text-on-primary font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer hover:bg-primary-container transition-colors" onclick="closeModal('satelliteModal')" type="button">
-          <span>Return to Dashboard</span>
+          <span id="sat-btn-return">Return to Dashboard</span>
         </button>
         <button class="min-h-[44px] px-3 rounded-xl bg-surface-container text-primary font-bold text-xs flex items-center justify-center gap-1 cursor-pointer hover:bg-surface-variant transition-colors" onclick="switchSatelliteLayer('ndvi'); closeModal('satelliteModal');" type="button">
           <span class="material-symbols-outlined text-[16px] text-emerald-600">grass</span>
-          <span>View NDVI</span>
+          <span id="sat-btn-ndvi">View NDVI</span>
         </button>
         <button class="min-h-[44px] px-3 rounded-xl bg-surface-container text-primary font-bold text-xs flex items-center justify-center gap-1 cursor-pointer hover:bg-surface-variant transition-colors" onclick="switchSatelliteLayer('false-color'); closeModal('satelliteModal');" type="button">
           <span class="material-symbols-outlined text-[16px] text-rose-500">filter_vintage</span>
-          <span>View CIR</span>
+          <span id="sat-btn-cir">View CIR</span>
         </button>
       </div>
     </div>
@@ -2018,8 +2018,8 @@
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-primary text-[24px]">map</span>
           <div>
-            <h3 class="text-base font-bold text-on-surface">My Farm • Parcel Inspector</h3>
-            <p class="text-[11px] text-secondary">Demonstration Field Diagnostic View</p>
+            <h3 class="text-base font-bold text-on-surface" id="field-modal-title">My Farm • Parcel Inspector</h3>
+            <p class="text-[11px] text-secondary" id="field-modal-subtitle">Demonstration Field Diagnostic View</p>
           </div>
         </div>
         <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface" onclick="closeModal('fieldModal')" type="button">
@@ -2029,10 +2029,10 @@
 
       <!-- Farm Metadata Card -->
       <div class="p-3 bg-surface-container-low rounded-xl text-xs space-y-1.5 border border-surface-variant">
-        <div class="flex justify-between"><strong>Survey Plot:</strong> <span class="font-semibold text-primary" id="modal-plot-id">142/A (Mandya)</span></div>
-        <div class="flex justify-between"><strong>Crop &amp; Variety:</strong> <span class="font-semibold" id="modal-crop-id">Paddy (Sona Masoori)</span></div>
-        <div class="flex justify-between"><strong>Total Area:</strong> <span id="modal-area-id">1.85 Hectares (~4.5 Acres)</span></div>
-        <div class="flex justify-between"><strong>Satellite pass:</strong> <span>Copernicus Sentinel-2 (ESA) Level-2A</span></div>
+        <div class="flex justify-between"><strong id="field-lbl-plot">Survey Plot:</strong> <span class="font-semibold text-primary" id="modal-plot-id">142/A (Mandya)</span></div>
+        <div class="flex justify-between"><strong id="field-lbl-crop">Crop &amp; Variety:</strong> <span class="font-semibold" id="modal-crop-id">Paddy (Sona Masoori)</span></div>
+        <div class="flex justify-between"><strong id="field-lbl-area">Total Area:</strong> <span id="modal-area-id">1.85 Hectares (~4.5 Acres)</span></div>
+        <div class="flex justify-between"><strong id="field-lbl-pass">Satellite pass:</strong> <span>Copernicus Sentinel-2 (ESA) Level-2A</span></div>
       </div>
 
       <!-- Structured 3-Stage Agronomic Diagnostic Framework -->
@@ -2068,12 +2068,12 @@
 
       <!-- SMS Preview Box with Copy Button -->
       <div class="p-3 bg-surface-container-low rounded-xl border border-dashed border-surface-variant flex flex-col gap-2">
-        <div class="flex items-center justify-between text-[11px] font-bold text-secondary">
-          <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">sms</span> SMS Advisory Preview (Feature Phone)</span>
+        <div class="flex items-center justify-between text-[11px] font-bold text-secondary flex-wrap gap-1">
+          <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">sms</span> <span id="field-sms-preview-title">SMS Advisory Preview (Feature Phone)</span></span>
           <div class="flex items-center gap-1.5">
             <button class="px-2 py-0.5 rounded bg-surface-container text-primary font-bold hover:bg-surface-variant transition-colors flex items-center gap-1 cursor-pointer" onclick="promptAndSendFarmerSms()" type="button" title="Send SMS Advisory to Mobile">
               <span class="material-symbols-outlined text-[14px]">send_to_mobile</span>
-              <span>Send SMS</span>
+              <span id="field-btn-send-sms">Send SMS</span>
             </button>
             <button class="px-2 py-0.5 rounded bg-surface-container text-primary font-bold hover:bg-surface-variant transition-colors flex items-center gap-1 cursor-pointer" onclick="copySmsText()" type="button">
               <span class="material-symbols-outlined text-[14px]">content_copy</span>
@@ -2087,12 +2087,12 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <button class="flex-1 min-h-[48px] rounded-xl bg-primary text-on-primary font-bold text-sm flex items-center justify-center gap-1.5" onclick="closeModal('fieldModal')" type="button">
+        <button class="flex-1 min-h-[48px] rounded-xl bg-primary text-on-primary font-bold text-sm flex items-center justify-center gap-1.5 cursor-pointer" onclick="closeModal('fieldModal')" id="field-btn-return" type="button">
           Return to Dashboard
         </button>
-        <button class="min-h-[48px] px-3 rounded-xl bg-surface-container text-primary font-semibold text-xs flex items-center justify-center gap-1" onclick="toggleAudioAdvice()" type="button">
+        <button class="min-h-[48px] px-3 rounded-xl bg-surface-container text-primary font-semibold text-xs flex items-center justify-center gap-1 cursor-pointer" onclick="toggleAudioAdvice()" type="button">
           <span class="material-symbols-outlined text-[18px]">volume_up</span>
-          <span>Listen</span>
+          <span id="field-btn-listen">Listen</span>
         </button>
       </div>
     </div>
@@ -2464,27 +2464,27 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="material-symbols-outlined text-primary text-[24px]">school</span>
-          <h3 class="text-lg font-bold text-on-surface">How EARTHWORM Works</h3>
+          <h3 class="text-lg font-bold text-on-surface" id="guide-modal-title">How EARTHWORM Works</h3>
         </div>
-        <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface" onclick="closeModal('guideModal')" type="button">
+        <button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface cursor-pointer" onclick="closeModal('guideModal')" type="button">
           <span class="material-symbols-outlined text-[20px]">close</span>
         </button>
       </div>
       <div class="space-y-3 text-xs text-on-surface-variant leading-relaxed">
         <div class="p-3 bg-surface-container rounded-xl">
-          <span class="font-bold text-on-surface block mb-1">1. Satellites scan crop light reflectance</span>
-          Sentinel-2 scans districts regularly using multi-spectral bands to measure chlorophyll and green biomass reflection.
+          <span class="font-bold text-on-surface block mb-1" id="guide-step1-title">1. Satellites scan crop light reflectance</span>
+          <span id="guide-step1-desc">Sentinel-2 scans districts regularly using multi-spectral bands to measure chlorophyll and green biomass reflection.</span>
         </div>
         <div class="p-3 bg-surface-container rounded-xl">
-          <span class="font-bold text-on-surface block mb-1">2. Local Weather Integration</span>
-          Combines rain forecast and humidity data to estimate if soil drying or crop stress is occurring.
+          <span class="font-bold text-on-surface block mb-1" id="guide-step2-title">2. Local Weather Integration</span>
+          <span id="guide-step2-desc">Combines rain forecast and humidity data to estimate if soil drying or crop stress is occurring.</span>
         </div>
         <div class="p-3 bg-surface-container rounded-xl">
-          <span class="font-bold text-on-surface block mb-1">3. Timely Farmer Notice</span>
-          Alerts you before crop stress visibly expands across the field so you save water, inputs, and protect yield.
+          <span class="font-bold text-on-surface block mb-1" id="guide-step3-title">3. Timely Farmer Notice</span>
+          <span id="guide-step3-desc">Alerts you before crop stress visibly expands across the field so you save water, inputs, and protect yield.</span>
         </div>
       </div>
-      <button class="w-full min-h-[48px] rounded-xl bg-primary text-on-primary font-bold text-sm" onclick="closeModal('guideModal')" type="button">
+      <button class="w-full min-h-[48px] rounded-xl bg-primary text-on-primary font-bold text-sm cursor-pointer hover:bg-primary-container transition-colors" onclick="closeModal('guideModal')" id="guide-btn-got-it" type="button">
         Got it!
       </button>
     </div>
@@ -2502,7 +2502,7 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       <div class="text-xs text-on-surface-variant leading-relaxed p-3 bg-surface-container-low rounded-xl" id="info-modal-body">
         Action details go here.
       </div>
-      <button class="w-full min-h-[48px] rounded-xl bg-primary text-on-primary font-bold text-sm" onclick="closeModal('infoModal')" type="button">
+      <button class="w-full min-h-[48px] rounded-xl bg-primary text-on-primary font-bold text-sm cursor-pointer" onclick="closeModal('infoModal')" id="info-modal-close-btn" type="button">
         Close
       </button>
     </div>
@@ -4092,7 +4092,62 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
     "badgeAgronomic": "Agronomic Cause",
     "badgePriority": "Today's Priority",
     "closeModalBtn": "Understood & Close",
-    "voiceReadoutBtn": "Voice Readout"
+    "voiceReadoutBtn": "Voice Readout",
+    "guideTitle": "How EARTHWORM Works",
+    "guideStep1Title": "1. Satellites scan crop light reflectance",
+    "guideStep1Desc": "Sentinel-2 scans districts regularly using multi-spectral bands to measure chlorophyll and green biomass reflection.",
+    "guideStep2Title": "2. Local Weather Integration",
+    "guideStep2Desc": "Combines rain forecast and humidity data to estimate if soil drying or crop stress is occurring.",
+    "guideStep3Title": "3. Timely Farmer Notice",
+    "guideStep3Desc": "Alerts you before crop stress visibly expands across the field so you save water, inputs, and protect yield.",
+    "guideBtnGotIt": "Got it!",
+    "satModalTitle": "Satellite Multispectral Inspector",
+    "satModalSub": "Copernicus Sentinel-2 • Multispectral Earth Observation",
+    "satLblParcel": "Field Parcel:",
+    "satLblSensor": "Sensor & Orbit:",
+    "satLblCoords": "Geo Coordinates & Elev:",
+    "satLblPass": "Acquisition Orbit Pass:",
+    "satSec1Title": "1. NDVI Heatmap (Vegetation Health Index)",
+    "satLblSignal": "Spectral Signal:",
+    "satSec2Title": "2. Infrared (CIR - Color Infrared) Data",
+    "satLblBio": "Biophysical Meaning:",
+    "satSec3Title": "3. NDMI (Canopy Moisture & Soil Water)",
+    "satSec4Title": "Raw Spectral Band Readings (Copernicus MSI 10m/20m)",
+    "satLblB3": "B03 (Green)",
+    "satLblB4": "B04 (Red)",
+    "satLblB8": "B08 (NIR)",
+    "satLblB11": "B11 (SWIR)",
+    "satBtnReturn": "Return to Dashboard",
+    "satBtnNdvi": "View NDVI",
+    "satBtnCir": "View CIR",
+    "fieldModalTitle": "My Farm • Parcel Inspector",
+    "fieldModalSub": "Demonstration Field Diagnostic View",
+    "fieldLblPlot": "Survey Plot:",
+    "fieldLblCrop": "Crop & Variety:",
+    "fieldLblArea": "Total Area:",
+    "fieldLblPass": "Satellite pass:",
+    "fieldSmsPreview": "SMS Advisory Preview (Feature Phone)",
+    "fieldBtnCopy": "Copy",
+    "fieldBtnListen": "Listen",
+    "healthModalTitle": "1. Crop Health Inspector",
+    "healthModalSub": "Multispectral Chlorophyll Assessment:",
+    "healthModalBody1": "Sentinel-2 vegetative index analysis shows 84% normal vigor in",
+    "healthModalNote": "Note: Cloud-free reference pass. Ground walk recommended along perimeter to inspect localized soil moisture and early disease signs.",
+    "waterModalTitle": "2. Should I Water?",
+    "waterModalSub": "Root-Zone Moisture & Evaporative Demand:",
+    "waterModalBody1": "Current estimated soil moisture in upper 15 cm: Adequate for",
+    "waterModalBody2": "Upcoming rainfall outlook is dry (0 mm). If you observe surface cracking or afternoon leaf-wilting, apply 2.5 cm depth irrigation in late afternoon to minimize evaporation loss.",
+    "weatherModalTitle": "3. Weather & Spraying Windows",
+    "weatherModalSub": "72-Hour Spraying & Field Operations:",
+    "weatherModalLine1": "Wind speed: 8 - 14 km/h (Favorable, low spray drift risk).",
+    "weatherModalLine2": "Rain probability: Under 10%.",
+    "weatherModalLine3": "Dew point: Normal seasonal condensation during early morning hours. Optimal spray window: 7:30 AM to 10:30 AM.",
+    "btnClose": "Close",
+    "btnStatGraphs": "Statistical Graphs",
+    "seasonalBenchmarkPrefix": "Seasonal Benchmark: 0.70 •",
+    "satRadarScan": "Radar Scan",
+    "satRefresh": "Refresh",
+    "satLayerRgb": "Natural RGB"
   },
   "hi": {
     "heroTitle": "समस्याएं बढ़ने से पहले अपनी फसलों को समझें।",
@@ -4175,7 +4230,62 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
     "badgeAgronomic": "कृषि कारण",
     "badgePriority": "आज की प्राथमिकता",
     "closeModalBtn": "समझ गया और बंद करें",
-    "voiceReadoutBtn": "आवाज में सुनें"
+    "voiceReadoutBtn": "आवाज में सुनें",
+    "guideTitle": "EARTHWORM कैसे काम करता है?",
+    "guideStep1Title": "1. उपग्रह फसल के प्रकाश परावर्तन को स्कैन करते हैं",
+    "guideStep1Desc": "सेंटिनल-2 क्लोरोफिल और हरी फसल के घनत्व को मापने के लिए बहु-स्पेक्ट्रल बैंड का उपयोग करके नियमित रूप से क्षेत्रों को स्कैन करता है।",
+    "guideStep2Title": "2. स्थानीय मौसम डेटा का एकीकरण",
+    "guideStep2Desc": "यह अनुमान लगाने के लिए बारिश के पूर्वानुमान और नमी को जोड़ता है कि मिट्टी सूख रही है या फसल पर दबाव है।",
+    "guideStep3Title": "3. किसान को समय पर सूचना",
+    "guideStep3Desc": "खेत में तनाव फैलने से पहले ही आपको सतर्क करता है ताकि आप पानी, खाद बचा सकें और उपज की रक्षा कर सकें।",
+    "guideBtnGotIt": "समझ गया!",
+    "satModalTitle": "उपग्रह मल्टी-स्पेक्ट्रल निरीक्षक",
+    "satModalSub": "कॉपरनिकस सेंटिनल-2 • मल्टी-स्पेक्ट्रल पृथ्वी अवलोकन",
+    "satLblParcel": "खेत प्लॉट:",
+    "satLblSensor": "सेंसर और कक्षा:",
+    "satLblCoords": "निर्देशांक और ऊंचाई:",
+    "satLblPass": "उपग्रह पास समय:",
+    "satSec1Title": "1. NDVI हीटमैप (वनस्पति स्वास्थ्य सूचकांक)",
+    "satLblSignal": "स्पेक्ट्रल संकेत:",
+    "satSec2Title": "2. इन्फ्रारेड (CIR - कलर इन्फ्रारेड) डेटा",
+    "satLblBio": "जैवभौतिक अर्थ:",
+    "satSec3Title": "3. NDMI (फसल और मिट्टी में जल स्तर)",
+    "satSec4Title": "कच्चे स्पेक्ट्रल बैंड रीडिंग (कॉपरनिकस MSI 10m/20m)",
+    "satLblB3": "B03 (हरा)",
+    "satLblB4": "B04 (लाल)",
+    "satLblB8": "B08 (NIR)",
+    "satLblB11": "B11 (SWIR)",
+    "satBtnReturn": "डैशबोर्ड पर लौटें",
+    "satBtnNdvi": "NDVI देखें",
+    "satBtnCir": "CIR देखें",
+    "fieldModalTitle": "मेरा खेत • प्लॉट निरीक्षक",
+    "fieldModalSub": "प्रदर्शनात्मक खेत निदान दृश्य",
+    "fieldLblPlot": "सर्वे प्लॉट:",
+    "fieldLblCrop": "फसल और किस्म:",
+    "fieldLblArea": "कुल क्षेत्रफल:",
+    "fieldLblPass": "उपग्रह पास:",
+    "fieldSmsPreview": "SMS सलाह पूर्वावलोकन (सामान्य फोन)",
+    "fieldBtnCopy": "कॉपी करें",
+    "fieldBtnListen": "सुनें",
+    "healthModalTitle": "1. फसल स्वास्थ्य निरीक्षक",
+    "healthModalSub": "मल्टी-स्पेक्ट्रल क्लोरोफिल मूल्यांकन:",
+    "healthModalBody1": "सेंटिनल-2 विश्लेषण 84% सामान्य फसल स्वास्थ्य दर्शाता है:",
+    "healthModalNote": "नोट: बादल-मुक्त संदर्भ पास। स्थानीय मिट्टी की नमी और बीमारी के शुरुआती लक्षणों की जांच के लिए मेड़ पर पैदल निरीक्षण की सलाह दी जाती है।",
+    "waterModalTitle": "2. क्या मुझे सिंचाई करनी चाहिए?",
+    "waterModalSub": "जड़ क्षेत्र की नमी और वाष्पीकरण मांग:",
+    "waterModalBody1": "ऊपरी 15 सेमी में अनुमानित मिट्टी की नमी इस फसल के लिए पर्याप्त है —",
+    "waterModalBody2": "आगामी मौसम शुष्क है (0 मिमी बारिश)। यदि जमीन में दरारें या दोपहर में पत्तियां मुरझाती दिखें, तो वाष्पीकरण से बचने के लिए शाम को 2.5 सेमी सिंचाई करें।",
+    "weatherModalTitle": "3. मौसम और छिड़काव का समय",
+    "weatherModalSub": "72-घंटे छिड़काव और खेत संचालन:",
+    "weatherModalLine1": "हवा की गति: 8 - 14 किमी/घंटा (अनुकूल, कम छिड़काव बहाव जोखिम)।",
+    "weatherModalLine2": "बारिश की संभावना: 10% से कम।",
+    "weatherModalLine3": "ओस बिंदु: सुबह के समय सामान्य नमी। छिड़काव का सर्वोत्तम समय: सुबह 7:30 से 10:30 बजे तक।",
+    "btnClose": "बंद करें",
+    "btnStatGraphs": "सांख्यिकीय ग्राफ़",
+    "seasonalBenchmarkPrefix": "मौसमी मानक: 0.70 •",
+    "satRadarScan": "रडार स्कैन",
+    "satRefresh": "रिफ्रेश",
+    "satLayerRgb": "प्राकृतिक RGB"
   },
   "kn": {
     "heroTitle": "ಸಮಸ್ಯೆಗಳು ಬೆಳೆಯುವ ಮುನ್ನ ನಿಮ್ಮ ಬೆಳೆಗಳನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಿ.",
@@ -4258,7 +4368,62 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
     "badgeAgronomic": "ಕೃಷಿ ಕಾರಣ",
     "badgePriority": "ಇಂದಿನ ಆದ್ಯತೆ",
     "closeModalBtn": "ಅರ್ಥವಾಯಿತು & ಮುಚ್ಚಿ",
-    "voiceReadoutBtn": "ಧ್ವನಿ ಓದುವಿಕೆ"
+    "voiceReadoutBtn": "ಧ್ವನಿ ಓದುವಿಕೆ",
+    "guideTitle": "ಅರ್ಥ್‌ವರ್ಮ್ ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ?",
+    "guideStep1Title": "1. ಉಪಗ್ರಹಗಳು ಬೆಳೆಯ ಬೆಳಕಿನ ಪ್ರತಿಫಲನವನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡುತ್ತವೆ",
+    "guideStep1Desc": "ಸೆಂಟಿನೆಲ್-2 ಉಪಗ್ರಹವು ಕ್ಲೋರೊಫಿಲ್ ಮತ್ತು ಹಸಿರು ಬೆಳೆ ಸಾಂದ್ರತೆಯನ್ನು ಅಳೆಯಲು ನಿಯಮಿತವಾಗಿ ಬಹು-ಸ್ಪೆಕ್ಟ್ರಲ್ ಬ್ಯಾಂಡ್‌ಗಳನ್ನು ಬಳಸಿ ಜಿಲ್ಲೆಗಳನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡುತ್ತದೆ.",
+    "guideStep2Title": "2. ಸ್ಥಳೀಯ ಹವಾಮಾನ ಮಾಹಿತಿ ಸೇರ್ಪಡೆ",
+    "guideStep2Desc": "ಮಣ್ಣು ಒಣಗುತ್ತಿದೆಯೇ ಅಥವಾ ಬೆಳೆಗೆ ಒತ್ತಡ ಉಂಟಾಗುತ್ತಿದೆಯೇ ಎಂದು ಅಂದಾಜು ಮಾಡಲು ಮಳೆ ಮುನ್ಸೂಚನೆ ಮತ್ತು ಗಾಳಿಯ ತೇವಾಂಶವನ್ನು ಸಂಯೋಜಿಸುತ್ತದೆ.",
+    "guideStep3Title": "3. ರೈತರಿಗೆ ಸಕಾಲಿಕ ಎಚ್ಚರಿಕೆ",
+    "guideStep3Desc": "ಬೆಳೆಯ ಒತ್ತಡ ಜಮೀನಿನ ತುಂಬಾ ಹರಡುವ ಮೊದಲೇ ನಿಮಗೆ ಎಚ್ಚರಿಕೆ ನೀಡುತ್ತದೆ. ಇದರಿಂದ ನೀರು, ಗೊಬ್ಬರ ಉಳಿಸಿ ಇಳುವರಿಯನ್ನು ರಕ್ಷಿಸಬಹುದು.",
+    "guideBtnGotIt": "ಅರ್ಥವಾಯಿತು!",
+    "satModalTitle": "ಉಪಗ್ರಹ ಬಹು-ಸ್ಪೆಕ್ಟ್ರಲ್ ನಿರೀಕ್ಷಕ",
+    "satModalSub": "ಕೋಪರ್ನಿಕಸ್ ಸೆಂಟಿನೆಲ್-2 • ಬಹು-ಸ್ಪೆಕ್ಟ್ರಲ್ ಭೂ ವೀಕ್ಷಣೆ",
+    "satLblParcel": "ಜಮೀನು ಪ್ಲಾಟ್:",
+    "satLblSensor": "ಸೆನ್ಸಾರ್ ಮತ್ತು ಕಕ್ಷೆ:",
+    "satLblCoords": "ಭೂ ನಿರ್ದೇಶಾಂಕಗಳು & ಎತ್ತರ:",
+    "satLblPass": "ಉಪಗ್ರಹ ಚಿತ್ರ ಸೆರೆ ಸಮಯ:",
+    "satSec1Title": "1. NDVI ಹೀಟ್‌ಮ್ಯಾಪ್ (ಬೆಳೆ ಆರೋಗ್ಯ ಸೂಚ್ಯಂಕ)",
+    "satLblSignal": "ಸ್ಪೆಕ್ಟ್ರಲ್ ಸಂಕೇತ:",
+    "satSec2Title": "2. ಇನ್ಫ್ರಾರೆಡ್ (CIR) ದತ್ತಾಂಶ",
+    "satLblBio": "ಜೀವಭೌತಿಕ ಅರ್ಥ:",
+    "satSec3Title": "3. NDMI (ಬೆಳೆ ತೇವಾಂಶ ಮತ್ತು ಮಣ್ಣಿನ ನೀರು)",
+    "satSec4Title": "ಕಚ್ಚಾ ಸ್ಪೆಕ್ಟ್ರಲ್ ಬ್ಯಾಂಡ್ ರೀಡಿಂಗ್‌ಗಳು (MSI 10m/20m)",
+    "satLblB3": "B03 (ಹಸಿರು)",
+    "satLblB4": "B04 (ಕೆಂಪು)",
+    "satLblB8": "B08 (NIR)",
+    "satLblB11": "B11 (SWIR)",
+    "satBtnReturn": "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ಗೆ ಹಿಂತಿರುಗಿ",
+    "satBtnNdvi": "NDVI ನೋಡಿ",
+    "satBtnCir": "CIR ನೋಡಿ",
+    "fieldModalTitle": "ನನ್ನ ಜಮೀನು • ಪ್ಲಾಟ್ ನಿರೀಕ್ಷಕ",
+    "fieldModalSub": "ಪ್ರಾಯೋಗಿಕ ಜಮೀನು ರೋಗನಿರ್ಣಯ ನೋಟ",
+    "fieldLblPlot": "ಸರ್ವೆ ಪ್ಲಾಟ್:",
+    "fieldLblCrop": "ಬೆಳೆ ಮತ್ತು ತಳಿ:",
+    "fieldLblArea": "ಒಟ್ಟು ವಿಸ್ತೀರ್ಣ:",
+    "fieldLblPass": "ಉಪಗ್ರಹ ಪಾಸ್:",
+    "fieldSmsPreview": "SMS ಸಲಹಾ ಪೂರ್ವವೀಕ್ಷಣೆ (ಸಾಮಾನ್ಯ ಫೋನ್)",
+    "fieldBtnCopy": "ನಕಲಿಸಿ",
+    "fieldBtnListen": "ಆಲಿಸಿ",
+    "healthModalTitle": "1. ಬೆಳೆ ಆರೋಗ್ಯ ನಿರೀಕ್ಷಕ",
+    "healthModalSub": "ಬಹು-ಸ್ಪೆಕ್ಟ್ರಲ್ ಕ್ಲೋರೊಫಿಲ್ ಮೌಲ್ಯಮಾಪನ:",
+    "healthModalBody1": "ಸೆಂಟಿನೆಲ್-2 ಸಸ್ಯ ಸೂಚ್ಯಂಕ ವಿಶ್ಲೇಷಣೆಯು 84% ಸಾಮಾನ್ಯ ಬೆಳೆ ಹುರುಪನ್ನು ತೋರಿಸುತ್ತದೆ:",
+    "healthModalNote": "ಸೂಚನೆ: ಮೋಡ-ರಹಿತ ಉಲ್ಲೇಖ ಪಾಸ್. ಸ್ಥಳೀಯ ಮಣ್ಣಿನ ತೇವಾಂಶ ಮತ್ತು ರೋಗದ ಆರಂಭಿಕ ಲಕ್ಷಣಗಳನ್ನು ಪರೀಕ್ಷಿಸಲು ಜಮೀನಿನ ಬದುವಿನಲ್ಲಿ ನಡೆಯಲು ಶಿಫಾರಸು ಮಾಡಲಾಗಿದೆ.",
+    "waterModalTitle": "2. ನಾನು ನೀರು ಹಾಕಬೇಕೇ?",
+    "waterModalSub": "ಬೇರು ವಲಯದ ತೇವಾಂಶ ಮತ್ತು ಆವಿಯಾಗುವಿಕೆ:",
+    "waterModalBody1": "ಮೇಲಿನ 15 ಸೆಂ.ಮೀ ನಲ್ಲಿ ಪ್ರಸ್ತುತ ಅಂದಾಜು ಮಣ್ಣಿನ ತೇವಾಂಶ: ಈ ಬೆಳೆಗೆ ತೃಪ್ತಿಕರವಾಗಿದೆ —",
+    "waterModalBody2": "ಮುಂದಿನ ದಿನಗಳಲ್ಲಿ ಮಳೆ ಇಲ್ಲ (0 ಮಿಮೀ). ಮಣ್ಣು ಬಿರುಕು ಬಿಡುವುದು ಅಥವಾ ಮಧ್ಯಾಹ್ನ ಎಲೆ ಬಾಡುವುದು ಕಂಡುಬಂದರೆ, ಆವಿಯಾಗುವಿಕೆ ತಪ್ಪಿಸಲು ಸಂಜೆ 2.5 ಸೆಂ.ಮೀ ನೀರು ಹಾಯಿಸಿ.",
+    "weatherModalTitle": "3. ಹವಾಮಾನ ಮತ್ತು ಸಿಂಪಡಣೆ ಸಮಯ",
+    "weatherModalSub": "72-ಗಂಟೆಗಳ ಸಿಂಪಡಣೆ ಮತ್ತು ಕೃಷಿ ಕಾರ್ಯಗಳು:",
+    "weatherModalLine1": "ಗಾಳಿಯ ವೇಗ: 8 - 14 ಕಿಮೀ/ಗಂ (ಅನುಕೂಲಕರ, ಕಡಿಮೆ ಅಪಾಯ).",
+    "weatherModalLine2": "ಮಳೆಯ ಸಾಧ್ಯತೆ: 10% ಕ್ಕಿಂತ ಕಡಿಮೆ.",
+    "weatherModalLine3": "ಇಬ್ಬನಿ: ಬೆಳಗಿನ ಜಾವ ಸಾಮಾನ್ಯ ತೇವಾಂಶ. ಸಿಂಪಡಣೆಗೆ ಉತ್ತಮ ಸಮಯ: ಬೆಳಿಗ್ಗೆ 7:30 ರಿಂದ 10:30 ರವರೆಗೆ.",
+    "btnClose": "ಮುಚ್ಚಿ",
+    "btnStatGraphs": "ಅಂಕಿಅಂಶಗಳ ಗ್ರಾಫ್",
+    "seasonalBenchmarkPrefix": "ಕಾಲೋಚಿತ ಮಾನದಂಡ: 0.70 •",
+    "satRadarScan": "ರೇಡಾರ್ ಸ್ಕ್ಯಾನ್",
+    "satRefresh": "ರಿಫ್ರೆಶ್",
+    "satLayerRgb": "ನೈಜ ಬಣ್ಣ RGB"
   },
   "te": {
     "heroTitle": "సమస్యలు పెరిగే ముందే మీ పంటలను అర్థం చేసుకోండి.",
@@ -4341,7 +4506,62 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
     "badgeAgronomic": "వ్యవసాయ కారణం",
     "badgePriority": "నేటి ప్రాధాన్యత",
     "closeModalBtn": "అర్థమైంది & మూసివేయండి",
-    "voiceReadoutBtn": "వాయిస్ రీడౌట్"
+    "voiceReadoutBtn": "వాయిస్ రీడౌట్",
+    "guideTitle": "EARTHWORM ఎలా పనిచేస్తుంది?",
+    "guideStep1Title": "1. ఉపగ్రహాలు పంట కాంతి ప్రతిబింబాన్ని స్కాన్ చేస్తాయి",
+    "guideStep1Desc": "క్లోరోఫిల్ మరియు ఆకుపచ్చ జీవద్రవ్య సాంద్రతను కొలవడానికి సెంటినెల్-2 బహుళ-స్పెక్ట్రల్ బ్యాండ్‌లను ఉపయోగించి జిల్లాలను క్రమం తప్పకుండా స్కాన్ చేస్తుంది.",
+    "guideStep2Title": "2. స్థానిక వాతావరణ అనుసంధానం",
+    "guideStep2Desc": "నేల ఎండిపోతుందో లేదో లేదా పంట ఒత్తిడి ఉందో అంచనా వేయడానికి వర్ష సూచన మరియు తేమ డేటాను కలుపుతుంది.",
+    "guideStep3Title": "3. రైతుకు సకాలంలో సమాచారం",
+    "guideStep3Desc": "పంట ఒత్తిడి పొలమంతా వ్యాపించకముందే హెచ్చరిస్తుంది, తద్వారా మీరు నీరు, ఎరువులు ఆదా చేసి దిగుబడిని కాపాడుకోవచ్చు.",
+    "guideBtnGotIt": "అర్థమైంది!",
+    "satModalTitle": "ఉపగ్రహ బహుళ-స్పెక్ట్రల్ పరిశీలకుడు",
+    "satModalSub": "కోపర్నికస్ సెంటినెల్-2 • బహుళ-స్పెక్ట్రల్ భూ పరిశీలన",
+    "satLblParcel": "పొలం ప్లాట్:",
+    "satLblSensor": "సెన్సార్ మరియు కక్ష్య:",
+    "satLblCoords": "భౌగోళిక నిర్దేశాంకాలు & ఎత్తు:",
+    "satLblPass": "ఉపగ్రహ సమయం:",
+    "satSec1Title": "1. NDVI హీట్‌మ్యాప్ (పంట ఆరోగ్య సూచిక)",
+    "satLblSignal": "స్పెక్ట్రల్ సిగ్నల్:",
+    "satSec2Title": "2. ఇన్ఫ్రారెడ్ (CIR) డేటా",
+    "satLblBio": "జీవభౌతిక అర్థం:",
+    "satSec3Title": "3. NDMI (పంట మరియు నేల తేమ)",
+    "satSec4Title": "ముడి స్పెక్ట్రల్ బ్యాండ్ రీడింగ్స్ (MSI 10m/20m)",
+    "satLblB3": "B03 (ఆకుపచ్చ)",
+    "satLblB4": "B04 (ఎరుపు)",
+    "satLblB8": "B08 (NIR)",
+    "satLblB11": "B11 (SWIR)",
+    "satBtnReturn": "డ్యాష్‌బోర్డ్‌కు తిరిగి వెళ్ళండి",
+    "satBtnNdvi": "NDVI చూడండి",
+    "satBtnCir": "CIR చూడండి",
+    "fieldModalTitle": "నా పొలం • ప్లాట్ పరిశీలకుడు",
+    "fieldModalSub": "ప్రదర్శన పొలం విశ్లేషణ వీక్షణ",
+    "fieldLblPlot": "సర్వే ప్లాట్:",
+    "fieldLblCrop": "పంట మరియు రకం:",
+    "fieldLblArea": "మొత్తం విస్తీర్ణం:",
+    "fieldLblPass": "ఉపగ్రహ పాస్:",
+    "fieldSmsPreview": "SMS సలహా ప్రివ్యూ (సాధారణ ఫోన్)",
+    "fieldBtnCopy": "కాపీ చేయండి",
+    "fieldBtnListen": "వినండి",
+    "healthModalTitle": "1. పంట ఆరోగ్య పరిశీలకుడు",
+    "healthModalSub": "బహుళ-స్పెక్ట్రల్ క్లోరోఫిల్ అంచనా:",
+    "healthModalBody1": "సెంటినెల్-2 విశ్లేషణ ఈ ప్రాంతంలో 84% సాధారణ పంట ఆరోగ్యాన్ని చూపుతుంది:",
+    "healthModalNote": "గమనిక: మేఘాలు లేని చిత్రం. స్థానిక నేల తేమ మరియు తెగుళ్ల ప్రారంభ లక్షణాలను తనిఖీ చేయడానికి పొలం గట్టుపై నడవాలని సూచించబడింది.",
+    "waterModalTitle": "2. నేను నీరు పెట్టాలా?",
+    "waterModalSub": "వేరు మండల తేమ మరియు ఆవిరి నష్టం:",
+    "waterModalBody1": "పై 15 సెం.మీ మట్టిలో ప్రస్తుత అంచనా తేమ ఈ పంటకు సరిపోతుంది —",
+    "waterModalBody2": "రాబోయే రోజుల్లో వర్షం లేదు (0 మి.మీ). నేల పగుళ్లు లేదా మధ్యాహ్నం ఆకులు వాడిపోవడం కనిపిస్తే, ఆవిరి నష్టాన్ని తగ్గించడానికి సాయంత్రం 2.5 సెం.మీ నీరు పెట్టండి.",
+    "weatherModalTitle": "3. వాతావరణం & పిచికారీ సమయం",
+    "weatherModalSub": "72-గంటల పిచికారీ & పొలం పనులు:",
+    "weatherModalLine1": "గాలి వేగం: 8 - 14 కి.మీ/గం (అనుకూలం, పిచికారీ గాలిలో కొట్టుకుపోయే ప్రమాదం తక్కువ).",
+    "weatherModalLine2": "వర్షం అవకాశం: 10% కంటే తక్కువ.",
+    "weatherModalLine3": "మంచు బిందువు: ఉదయం సాధారణ తేమ. పిచికారీకి ఉత్తమ సమయం: ఉదయం 7:30 నుండి 10:30 వరకు.",
+    "btnClose": "మూసివేయండి",
+    "btnStatGraphs": "గణాంక గ్రాఫ్‌లు",
+    "seasonalBenchmarkPrefix": "సీజనల్ ప్రమాణం: 0.70 •",
+    "satRadarScan": "రాడార్ స్కాన్",
+    "satRefresh": "రిఫ్రెష్",
+    "satLayerRgb": "సహజ RGB"
   },
   "ta": {
     "heroTitle": "பிரச்சினைகள் வளர்வதற்கு முன்பே உங்கள் பயிர்களைப் புரிந்து கொள்ளுங்கள்.",
@@ -4424,7 +4644,62 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
     "badgeAgronomic": "வேளாண் காரணம்",
     "badgePriority": "இன்றைய முன்னுரிமை",
     "closeModalBtn": "புரிந்தது & மூடுக",
-    "voiceReadoutBtn": "குரல் வாசிப்பு"
+    "voiceReadoutBtn": "குரல் வாசிப்பு",
+    "guideTitle": "EARTHWORM எவ்வாறு செயல்படுகிறது?",
+    "guideStep1Title": "1. செயற்கைக்கோள்கள் பயிர் ஒளி பிரதிபலிப்பை ஸ்கேன் செய்கின்றன",
+    "guideStep1Desc": "பச்சையம் மற்றும் பசுமை அடர்த்தியை அளவிட சென்டினெல்-2 பல்கோண அலைவரிசைகளைப் பயன்படுத்தி மாவட்டங்களைத் தொடர்ந்து ஸ்கேன் செய்கிறது.",
+    "guideStep2Title": "2. உள்ளூர் வானிலை இணைப்பு",
+    "guideStep2Desc": "மண் உலர்கிறதா அல்லது பயிர் அழுத்தம் உள்ளதா என்பதை கணிக்க மழை முன்னறிவிப்பு மற்றும் ஈரப்பதத் தகவல்களை இணைக்கிறது.",
+    "guideStep3Title": "3. விவசாயிகளுக்கு உரிய நேர அறிவிப்பு",
+    "guideStep3Desc": "பயிர் பாதிப்பு வயல் முழுவதும் பரவுவதற்கு முன்பே உங்களை எச்சரிக்கிறது, இதனால் நீர் மற்றும் இடுபொருட்களைச் சேமித்து மகசூலைப் பாதுகாக்கலாம்.",
+    "guideBtnGotIt": "புரிந்தது!",
+    "satModalTitle": "செயற்கைக்கோள் பல்கோண ஆய்வாளர்",
+    "satModalSub": "கோப்பர்நிக்கஸ் சென்டினெல்-2 • பல்கோண புவி கண்காணிப்பு",
+    "satLblParcel": "நிலப் பிரிவு:",
+    "satLblSensor": "உணரி & சுற்றுப்பாதை:",
+    "satLblCoords": "ஆயத்தொலைவு & உயரம்:",
+    "satLblPass": "படம் எடுத்த நேரம்:",
+    "satSec1Title": "1. NDVI வரைபடம் (பயிர் ஆரோக்கிய குறியீடு)",
+    "satLblSignal": "நிறமாலை சமிக்ஞை:",
+    "satSec2Title": "2. அகச்சிவப்பு (CIR) தரவு",
+    "satLblBio": "உயிர் இயற்பியல் பொருள்:",
+    "satSec3Title": "3. NDMI (பயிர் ஈரப்பதம் & மண் நீர்)",
+    "satSec4Title": "அசல் நிறமாலை அலைவரிசை அளவுகள் (MSI 10m/20m)",
+    "satLblB3": "B03 (பச்சை)",
+    "satLblB4": "B04 (சிவப்பு)",
+    "satLblB8": "B08 (NIR)",
+    "satLblB11": "B11 (SWIR)",
+    "satBtnReturn": "முகப்புக்குத் திரும்பு",
+    "satBtnNdvi": "NDVI காட்டு",
+    "satBtnCir": "CIR காட்டு",
+    "fieldModalTitle": "என் பண்ணை • நில ஆய்வாளர்",
+    "fieldModalSub": "மாதிரி வயல் ஆய்வுப் பார்வை",
+    "fieldLblPlot": "சர்வே எண்:",
+    "fieldLblCrop": "பயிர் & ரகம்:",
+    "fieldLblArea": "மொத்த பரப்பளவு:",
+    "fieldLblPass": "செயற்கைக்கோள் நேரம்:",
+    "fieldSmsPreview": "SMS ஆலோசனை மாதிரி (சாதாரண போன்)",
+    "fieldBtnCopy": "நகலெடு",
+    "fieldBtnListen": "கேளுங்கள்",
+    "healthModalTitle": "1. பயிர் ஆரோக்கிய ஆய்வாளர்",
+    "healthModalSub": "பல்கோண பச்சையம் மதிப்பீடு:",
+    "healthModalBody1": "சென்டினெல்-2 ஆய்வு இப்பகுதியில் 84% சாதாரண பயிர் வளர்ச்சியைக் காட்டுகிறது:",
+    "healthModalNote": "குறிப்பு: மேகமற்ற தெளிவான பதிவு. உள்ளூர் மண் ஈரப்பதம் மற்றும் ஆரம்பகட்ட நோய் அறிகுறிகளைக் கண்டறிய வரப்பு வழியே நடந்து ஆய்வு செய்யவும்.",
+    "waterModalTitle": "2. நான் நீர் பாய்ச்ச வேண்டுமா?",
+    "waterModalSub": "வேர் மண்டல ஈரப்பதம் & ஆவியாதல்:",
+    "waterModalBody1": "மேல் 15 செ.மீ மண்ணில் தற்போதைய ஈரப்பதம் இந்த பயிருக்கு போதுமானதாக உள்ளது —",
+    "waterModalBody2": "அடுத்த 3 நாட்களுக்கு மழை இல்லை (0 மி.மீ). மண் வெடிப்பு அல்லது மதிய நேர இலை வாடல் கண்டால், ஆவியாதலைத் தவிர்க்க மாலையில் 2.5 செ.மீ நீர் பாய்ச்சவும்.",
+    "weatherModalTitle": "3. வானிலை & தெளிப்பு நேரம்",
+    "weatherModalSub": "72-மணி நேர தெளிப்பு & வயல் பணிகள்:",
+    "weatherModalLine1": "காற்றின் வேகம்: 8 - 14 கி.மீ/மணி (சாதகமானது, தெளிப்பு சிதறல் ஆபத்து குறைவு).",
+    "weatherModalLine2": "மழை வாய்ப்பு: 10% க்கும் குறைவு.",
+    "weatherModalLine3": "பனிப் புள்ளி: அதிகாலையில் சாதாரண ஈரப்பதம். தெளிக்க உகந்த நேரம்: காலை 7:30 முதல் 10:30 வரை.",
+    "btnClose": "மூடு",
+    "btnStatGraphs": "புள்ளிவிவர வரைபடம்",
+    "seasonalBenchmarkPrefix": "பருவகால அளவுகோல்: 0.70 •",
+    "satRadarScan": "ரேடார் ஸ்கேன்",
+    "satRefresh": "புதுப்பி",
+    "satLayerRgb": "இயற்கை RGB"
   },
   "mr": {
     "heroTitle": "समस्या वाढण्यापूर्वी तुमची पिके समजून घ्या.",
@@ -4507,7 +4782,62 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
     "badgeAgronomic": "कृषी कारण",
     "badgePriority": "आजचे प्राधान्य",
     "closeModalBtn": "समजले आणि बंद करा",
-    "voiceReadoutBtn": "व्हॉइस वाचन"
+    "voiceReadoutBtn": "व्हॉइस वाचन",
+    "guideTitle": "EARTHWORM कसे कार्य करते?",
+    "guideStep1Title": "1. उपग्रह पिकांचे प्रकाश परावर्तन स्कॅन करतात",
+    "guideStep1Desc": "क्लोरोफिल आणि हिरव्या पिकांची घनता मोजण्यासाठी सेंटिनेल-2 मल्टी-स्पेक्ट्रल बँड वापरून नियमितपणे जिल्ह्यांचे स्कॅनिंग करते.",
+    "guideStep2Title": "2. स्थानिक हवामान माहितीचे एकत्रीकरण",
+    "guideStep2Desc": "माती कोरडी पडत आहे का किंवा पिकावर ताण येत आहे का हे तपासण्यासाठी पावसाचा अंदाज आणि आर्द्रतेची माहिती एकत्रित करते.",
+    "guideStep3Title": "3. शेतकऱ्यांना वेळेवर सूचना",
+    "guideStep3Desc": "पिकावरील ताण शेतात पसरण्यापूर्वीच तुम्हाला सावध करते, ज्यामुळे पाणी आणि खतांची बचत होऊन उत्पन्नाचे रक्षण होते.",
+    "guideBtnGotIt": "समजले!",
+    "satModalTitle": "उपग्रह मल्टी-स्पेक्ट्रल निरीक्षक",
+    "satModalSub": "कोपरनिकस सेंटिनेल-2 • मल्टी-स्पेक्ट्रल पृथ्वी निरीक्षण",
+    "satLblParcel": "शेत प्लॉट:",
+    "satLblSensor": "सेन्सर आणि कक्षा:",
+    "satLblCoords": "अक्षांश-रेखांश आणि उंची:",
+    "satLblPass": "उपग्रह पास वेळ:",
+    "satSec1Title": "1. NDVI हीटमॅप (पीक आरोग्य निर्देशांक)",
+    "satLblSignal": "स्पेक्ट्रल सिग्नल:",
+    "satSec2Title": "2. इन्फ्रारेड (CIR - कलर इन्फ्रारेड) डेटा",
+    "satLblBio": "जैवभौतिक अर्थ:",
+    "satSec3Title": "3. NDMI (पिकातील ओलावा आणि मातीतील पाणी)",
+    "satSec4Title": "कच्च्या स्पेक्ट्रल बँड नोंदी (MSI 10m/20m)",
+    "satLblB3": "B03 (हिरवा)",
+    "satLblB4": "B04 (लाल)",
+    "satLblB8": "B08 (NIR)",
+    "satLblB11": "B11 (SWIR)",
+    "satBtnReturn": "डॅशबोर्डवर परत जा",
+    "satBtnNdvi": "NDVI पहा",
+    "satBtnCir": "CIR पहा",
+    "fieldModalTitle": "माझे शेत • प्लॉट निरीक्षक",
+    "fieldModalSub": "प्रात्यक्षिक शेत निदान दृश्य",
+    "fieldLblPlot": "सर्व्हे प्लॉट:",
+    "fieldLblCrop": "पीक आणि वाण:",
+    "fieldLblArea": "एकूण क्षेत्रफळ:",
+    "fieldLblPass": "उपग्रह पास:",
+    "fieldSmsPreview": "SMS सल्ला पूर्वावलोकन (साधा फोन)",
+    "fieldBtnCopy": "कॉपी करा",
+    "fieldBtnListen": "ऐका",
+    "healthModalTitle": "1. पीक आरोग्य निरीक्षक",
+    "healthModalSub": "मल्टी-स्पेक्ट्रल क्लोरोफिल मूल्यांकन:",
+    "healthModalBody1": "सेंटिनेल-2 विश्लेषण या भागात 84% सामान्य पीक वाढ दर्शवते:",
+    "healthModalNote": "टीप: ढगरहित संदर्भ पास. स्थानिक जमिनीतील ओलावा आणि रोगाची प्रारंभिक लक्षणे तपासण्यासाठी बांधावरून फेरफटका मारण्याची शिफारस केली जाते.",
+    "waterModalTitle": "2. मी पाणी द्यावे का?",
+    "waterModalSub": "मुळांजवळील ओलावा आणि बाष्पीभवन:",
+    "waterModalBody1": "वरच्या 15 सेमी थरातील अंदाजे ओलावा या पिकासाठी पुरेसा आहे —",
+    "waterModalBody2": "पुढील हवामान कोरडे आहे (0 मिमी पाऊस). जमिनीला भेगा पडल्यास किंवा दुपारी पाने कोमेजल्यास, बाष्पीभवन टाळण्यासाठी संध्याकाळी 2.5 सेमी सिंचन करा.",
+    "weatherModalTitle": "3. हवामान आणि फवारणीची वेळ",
+    "weatherModalSub": "72-तास फवारणी आणि शेती कामकाज:",
+    "weatherModalLine1": "वाऱ्याचा वेग: 8 - 14 किमी/तास (अनुकूल, फवारणी उडून जाण्याचा धोका कमी).",
+    "weatherModalLine2": "पावसाची शक्यता: 10% पेक्षा कमी.",
+    "weatherModalLine3": "दवबिंदू: पहाटेच्या वेळी सामान्य आर्द्रता. फवारणीसाठी उत्तम वेळ: सकाळी 7:30 ते 10:30 पर्यंत.",
+    "btnClose": "बंद करा",
+    "btnStatGraphs": "सांख्यिकीय आलेख",
+    "seasonalBenchmarkPrefix": "हंगामी मानक: 0.70 •",
+    "satRadarScan": "रडार स्कॅन",
+    "satRefresh": "रिफ्रेश",
+    "satLayerRgb": "नैसर्गिक RGB"
   },
   "bn": {
     "heroTitle": "সমস্যা বাড়ার আগেই আপনার ফসলকে বুঝুন।",
@@ -4590,7 +4920,62 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
     "badgeAgronomic": "কৃষি কারণ",
     "badgePriority": "আজকের অগ্রাধিকার",
     "closeModalBtn": "বুঝেছি এবং বন্ধ করুন",
-    "voiceReadoutBtn": "ভয়েস পাঠ"
+    "voiceReadoutBtn": "ভয়েস পাঠ",
+    "guideTitle": "EARTHWORM কীভাবে কাজ করে?",
+    "guideStep1Title": "1. উপগ্রহ ফসলের আলোর প্রতিফলন স্ক্যান করে",
+    "guideStep1Desc": "সেন্টিনেল-২ ক্লোরোফিল এবং সবুজ ফসলের ঘনত্ব পরিমাপ করতে মাল্টি-স্পেকট্রাল ব্যান্ড ব্যবহার করে নিয়মিত অঞ্চলগুলো স্ক্যান করে।",
+    "guideStep2Title": "2. স্থানীয় আবহাওয়া তথ্যের সমন্বয়",
+    "guideStep2Desc": "মাটি শুকিয়ে যাচ্ছে কিনা বা ফসলে চাপ পড়ছে কিনা তা অনুমান করতে বৃষ্টির পূর্বাভাস ও আর্দ্রতা বিশ্লেষণ করে।",
+    "guideStep3Title": "3. কৃষকের কাছে সময়মতো বার্তা",
+    "guideStep3Desc": "ফসলের ক্ষতি জমিতে ছড়িয়ে পড়ার আগেই সতর্ক করে দেয়, যাতে আপনি জল ও সার বাঁচাতে এবং ফলন রক্ষা করতে পারেন।",
+    "guideBtnGotIt": "বুঝতে পেরেছি!",
+    "satModalTitle": "উপগ্রহ মাল্টি-স্পেকট্রাল পরিদর্শক",
+    "satModalSub": "কোপার্নিকাস সেন্টিনেল-২ • মাল্টি-স্পেকট্রাল ভূ-পর্যবেক্ষণ",
+    "satLblParcel": "জমির প্লট:",
+    "satLblSensor": "সেন্সর এবং কক্ষপথ:",
+    "satLblCoords": "স্থানাঙ্ক ও উচ্চতা:",
+    "satLblPass": "তথ্য সংগ্রহের সময়:",
+    "satSec1Title": "1. NDVI হিটম্যাপ (ফসলের স্বাস্থ্য সূচক)",
+    "satLblSignal": "স্পেকট্রাল সংকেত:",
+    "satSec2Title": "2. ইনফ্রারেড (CIR) তথ্য",
+    "satLblBio": "জৈবভৌতিক অর্থ:",
+    "satSec3Title": "3. NDMI (গাছের আর্দ্রতা ও মাটির জল)",
+    "satSec4Title": "মূল স্পেকট্রাল ব্যান্ড পরিমাপ (MSI 10m/20m)",
+    "satLblB3": "B03 (সবুজ)",
+    "satLblB4": "B04 (লাল)",
+    "satLblB8": "B08 (NIR)",
+    "satLblB11": "B11 (SWIR)",
+    "satBtnReturn": "ড্যাশবোর্ডে ফিরে যান",
+    "satBtnNdvi": "NDVI দেখুন",
+    "satBtnCir": "CIR দেখুন",
+    "fieldModalTitle": "আমার জমি • প্লট পরিদর্শক",
+    "fieldModalSub": "নমুনা জমি বিশ্লেষণ দৃশ্য",
+    "fieldLblPlot": "সার্ভে প্লট:",
+    "fieldLblCrop": "ফসল ও জাত:",
+    "fieldLblArea": "মোট আয়তন:",
+    "fieldLblPass": "উপগ্রহ পাস:",
+    "fieldSmsPreview": "SMS পরামর্শ প্রিভিউ (সাধারণ ফোন)",
+    "fieldBtnCopy": "কপি করুন",
+    "fieldBtnListen": "শুনুন",
+    "healthModalTitle": "1. ফসল স্বাস্থ্য পরিদর্শক",
+    "healthModalSub": "মাল্টি-স্পেকট্রাল ক্লোরোফিল মূল্যায়ন:",
+    "healthModalBody1": "সেন্টিনেল-২ বিশ্লেষণে দেখা গেছে এই এলাকায় ৮৪% স্বাভাবিক সতেজতা রয়েছে:",
+    "healthModalNote": "দ্রষ্টব্য: মেঘমুক্ত ছবি। স্থানীয় মাটির আর্দ্রতা ও রোগের প্রাথমিক লক্ষণ দেখতে জমির আইল বরাবর হেঁটে পরিদর্শন করার পরামর্শ দেওয়া হচ্ছে।",
+    "waterModalTitle": "2. আমার কি সেচ দেওয়া উচিত?",
+    "waterModalSub": "শেকড়ের গভীরতার আর্দ্রতা ও বাষ্পীভবন:",
+    "waterModalBody1": "উপরের ১৫ সেমি স্তরে আনুমানিক মাটির আর্দ্রতা এই ফসলের জন্য পর্যাপ্ত —",
+    "waterModalBody2": "আগামী কয়েক দিন শুষ্ক থাকবে (০ মিমি বৃষ্টি)। মাটিতে ফাটল ধরলে বা দুপুরে পাতা নেতিয়ে পড়লে, বাষ্পীভবন কমাতে বিকেলে ২.৫ সেমি সেচ দিন।",
+    "weatherModalTitle": "3. আবহাওয়া ও স্প্রে করার সময়",
+    "weatherModalSub": "৭২ ঘণ্টার স্প্রে ও মাঠ পর্যায়ের কাজ:",
+    "weatherModalLine1": "বাতাসের গতি: ৮ - ১৪ কিমি/ঘণ্টা (অনুকূল, স্প্রে উড়ে যাওয়ার ঝুঁকি কম)।",
+    "weatherModalLine2": "বৃষ্টির সম্ভাবনা: ১০% এর কম।",
+    "weatherModalLine3": "শিশির বিন্দু: ভোরের দিকে স্বাভাবিক আর্দ্রতা। স্প্রে করার সেরা সময়: সকাল ৭:৩০ থেকে ১০:৩০।",
+    "btnClose": "বন্ধ করুন",
+    "btnStatGraphs": "পরিসংখ্যান গ্রাফ",
+    "seasonalBenchmarkPrefix": "মৌসুমী মানদণ্ড: 0.70 •",
+    "satRadarScan": "রাডার স্ক্যান",
+    "satRefresh": "রিফ্রেশ",
+    "satLayerRgb": "স্বাভাবিক RGB"
   }
 };
 
@@ -4652,6 +5037,555 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
     let leafletMap = null;
     let leafletParcelLayer = null;
     let leafletMarker = null;
+
+    const SPECTRAL_DATA_TRANSLATIONS = {
+  "en": {
+    "mandya": {
+      "plot": "Plot #142/A • Mandya (Karnataka)",
+      "sensor": "Copernicus Sentinel-2B (MSI Level-2A BOA)",
+      "pass": "24 Feb 2024 • 10:48 UTC (Cloud: 0.8%)",
+      "ndviVal": "0.58 (Benchmark 0.70 • -17% Drop)",
+      "ndviDesc": "Multi-spectral vegetation index indicates localized canopy stress in the North-East quarter. Rest of parcel maintains standard canopy vigor.",
+      "ndviSignal": "Red light (665 nm) absorption decreased; NIR (842 nm) reflectance reduced due to early moisture stress.",
+      "cirVal": "NIR (B08): 0.42 • Red (B04): 0.14",
+      "cirDesc": "Color Infrared (CIR) false-color return reveals lowered cellular turgor in the NE zone; western quadrants exhibit dense crimson foliage.",
+      "cirSignal": "Healthy leaf mesophyll reflects 40–50% NIR. Cell dehydration reduces internal scattering, dampening CIR brightness.",
+      "moistureVal": "NDMI: +0.20 • SWIR (B11): 0.28",
+      "moistureDesc": "Normalized Difference Moisture Index confirms localized soil percolation deficit along the NE ridge. Top 10 cm root zone drying.",
+      "bands": {
+        "b3": "0.08 (Peak)",
+        "b4": "0.14 (Absorb)",
+        "b8": "0.42 (Scatter)",
+        "b11": "0.28 (Water)"
+      }
+    },
+    "ludhiana": {
+      "plot": "Plot #89/C • Ludhiana (Punjab)",
+      "sensor": "Copernicus Sentinel-2A (MSI Level-2A BOA)",
+      "pass": "22 Feb 2024 • 11:05 UTC (Cloud: 1.4%)",
+      "ndviVal": "0.72 (Benchmark 0.68 • +6% Optimal)",
+      "ndviDesc": "High uniform chlorophyll density across entire cadastral parcel. Active tillering in PBW 343 wheat progressing with high leaf vigor.",
+      "ndviSignal": "High Red (665 nm) chlorophyll absorption (>90%) with strong NIR (842 nm) canopy scattering.",
+      "cirVal": "NIR (B08): 0.62 • Red (B04): 0.06",
+      "cirDesc": "Brilliant crimson false-color return throughout parcel. Dense canopy coverage with high Leaf Area Index (LAI ~3.8).",
+      "cirSignal": "Optimal cellular hydration and nitrogen assimilation producing maximum Near-Infrared reflectance.",
+      "moistureVal": "NDMI: +0.55 • SWIR (B11): 0.18",
+      "moistureDesc": "Canopy water absorption optimal. Sub-surface moisture retention steady following canal irrigation.",
+      "bands": {
+        "b3": "0.07 (Peak)",
+        "b4": "0.06 (Absorb)",
+        "b8": "0.62 (Scatter)",
+        "b11": "0.18 (Water)"
+      }
+    },
+    "varanasi": {
+      "plot": "Plot #214/B • Varanasi (Uttar Pradesh)",
+      "sensor": "Copernicus Sentinel-2B (MSI Level-2A BOA)",
+      "pass": "23 Feb 2024 • 10:32 UTC (Cloud: 2.1%)",
+      "ndviVal": "0.64 (Benchmark 0.65 • Stable 0%)",
+      "ndviDesc": "Uniform vegetative vigor consistent with flowering stage in Varuna mustard and intercropped vegetables. Balanced canopy development.",
+      "ndviSignal": "Moderate yellow blossom signature mixing with green leaf reflectance; healthy physiological progression.",
+      "cirVal": "NIR (B08): 0.52 • Red (B04): 0.09",
+      "cirDesc": "Consistent moderate crimson response across all ridges. No signs of aphid infestation or moisture wilt.",
+      "cirSignal": "Uniform vegetative cellular structure across Gangetic alluvial loam soil bed.",
+      "moistureVal": "NDMI: +0.41 • SWIR (B11): 0.22",
+      "moistureDesc": "Adequate soil water retention; irrigation can be withheld for the next 4–5 days.",
+      "bands": {
+        "b3": "0.08 (Peak)",
+        "b4": "0.09 (Absorb)",
+        "b8": "0.52 (Scatter)",
+        "b11": "0.22 (Water)"
+      }
+    },
+    "nashik": {
+      "plot": "Plot #56/D • Nashik (Maharashtra)",
+      "sensor": "Copernicus Sentinel-2A (MSI Level-2A BOA)",
+      "pass": "21 Feb 2024 • 10:52 UTC (Cloud: 0.4%)",
+      "ndviVal": "0.61 (Benchmark 0.62 • -2% Nominal)",
+      "ndviDesc": "Steady canopy density across Red Pinhead onion field at bulb expansion stage. Healthy cylindrical leaf tops.",
+      "ndviSignal": "Characteristic onion erect canopy reflectance with good ground coverage and minimal soil background noise.",
+      "cirVal": "NIR (B08): 0.48 • Red (B04): 0.10",
+      "cirDesc": "Even false-color infrared distribution. No fungal purple blotch or thrips damage signatures detected.",
+      "cirSignal": "Stable turgor pressure maintained through scheduled micro-drip irrigation.",
+      "moistureVal": "NDMI: +0.33 • SWIR (B11): 0.24",
+      "moistureDesc": "Drip root zone maintaining steady hydration; deficit minimal.",
+      "bands": {
+        "b3": "0.07 (Peak)",
+        "b4": "0.10 (Absorb)",
+        "b8": "0.48 (Scatter)",
+        "b11": "0.24 (Water)"
+      }
+    }
+  },
+  "kn": {
+    "mandya": {
+      "plot": "ಪ್ಲಾಟ್ #142/A • ಮಂಡ್ಯ (ಕರ್ನಾಟಕ)",
+      "sensor": "ಕೋಪರ್ನಿಕಸ್ ಸೆಂಟಿನೆಲ್-2B (MSI ಲೆವೆಲ್-2A)",
+      "pass": "24 ಫೆಬ್ರವರಿ 2024 • 10:48 UTC (ಮೋಡ: 0.8%)",
+      "ndviVal": "0.58 (ಮಾನದಂಡ 0.70 • -17% ಇಳಿಕೆ)",
+      "ndviDesc": "ಬಹು-ಸ್ಪೆಕ್ಟ್ರಲ್ ಸೂಚ್ಯಂಕವು ಈಶಾನ್ಯ ಭಾಗದಲ್ಲಿ ಸ್ಥಳೀಯ ಬೆಳೆ ಒತ್ತಡವನ್ನು ತೋರಿಸುತ್ತದೆ. ಉಳಿದ ಜಮೀನು ಉತ್ತಮ ಬೆಳವಣಿಗೆ ಹೊಂದಿದೆ.",
+      "ndviSignal": "ತೇವಾಂಶ ಕೊರತೆಯಿಂದ ಕೆಂಪು ಬೆಳಕಿನ (665 nm) ಹೀರಿಕೊಳ್ಳುವಿಕೆ ಕಡಿಮೆಯಾಗಿ NIR (842 nm) ಪ್ರತಿಫಲನ ತಗ್ಗಿದೆ.",
+      "cirVal": "NIR (B08): 0.42 • Red (B04): 0.14",
+      "cirDesc": "CIR ಬಣ್ಣದ ಚಿತ್ರವು ಈಶಾನ್ಯ ಭಾಗದಲ್ಲಿ ಜೀವಕೋಶದ ದೃಢತೆ ಕಡಿಮೆಯಾಗಿರುವುದನ್ನು ತೋರಿಸುತ್ತದೆ; ಪಶ್ಚಿಮ ಭಾಗವು ದಟ್ಟವಾದ ಹಸಿರು ಹೊಂದಿದೆ.",
+      "cirSignal": "ಆರೋಗ್ಯಕರ ಎಲೆಗಳು 40–50% NIR ಪ್ರತಿಫಲಿಸುತ್ತವೆ. ತೇವಾಂಶ ಇಳಿದಾಗ ಎಲೆಯ ಕಾಂತಿ ಕಡಿಮೆಯಾಗುತ್ತದೆ.",
+      "moistureVal": "NDMI: +0.20 • SWIR (B11): 0.28",
+      "moistureDesc": "ಈಶಾನ್ಯ ಬದುವಿನಲ್ಲಿ ಮಣ್ಣಿನ ನೀರಿನ ಇಂಗುವಿಕೆ ಕೊರತೆಯನ್ನು ದೃಢಪಡಿಸುತ್ತದೆ. ಮೇಲಿನ 10 ಸೆಂ.ಮೀ ಬೇರು ವಲಯ ಒಣಗುತ್ತಿದೆ.",
+      "bands": {
+        "b3": "0.08 (ಗರಿಷ್ಠ)",
+        "b4": "0.14 (ಹೀರಿಕೆ)",
+        "b8": "0.42 (ಪ್ರಸರಣ)",
+        "b11": "0.28 (ನೀರು)"
+      }
+    },
+    "ludhiana": {
+      "plot": "ಪ್ಲಾಟ್ #89/C • ಲುಧಿಯಾನ (ಪಂಜಾಬ್)",
+      "sensor": "ಕೋಪರ್ನಿಕಸ್ ಸೆಂಟಿನೆಲ್-2A (MSI ಲೆವೆಲ್-2A)",
+      "pass": "22 ಫೆಬ್ರವರಿ 2024 • 11:05 UTC (ಮೋಡ: 1.4%)",
+      "ndviVal": "0.72 (ಮಾನದಂಡ 0.68 • +6% ಉತ್ತಮ)",
+      "ndviDesc": "ಸಂಪೂರ್ಣ ಜಮೀನಿನಲ್ಲಿ ಏಕರೂಪದ ಉತ್ತಮ ಹರಿತ್ತು (ಕ್ಲೋರೊಫಿಲ್) ಸಾಂದ್ರತೆ ಇದೆ. ಗೋಧಿ ಬೆಳೆಯು ಆರೋಗ್ಯಕರವಾಗಿ ಬೆಳೆಯುತ್ತಿದೆ.",
+      "ndviSignal": "ಬಲವಾದ NIR (842 nm) ಪ್ರತಿಫಲನದೊಂದಿಗೆ 90% ಕ್ಕೂ ಹೆಚ್ಚು ಕೆಂಪು ಬೆಳಕಿನ (665 nm) ಹೀರಿಕೊಳ್ಳುವಿಕೆ.",
+      "cirVal": "NIR (B08): 0.62 • Red (B04): 0.06",
+      "cirDesc": "ಜಮೀನಿನ ತುಂಬಾ ಪ್ರಕಾಶಮಾನವಾದ ಇನ್ಫ್ರಾರೆಡ್ ಪ್ರತಿಫಲನ. ದಟ್ಟವಾದ ಎಲೆಗಳ ಹರಡುವಿಕೆ (LAI ~3.8).",
+      "cirSignal": "ಉತ್ತಮ ಜೀವಕೋಶದ ತೇವಾಂಶ ಮತ್ತು ಸಾರಜನಕದ ಹೀರಿಕೆಯು ಗರಿಷ್ಠ NIR ಪ್ರತಿಫಲನವನ್ನು ನೀಡುತ್ತಿದೆ.",
+      "moistureVal": "NDMI: +0.55 • SWIR (B11): 0.18",
+      "moistureDesc": "ಬೆಳೆಯ ನೀರಿನ ಹೀರಿಕೊಳ್ಳುವಿಕೆ ಉತ್ತಮವಾಗಿದೆ. ಕಾಲುವೆ ನೀರಾವರಿಯ ನಂತರ ಮಣ್ಣಿನಲ್ಲಿ ತೇವಾಂಶ ಸ್ಥಿರವಾಗಿದೆ.",
+      "bands": {
+        "b3": "0.07 (ಗರಿಷ್ಠ)",
+        "b4": "0.06 (ಹೀರಿಕೆ)",
+        "b8": "0.62 (ಪ್ರಸರಣ)",
+        "b11": "0.18 (ನೀರು)"
+      }
+    },
+    "varanasi": {
+      "plot": "ಪ್ಲಾಟ್ #214/B • ವಾರಣಾಸಿ (ಉತ್ತರ ಪ್ರದೇಶ)",
+      "sensor": "ಕೋಪರ್ನಿಕಸ್ ಸೆಂಟಿನೆಲ್-2B (MSI ಲೆವೆಲ್-2A)",
+      "pass": "23 ಫೆಬ್ರವರಿ 2024 • 10:32 UTC (ಮೋಡ: 2.1%)",
+      "ndviVal": "0.64 (ಮಾನದಂಡ 0.65 • 0% ಸ್ಥಿರ)",
+      "ndviDesc": "ವರುಣ ಸಾಸಿವೆ ಹೂಬಿಡುವ ಹಂತಕ್ಕೆ ಅನುಗುಣವಾದ ಸಮತೋಲಿತ ಹಸಿರು ಹುರುಪು ಕಂಡುಬಂದಿದೆ.",
+      "ndviSignal": "ಹಸಿರು ಎಲೆಗಳೊಂದಿಗೆ ಹಳದಿ ಹೂವುಗಳ ಪ್ರತಿಫಲನ ಮಿಶ್ರಣವಾಗಿದೆ; ಬೆಳವಣಿಗೆ ಆರೋಗ್ಯಕರವಾಗಿದೆ.",
+      "cirVal": "NIR (B08): 0.52 • Red (B04): 0.09",
+      "cirDesc": "ಎಲ್ಲಾ ಸಾಲುಗಳಲ್ಲಿ ಸಮನಾದ ಪ್ರತಿಫಲನ. ಹೇನು ಬಾಧೆ ಅಥವಾ ನೀರಿನ ಕೊರತೆಯ ಲಕ್ಷಣಗಳಿಲ್ಲ.",
+      "cirSignal": "ಗಂಗಾ ನದಿಯ ಮೆಕ್ಕಲು ಮಣ್ಣಿನಲ್ಲಿ ಏಕರೂಪದ ಸಸ್ಯ ಜೀವಕೋಶದ ರಚನೆ ಕಂಡುಬಂದಿದೆ.",
+      "moistureVal": "NDMI: +0.41 • SWIR (B11): 0.22",
+      "moistureDesc": "ಮಣ್ಣಿನಲ್ಲಿ ಸಾಕಷ್ಟು ತೇವಾಂಶವಿದೆ; ಮುಂದಿನ 4–5 ದಿನಗಳವರೆಗೆ ನೀರು ಹಾಯಿಸುವ ಅಗತ್ಯವಿಲ್ಲ.",
+      "bands": {
+        "b3": "0.08 (ಗರಿಷ್ಠ)",
+        "b4": "0.09 (ಹೀರಿಕೆ)",
+        "b8": "0.52 (ಪ್ರಸರಣ)",
+        "b11": "0.22 (ನೀರು)"
+      }
+    },
+    "nashik": {
+      "plot": "ಪ್ಲಾಟ್ #56/D • ನಾಸಿಕ್ (ಮಹಾರಾಷ್ಟ್ರ)",
+      "sensor": "ಕೋಪರ್ನಿಕಸ್ ಸೆಂಟಿನೆಲ್-2A (MSI ಲೆವೆಲ್-2A)",
+      "pass": "21 ಫೆಬ್ರವರಿ 2024 • 10:52 UTC (ಮೋಡ: 0.4%)",
+      "ndviVal": "0.61 (ಮಾನದಂಡ 0.62 • -2% ಸಾಮಾನ್ಯ)",
+      "ndviDesc": "ಈರುಳ್ಳಿ ಗಡ್ಡೆ ಬೆಳೆಯುವ ಹಂತದಲ್ಲಿ ಸ್ಥಿರವಾದ ಬೆಳೆ ಸಾಂದ್ರತೆ ಕಂಡುಬಂದಿದೆ. ಎಲೆಗಳು ನೇರವಾಗಿ ಆರೋಗ್ಯಕರವಾಗಿವೆ.",
+      "ndviSignal": "ಈರುಳ್ಳಿ ಎಲೆಗಳ ವಿಶಿಷ್ಟ ಪ್ರತಿಫಲನವು ಉತ್ತಮ ನೆಲದ ಕವರೇಜ್ ತೋರಿಸುತ್ತದೆ.",
+      "cirVal": "NIR (B08): 0.48 • Red (B04): 0.10",
+      "cirDesc": "ಸಮನಾದ ಇನ್ಫ್ರಾರೆಡ್ ವಿತರಣೆ. ನೇರಳೆ ಮಚ್ಚೆ ರೋಗ ಅಥವಾ ನುಸಿ ಬಾಧೆಯ ಯಾವುದೇ ಲಕ್ಷಣಗಳಿಲ್ಲ.",
+      "cirSignal": "ನಿಯಮಿತ ಹನಿ ನೀರಾವರಿಯಿಂದ ಎಲೆಗಳಲ್ಲಿ ಉತ್ತಮ ತೇವಾಂಶದ ಒತ್ತಡ ಕಾಯ್ದುಕೊಳ್ಳಲಾಗಿದೆ.",
+      "moistureVal": "NDMI: +0.33 • SWIR (B11): 0.24",
+      "moistureDesc": "ಹನಿ ನೀರಾವರಿ ಬೇರು ವಲಯದಲ್ಲಿ ಸ್ಥಿರವಾದ ತೇವಾಂಶವಿದೆ; ನೀರಿನ ಕೊರತೆ ಕನಿಷ್ಠವಾಗಿದೆ.",
+      "bands": {
+        "b3": "0.07 (ಗರಿಷ್ಠ)",
+        "b4": "0.10 (ಹೀರಿಕೆ)",
+        "b8": "0.48 (ಪ್ರಸರಣ)",
+        "b11": "0.24 (ನೀರು)"
+      }
+    }
+  },
+  "hi": {
+    "mandya": {
+      "plot": "प्लॉट #142/A • मांड्या (कर्नाटक)",
+      "sensor": "कॉपरनिकस सेंटिनल-2B (MSI लेवल-2A)",
+      "pass": "24 फरवरी 2024 • 10:48 UTC (बादल: 0.8%)",
+      "ndviVal": "0.58 (मानक 0.70 • -17% गिरावट)",
+      "ndviDesc": "मल्टी-स्पेक्ट्रल सूचकांक उत्तर-पूर्वी हिस्से में स्थानीय नमी के तनाव का संकेत देता है। शेष खेत सामान्य स्थिति में है।",
+      "ndviSignal": "शुरुआती नमी की कमी के कारण लाल प्रकाश (665 nm) का अवशोषण कम हुआ और NIR (842 nm) परावर्तन घटा है।",
+      "cirVal": "NIR (B08): 0.42 • Red (B04): 0.14",
+      "cirDesc": "कलर इन्फ्रारेड (CIR) चित्र उत्तर-पूर्वी कोने में कोशिका दबाव में कमी दिखाता है; पश्चिमी क्षेत्र घना हरा है।",
+      "cirSignal": "स्वस्थ पत्तियां 40–50% NIR परावर्तित करती हैं। पानी की कमी से चमक कम हो जाती है।",
+      "moistureVal": "NDMI: +0.20 • SWIR (B11): 0.28",
+      "moistureDesc": "नॉर्मलाइज्ड डिफरेंस मॉइस्चर इंडेक्स ऊपरी 10 सेमी जड़ क्षेत्र में पानी के रिसाव की कमी की पुष्टि करता है।",
+      "bands": {
+        "b3": "0.08 (शिखर)",
+        "b4": "0.14 (अवशोषण)",
+        "b8": "0.42 (प्रकीर्णन)",
+        "b11": "0.28 (जल)"
+      }
+    },
+    "ludhiana": {
+      "plot": "प्लॉट #89/C • लुधियाना (पंजाब)",
+      "sensor": "कॉपरनिकस सेंटिनल-2A (MSI लेवल-2A)",
+      "pass": "22 फरवरी 2024 • 11:05 UTC (बादल: 1.4%)",
+      "ndviVal": "0.72 (मानक 0.68 • +6% सर्वोत्तम)",
+      "ndviDesc": "पूरे प्लॉट में उच्च और एकसमान क्लोरोफिल घनत्व। गेहूं की फसल उच्च ऊर्जा और कल्लों के साथ बढ़ रही है।",
+      "ndviSignal": "मजबूत NIR (842 nm) परावर्तन के साथ 90% से अधिक लाल प्रकाश (665 nm) का अवशोषण।",
+      "cirVal": "NIR (B08): 0.62 • Red (B04): 0.06",
+      "cirDesc": "पूरे खेत में चमकदार लाल CIR संकेत। उच्च लीफ एरिया इंडेक्स (LAI ~3.8) के साथ घनी फसल।",
+      "cirSignal": "उत्तम कोशिकीय नमी और नाइट्रोजन अवशोषण से अधिकतम NIR परावर्तन मिल रहा है।",
+      "moistureVal": "NDMI: +0.55 • SWIR (B11): 0.18",
+      "moistureDesc": "फसल द्वारा जल अवशोषण उत्तम है। नहर सिंचाई के बाद उप-सतही नमी स्थिर बनी हुई है।",
+      "bands": {
+        "b3": "0.07 (शिखर)",
+        "b4": "0.06 (अवशोषण)",
+        "b8": "0.62 (प्रकीर्णन)",
+        "b11": "0.18 (जल)"
+      }
+    },
+    "varanasi": {
+      "plot": "प्लॉट #214/B • वाराणसी (उत्तर प्रदेश)",
+      "sensor": "कॉपरनिकस सेंटिनल-2B (MSI लेवल-2A)",
+      "pass": "23 फरवरी 2024 • 10:32 UTC (बादल: 2.1%)",
+      "ndviVal": "0.64 (मानक 0.65 • स्थिर 0%)",
+      "ndviDesc": "वरुणा सरसों के फूल आने की अवस्था के अनुरूप संतुलित वानस्पतिक विकास।",
+      "ndviSignal": "हरी पत्तियों के परावर्तन के साथ पीले फूलों का मिश्रित संकेत; स्वस्थ शारीरिक प्रगति।",
+      "cirVal": "NIR (B08): 0.52 • Red (B04): 0.09",
+      "cirDesc": "सभी मेड़ों पर समान प्रतिक्रिया। माहू कीट या नमी की कमी के कोई लक्षण नहीं हैं।",
+      "cirSignal": "गंगा की जलोढ़ दोमट मिट्टी में एकसमान कोशिकीय संरचना।",
+      "moistureVal": "NDMI: +0.41 • SWIR (B11): 0.22",
+      "moistureDesc": "मिट्टी में पर्याप्त जल धारण क्षमता; अगले 4–5 दिनों तक सिंचाई रोकी जा सकती है।",
+      "bands": {
+        "b3": "0.08 (शिखर)",
+        "b4": "0.09 (अवशोषण)",
+        "b8": "0.52 (प्रकीर्णन)",
+        "b11": "0.22 (जल)"
+      }
+    },
+    "nashik": {
+      "plot": "प्लॉट #56/D • नासिक (महाराष्ट्र)",
+      "sensor": "कॉपरनिकस सेंटिनल-2A (MSI लेवल-2A)",
+      "pass": "21 फरवरी 2024 • 10:52 UTC (बादल: 0.4%)",
+      "ndviVal": "0.61 (मानक 0.62 • -2% सामान्य)",
+      "ndviDesc": "कंद विस्तार चरण में प्याज के खेत में स्थिर घनत्व। पत्तियां सीधी और स्वस्थ हैं।",
+      "ndviSignal": "प्याज की खड़ी पत्तियों का विशिष्ट परावर्तन अच्छी भूमि कवरेज दर्शाता है।",
+      "cirVal": "NIR (B08): 0.48 • Red (B04): 0.10",
+      "cirDesc": "एकसमान इन्फ्रारेड वितरण। बैंगनी धब्बा रोग या थ्रिप्स क्षति के कोई संकेत नहीं।",
+      "cirSignal": "नियमित ड्रिप सिंचाई से पत्तियों में स्थिर दबाव बना हुआ है।",
+      "moistureVal": "NDMI: +0.33 • SWIR (B11): 0.24",
+      "moistureDesc": "ड्रिप जड़ क्षेत्र में स्थिर नमी बनी हुई है; जल की कमी न्यूनतम है।",
+      "bands": {
+        "b3": "0.07 (शिखर)",
+        "b4": "0.10 (अवशोषण)",
+        "b8": "0.48 (प्रकीर्णन)",
+        "b11": "0.24 (जल)"
+      }
+    }
+  },
+  "te": {
+    "mandya": {
+      "plot": "ప్లాట్ #142/A • మాండ్య (కర్ణాటక)",
+      "sensor": "కోపర్నికస్ సెంటినెల్-2B (MSI లెవెల్-2A)",
+      "pass": "24 ఫిబ్రవరి 2024 • 10:48 UTC (మేఘాలు: 0.8%)",
+      "ndviVal": "0.58 (ప్రమాణం 0.70 • -17% తగ్గుదల)",
+      "ndviDesc": "ఈశాన్య భాగంలో స్థానిక పంట ఒత్తిడి కనిపిస్తోంది. మిగిలిన పొలం సాధారణ ఆరోగ్యంతో ఉంది.",
+      "ndviSignal": "తొలి తేమ లోపం వల్ల ఎరుపు కాంతి (665 nm) శోషణ తగ్గి, NIR (842 nm) ప్రతిబింబం తగ్గింది.",
+      "cirVal": "NIR (B08): 0.42 • Red (B04): 0.14",
+      "cirDesc": "ఈశాన్య జోన్‌లో కణ ఒత్తిడి తగ్గినట్లు CIR చిత్రం చూపుతుంది; పశ్చిమ భాగం దట్టంగా ఉంది.",
+      "cirSignal": "ఆరోగ్యకరమైన ఆకులు 40–50% NIR ప్రతిబింబిస్తాయి. నీరు తగ్గినప్పుడు ప్రకాశం తగ్గుతుంది.",
+      "moistureVal": "NDMI: +0.20 • SWIR (B11): 0.28",
+      "moistureDesc": "ఈశాన్య గట్టు వద్ద పై 10 సెం.మీ వేరు మండలం ఎండిపోతున్నట్లు NDMI నిర్ధారిస్తుంది.",
+      "bands": {
+        "b3": "0.08 (గరిష్టం)",
+        "b4": "0.14 (శోషణ)",
+        "b8": "0.42 (వికీర్ణం)",
+        "b11": "0.28 (నీరు)"
+      }
+    },
+    "ludhiana": {
+      "plot": "ప్లాట్ #89/C • లూధియానా (పంజాబ్)",
+      "sensor": "కోపర్నికస్ సెంటినెల్-2A (MSI లెవెల్-2A)",
+      "pass": "22 ఫిబ్రవరి 2024 • 11:05 UTC (మేఘాలు: 1.4%)",
+      "ndviVal": "0.72 (ప్రమాణం 0.68 • +6% ఉత్తమం)",
+      "ndviDesc": "పొలం అంతటా అధిక మరియు సమానమైన పత్రహరిత సాంద్రత. గోధుమ పంట బలంగా పెరుగుతోంది.",
+      "ndviSignal": "బలమైన NIR (842 nm) ప్రతిబింబంతో 90% కంటే ఎక్కువ ఎరుపు కాంతి శోషణ.",
+      "cirVal": "NIR (B08): 0.62 • Red (B04): 0.06",
+      "cirDesc": "పొలం అంతటా ప్రకాశవంతమైన క్రిమ్సన్ CIR ఫలితం. అధిక ఆకు సాంద్రత (LAI ~3.8).",
+      "cirSignal": "ఉత్తమ కణ జలస్థాయి మరియు నత్రజని శోషణ గరిష్ట NIR ప్రతిబింబాన్ని ఇస్తున్నాయి.",
+      "moistureVal": "NDMI: +0.55 • SWIR (B11): 0.18",
+      "moistureDesc": "పంట నీటి శోషణ ఉత్తమంగా ఉంది. కాలువ నీటిపారుదల తర్వాత నేల తేమ స్థిరంగా ఉంది.",
+      "bands": {
+        "b3": "0.07 (గరిష్టం)",
+        "b4": "0.06 (శోషణ)",
+        "b8": "0.62 (వికీర్ణం)",
+        "b11": "0.18 (నీరు)"
+      }
+    },
+    "varanasi": {
+      "plot": "ప్లాట్ #214/B • వారణాసి (యూపీ)",
+      "sensor": "కోపర్నికస్ సెంటినెల్-2B (MSI లెవెల్-2A)",
+      "pass": "23 ఫిబ్రవరి 2024 • 10:32 UTC (మేఘాలు: 2.1%)",
+      "ndviVal": "0.64 (ప్రమాణం 0.65 • స్థిరం 0%)",
+      "ndviDesc": "వరుణ ఆవాల పూత దశకు అనుగుణంగా సమతుల్యమైన పంట ఎదుగుదల.",
+      "ndviSignal": "ఆకుపచ్చ ఆకులతో పసుపు పూల ప్రతిబింబం కలిసి ఆరోగ్యకరమైన అభివృద్ధిని చూపుతోంది.",
+      "cirVal": "NIR (B08): 0.52 • Red (B04): 0.09",
+      "cirDesc": "అన్ని వరుసలలో స్థిరమైన స్పందన. పేనుబంక లేదా వాడుదల ఆనవాళ్లు లేవు.",
+      "cirSignal": "గంగా ఒండ్రు నేలలో ఏకరీతి వృక్ష కణ నిర్మాణం.",
+      "moistureVal": "NDMI: +0.41 • SWIR (B11): 0.22",
+      "moistureDesc": "నేలలో తగినంత తేమ ఉంది; వచ్చే 4–5 రోజులు నీరు పెట్టాల్సిన అవసరం లేదు.",
+      "bands": {
+        "b3": "0.08 (గరిష్టం)",
+        "b4": "0.09 (శోషణ)",
+        "b8": "0.52 (వికీర్ణం)",
+        "b11": "0.22 (నీరు)"
+      }
+    },
+    "nashik": {
+      "plot": "ప్లాట్ #56/D • నాసిక్ (మహారాష్ట్ర)",
+      "sensor": "కోపర్నికస్ సెంటినెల్-2A (MSI లెవెల్-2A)",
+      "pass": "21 ఫిబ్రవరి 2024 • 10:52 UTC (మేఘాలు: 0.4%)",
+      "ndviVal": "0.61 (ప్రమాణం 0.62 • -2% సాధారణం)",
+      "ndviDesc": "గడ్డ ఊరే దశలో ఉల్లిపాయ పొలంలో స్థిరమైన పంట సాంద్రత.",
+      "ndviSignal": "నిటారుగా ఉన్న ఉల్లి ఆకుల ప్రతిబింబం మంచి భూ కవరేజీని చూపుతుంది.",
+      "cirVal": "NIR (B08): 0.48 • Red (B04): 0.10",
+      "cirDesc": "సమాన ఇన్ఫ్రారెడ్ పంపిణీ. పర్పుల్ బ్లాచ్ తెగులు లేదా తామరపురుగుల సంకేతాలు లేవు.",
+      "cirSignal": "నిర్ణీత డ్రిప్ నీటిపారుదల ద్వారా స్థిరమైన తేమ నిర్వహించబడుతోంది.",
+      "moistureVal": "NDMI: +0.33 • SWIR (B11): 0.24",
+      "moistureDesc": "డ్రిప్ వేరు మండలం స్థిరమైన తేమను కలిగి ఉంది; లోటు చాలా తక్కువ.",
+      "bands": {
+        "b3": "0.07 (గరిష్టం)",
+        "b4": "0.10 (శోషణ)",
+        "b8": "0.48 (వికీర్ణం)",
+        "b11": "0.24 (నీరు)"
+      }
+    }
+  },
+  "ta": {
+    "mandya": {
+      "plot": "நிலம் #142/A • மாண்டியா (கர்நாடகா)",
+      "sensor": "கோப்பர்நிக்கஸ் சென்டினெல்-2B (MSI லெவல்-2A)",
+      "pass": "24 பிப்ரவரி 2024 • 10:48 UTC (மேகம்: 0.8%)",
+      "ndviVal": "0.58 (அளவுகோல் 0.70 • -17% குறைவு)",
+      "ndviDesc": "வடகிழக்குப் பகுதியில் உள்ளூர் பயிர் அழுத்தம் தெரிகிறது. நிலத்தின் மற்ற பகுதிகள் இயல்பாக உள்ளன.",
+      "ndviSignal": "ஆரம்பகட்ட ஈரப்பதக் குறைவால் சிவப்பு ஒளி (665 nm) உறிஞ்சுதல் குறைந்து NIR (842 nm) பிரதிபலிப்பு குறைந்துள்ளது.",
+      "cirVal": "NIR (B08): 0.42 • Red (B04): 0.14",
+      "cirDesc": "வடகிழக்கு மண்டலத்தில் செல் அழுத்தம் குறைந்துள்ளதை CIR படம் காட்டுகிறது; மேற்குப் பகுதி அடர்த்தியாக உள்ளது.",
+      "cirSignal": "ஆரோக்கியமான இலைகள் 40–50% NIR பிரதிபலிக்கின்றன. நீரிழப்பால் பிரகாசம் குறையும்.",
+      "moistureVal": "NDMI: +0.20 • SWIR (B11): 0.28",
+      "moistureDesc": "வடகிழக்கு வரப்பில் மேல் 10 செ.மீ வேர் மண்டலம் உலர்வதை NDMI உறுதிப்படுத்துகிறது.",
+      "bands": {
+        "b3": "0.08 (உச்சம்)",
+        "b4": "0.14 (உறிஞ்சல்)",
+        "b8": "0.42 (சிதறல்)",
+        "b11": "0.28 (நீர்)"
+      }
+    },
+    "ludhiana": {
+      "plot": "நிலம் #89/C • லூதியானா (பஞ்சாப்)",
+      "sensor": "கோப்பர்நிக்கஸ் சென்டினெல்-2A (MSI லெவல்-2A)",
+      "pass": "22 பிப்ரவரி 2024 • 11:05 UTC (மேகம்: 1.4%)",
+      "ndviVal": "0.72 (அளவுகோல் 0.68 • +6% சிறப்பு)",
+      "ndviDesc": "வயல் முழுவதும் சீரான பச்சையம் அடர்த்தி. கோதுமைப் பயிர் அதிக வளர்ச்சியுடன் செழிப்பாக உள்ளது.",
+      "ndviSignal": "வலுவான NIR (842 nm) சிதறலுடன் 90% க்கும் அதிகமான சிவப்பு ஒளி (665 nm) உறிஞ்சுதல்.",
+      "cirVal": "NIR (B08): 0.62 • Red (B04): 0.06",
+      "cirDesc": "நிலம் முழுவதும் பிரகாசமான CIR பிரதிபலிப்பு. அதிக இலைப் பரப்பளவு குறியீடு (LAI ~3.8).",
+      "cirSignal": "சிறந்த செல் நீர்ச்சத்து மற்றும் தழைச்சத்து உறிஞ்சுதல் அதிகபட்ச NIR பிரதிபலிப்பைத் தருகிறது.",
+      "moistureVal": "NDMI: +0.55 • SWIR (B11): 0.18",
+      "moistureDesc": "பயிர் நீர் உறிஞ்சுதல் சிறப்பாக உள்ளது. கால்வாய் பாசனத்திற்குப் பிறகு ஈரப்பதம் சீராக உள்ளது.",
+      "bands": {
+        "b3": "0.07 (உச்சம்)",
+        "b4": "0.06 (உறிஞ்சல்)",
+        "b8": "0.62 (சிதறல்)",
+        "b11": "0.18 (நீர்)"
+      }
+    },
+    "varanasi": {
+      "plot": "நிலம் #214/B • வாரணாசி (உ.பி.)",
+      "sensor": "கோப்பர்நிக்கஸ் சென்டினெல்-2B (MSI லெவல்-2A)",
+      "pass": "23 பிப்ரவரி 2024 • 10:32 UTC (மேகம்: 2.1%)",
+      "ndviVal": "0.64 (அளவுகோல் 0.65 • சீரான 0%)",
+      "ndviDesc": "வருணா கடுகு பூக்கும் நிலைக்கு ஏற்ற சீரான பயிர் வளர்ச்சி.",
+      "ndviSignal": "பச்சை இலைகளுடன் மஞ்சள் பூக்களின் பிரதிபலிப்பு இணைந்து ஆரோக்கியமான வளர்ச்சியைக் காட்டுகிறது.",
+      "cirVal": "NIR (B08): 0.52 • Red (B04): 0.09",
+      "cirDesc": "அனைத்து வரப்புகளிலும் சீரான பதில். அசுவினி பூச்சி அல்லது வாடல் அறிகுறிகள் இல்லை.",
+      "cirSignal": "கங்கை வண்டல் மண்ணில் சீரான தாவர செல் அமைப்பு.",
+      "moistureVal": "NDMI: +0.41 • SWIR (B11): 0.22",
+      "moistureDesc": "மண்ணில் போதுமான நீர் இருப்பு உள்ளது; அடுத்த 4–5 நாட்களுக்கு நீர் பாய்ச்சத் தேவையில்லை.",
+      "bands": {
+        "b3": "0.08 (உச்சம்)",
+        "b4": "0.09 (உறிஞ்சல்)",
+        "b8": "0.52 (சிதறல்)",
+        "b11": "0.22 (நீர்)"
+      }
+    },
+    "nashik": {
+      "plot": "நிலம் #56/D • நாசிக் (மகாராஷ்டிரா)",
+      "sensor": "கோப்பர்நிக்கஸ் சென்டினெல்-2A (MSI லெவல்-2A)",
+      "pass": "21 பிப்ரவரி 2024 • 10:52 UTC (மேகம்: 0.4%)",
+      "ndviVal": "0.61 (அளவுகோல் 0.62 • -2% இயல்பு)",
+      "ndviDesc": "வெங்காயக் குமிழ் பெருக்கும் நிலையில் சீரான பயிர் அடர்த்தி.",
+      "ndviSignal": "வெங்காய இலைகளின் தனித்துவமான பிரதிபலிப்பு சிறந்த நிலப்பரப்பு மூடுதலைக் காட்டுகிறது.",
+      "cirVal": "NIR (B08): 0.48 • Red (B04): 0.10",
+      "cirDesc": "சீரான அகச்சிவப்பு பரவல். ஊதா கரும்புள்ளி நோய் அல்லது பேன் பாதிப்பு அறிகுறிகள் இல்லை.",
+      "cirSignal": "திட்டமிடப்பட்ட சொட்டு நீர்ப்பாசனம் மூலம் சீரான ஈரப்பதம் பராமரிக்கப்படுகிறது.",
+      "moistureVal": "NDMI: +0.33 • SWIR (B11): 0.24",
+      "moistureDesc": "சொட்டு நீர் வேர் மண்டலம் சீரான நீர்ச்சத்தைப் பராமரிக்கிறது.",
+      "bands": {
+        "b3": "0.07 (உச்சம்)",
+        "b4": "0.10 (உறிஞ்சல்)",
+        "b8": "0.48 (சிதறல்)",
+        "b11": "0.24 (நீர்)"
+      }
+    }
+  },
+  "mr": {
+    "mandya": {
+      "plot": "प्लॉट #142/A • मांड्या (कर्नाटक)",
+      "sensor": "कोपरनिकस सेंटिनेल-2B (MSI लेव्हल-2A)",
+      "pass": "24 फेब्रुवारी 2024 • 10:48 UTC (ढग: 0.8%)",
+      "ndviVal": "0.58 (मानक 0.70 • -17% घट)",
+      "ndviDesc": "ईशान्य कोपऱ्यात स्थानिक ओलाव्याचा ताण दिसत आहे. उर्वरित शेतात पिकाची वाढ चांगली आहे.",
+      "ndviSignal": "प्रारंभिक ओलावा कमी झाल्यामुळे लाल प्रकाशाचे (665 nm) शोषण घटून NIR (842 nm) परावर्तन कमी झाले आहे.",
+      "cirVal": "NIR (B08): 0.42 • Red (B04): 0.14",
+      "cirDesc": "ईशान्य क्षेत्रात पेशींमधील ताण कमी झाल्याचे CIR दर्शवते; पश्चिम भाग दाट हिरवा आहे.",
+      "cirSignal": "निरोगी पाने 40–50% NIR परावर्तित करतात. पाणी कमी झाल्यास चमक मंदावते.",
+      "moistureVal": "NDMI: +0.20 • SWIR (B11): 0.28",
+      "moistureDesc": "ईशान्य बांधावरील वरच्या 10 सेमी मुळांचा थर कोरडा होत असल्याचे NDMI पुष्टी करते.",
+      "bands": {
+        "b3": "0.08 (उच्च)",
+        "b4": "0.14 (शोषण)",
+        "b8": "0.42 (विखुरणे)",
+        "b11": "0.28 (पाणी)"
+      }
+    },
+    "ludhiana": {
+      "plot": "प्लॉट #89/C • लुधियाना (पंजाब)",
+      "sensor": "कोपरनिकस सेंटिनेल-2A (MSI लेव्हल-2A)",
+      "pass": "22 फेब्रुवारी 2024 • 11:05 UTC (ढग: 1.4%)",
+      "ndviVal": "0.72 (मानक 0.68 • +6% उत्तम)",
+      "ndviDesc": "संपूर्ण शेतात एकसमान आणि उच्च हरितद्रव्य घनता. गव्हाचे पीक जोमाने वाढत आहे.",
+      "ndviSignal": "मजबूत NIR (842 nm) परावर्तनासह 90% पेक्षा जास्त लाल प्रकाश (665 nm) शोषण.",
+      "cirVal": "NIR (B08): 0.62 • Red (B04): 0.06",
+      "cirDesc": "संपूर्ण शेतात तेजस्वी गडद लाल CIR संकेत. दाट पानांचे आच्छादन (LAI ~3.8).",
+      "cirSignal": "उत्तम पेशी ओलावा आणि नत्र शोषणामुळे जास्तीत जास्त NIR परावर्तन मिळते.",
+      "moistureVal": "NDMI: +0.55 • SWIR (B11): 0.18",
+      "moistureDesc": "पिकाद्वारे पाणी शोषण उत्तम आहे. कालवा सिंचनानंतर जमिनीतील ओलावा स्थिर आहे.",
+      "bands": {
+        "b3": "0.07 (उच्च)",
+        "b4": "0.06 (शोषण)",
+        "b8": "0.62 (विखुरणे)",
+        "b11": "0.18 (पाणी)"
+      }
+    },
+    "varanasi": {
+      "plot": "प्लॉट #214/B • वाराणसी (उत्तर प्रदेश)",
+      "sensor": "कोपरनिकस सेंटिनेल-2B (MSI लेव्हल-2A)",
+      "pass": "23 फेब्रुवारी 2024 • 10:32 UTC (ढग: 2.1%)",
+      "ndviVal": "0.64 (मानक 0.65 • स्थिर 0%)",
+      "ndviDesc": "वरुणा मोहरीच्या फुलोऱ्याच्या अवस्थेनुसार संतुलित आणि निरोगी वाढ.",
+      "ndviSignal": "हिरव्या पानांच्या परावर्तनासोबत पिवळ्या फुलांचे मिश्रित संकेत; चांगली वाढ.",
+      "cirVal": "NIR (B08): 0.52 • Red (B04): 0.09",
+      "cirDesc": "सर्व सऱ्यांमध्ये एकसमान प्रतिसाद. मावा कीड किंवा पाण्याच्या ताणाची लक्षणे नाहीत.",
+      "cirSignal": "गंगेच्या गाळाच्या जमिनीत एकसमान वनस्पती पेशी रचना.",
+      "moistureVal": "NDMI: +0.41 • SWIR (B11): 0.22",
+      "moistureDesc": "मातीत पुरेसा ओलावा टिकून आहे; पुढील 4–5 दिवस सिंचन थांबवता येईल.",
+      "bands": {
+        "b3": "0.08 (उच्च)",
+        "b4": "0.09 (शोषण)",
+        "b8": "0.52 (विखुरणे)",
+        "b11": "0.22 (पाणी)"
+      }
+    },
+    "nashik": {
+      "plot": "प्लॉट #56/D • नाशिक (महाराष्ट्र)",
+      "sensor": "कोपरनिकस सेंटिनेल-2A (MSI लेव्हल-2A)",
+      "pass": "21 फेब्रुवारी 2024 • 10:52 UTC (ढग: 0.4%)",
+      "ndviVal": "0.61 (मानक 0.62 • -2% सामान्य)",
+      "ndviDesc": "कांदा पोसण्याच्या अवस्थेत शेतात स्थिर घनता. पाने सरळ व निरोगी आहेत.",
+      "ndviSignal": "कांद्याच्या उभ्या पानांचे वैशिष्ट्यपूर्ण परावर्तन चांगले आच्छादन दर्शवते.",
+      "cirVal": "NIR (B08): 0.48 • Red (B04): 0.10",
+      "cirDesc": "एकसमान इन्फ्रारेड वितरण. करपा किंवा फुलकिड्यांच्या नुकसानीचे कोणतेही संकेत नाहीत.",
+      "cirSignal": "नियोजित ठिबक सिंचनामुळे पानांमधील दाब स्थिर राहिला आहे.",
+      "moistureVal": "NDMI: +0.33 • SWIR (B11): 0.24",
+      "moistureDesc": "ठिबक मुळांच्या क्षेत्रात स्थिर ओलावा टिकून आहे; पाण्याची कमतरता नगण्य.",
+      "bands": {
+        "b3": "0.07 (उच्च)",
+        "b4": "0.10 (शोषण)",
+        "b8": "0.48 (विखुरणे)",
+        "b11": "0.24 (पाणी)"
+      }
+    }
+  },
+  "bn": {
+    "mandya": {
+      "plot": "প্লট #142/A • মান্ড্য (কর্ণাটক)",
+      "sensor": "কোপার্নিকাস সেন্টিনেল-2B (MSI লেভেল-2A)",
+      "pass": "২৪ ফেব্রুয়ারি ২০২৪ • 10:48 UTC (মেঘ: 0.8%)",
+      "ndviVal": "0.58 (মানদণ্ড 0.70 • -17% হ্রাস)",
+      "ndviDesc": "উত্তর-পূর্ব অংশে স্থানীয় আর্দ্রতার ঘাটতি দেখা যাচ্ছে। বাকি জমিতে ফসল স্বাভাবিক সতেজ রয়েছে।",
+      "ndviSignal": "প্রাথমিক আর্দ্রতার অভাবে লাল আলো (665 nm) শোষণ কমে NIR (842 nm) প্রতিফলন হ্রাস পেয়েছে।",
+      "cirVal": "NIR (B08): 0.42 • Red (B04): 0.14",
+      "cirDesc": "উত্তর-পূর্ব জোনে কোষের সজীবতা কিছুটা কমেছে; পশ্চিম অংশ ঘন সবুজ ও সতেজ।",
+      "cirSignal": "সুস্থ পাতা 40–50% NIR প্রতিফলিত করে। জল কমলে উজ্জ্বলতা কমে যায়।",
+      "moistureVal": "NDMI: +0.20 • SWIR (B11): 0.28",
+      "moistureDesc": "উত্তর-পূর্ব আইল সংলগ্ন উপরের ১০ সেমি শেকড় স্তর শুকিয়ে যাচ্ছে বলে NDMI নিশ্চিত করে।",
+      "bands": {
+        "b3": "0.08 (শীর্ষ)",
+        "b4": "0.14 (শোষণ)",
+        "b8": "0.42 (বিচ্ছুরণ)",
+        "b11": "0.28 (জল)"
+      }
+    },
+    "ludhiana": {
+      "plot": "প্লট #89/C • লুধিয়ানা (পাঞ্জাব)",
+      "sensor": "কোপার্নিকাস সেন্টিনেল-2A (MSI লেভেল-2A)",
+      "pass": "২২ ফেব্রুয়ারি ২০২৪ • 11:05 UTC (মেঘ: 1.4%)",
+      "ndviVal": "0.72 (মানদণ্ড 0.68 • +6% চমৎকার)",
+      "ndviDesc": "সমগ্র জমিতে উচ্চ এবং সুষম ক্লোরোফিল ঘনত্ব। গম ফসল অত্যন্ত সতেজভাবে বৃদ্ধি পাচ্ছে।",
+      "ndviSignal": "শক্তিশালী NIR (842 nm) বিচ্ছুরণের সাথে ৯০% এর বেশি লাল আলো (665 nm) শোষণ।",
+      "cirVal": "NIR (B08): 0.62 • Red (B04): 0.06",
+      "cirDesc": "পুরো জমিতে উজ্জ্বল CIR সংকেত। ঘন পাতার আচ্ছাদন (LAI ~3.8)।",
+      "cirSignal": "উত্তম কোষীয় আর্দ্রতা ও নাইট্রোজেন শোষণের ফলে সর্বোচ্চ NIR প্রতিফলন।",
+      "moistureVal": "NDMI: +0.55 • SWIR (B11): 0.18",
+      "moistureDesc": "ফসলের জল শোষণ চমৎকার। খালের সেচের পর মাটির আর্দ্রতা স্থিতিশীল রয়েছে।",
+      "bands": {
+        "b3": "0.07 (শীর্ষ)",
+        "b4": "0.06 (শোষণ)",
+        "b8": "0.62 (বিচ্ছুরণ)",
+        "b11": "0.18 (জল)"
+      }
+    },
+    "varanasi": {
+      "plot": "প্লট #214/B • বারাণসী (উত্তর প্রদেশ)",
+      "sensor": "কোপার্নিকাস সেন্টিনেল-2B (MSI লেভেল-2A)",
+      "pass": "২৩ ফেব্রুয়ারি ২০২৪ • 10:32 UTC (মেঘ: 2.1%)",
+      "ndviVal": "0.64 (মানদণ্ড 0.65 • স্থিতিশীল 0%)",
+      "ndviDesc": "বরুণা সরিষার ফুল আসার পর্যায়ের সাথে সঙ্গতিপূর্ণ সুষম বৃদ্ধি।",
+      "ndviSignal": "সবুজ পাতার সাথে হলুদ ফুলের প্রতিফলনের মিশ্রণ; স্বাভাবিক শারীরবৃত্তীয় অগ্রগতি।",
+      "cirVal": "NIR (B08): 0.52 • Red (B04): 0.09",
+      "cirDesc": "সব আইলে সমান সংকেত। জাবপোকা বা শুকিয়ে যাওয়ার কোনো লক্ষণ নেই।",
+      "cirSignal": "গাঙ্গেয় পলি দোআঁশ মাটিতে সুষম উদ্ভিদ কোষীয় গঠন।",
+      "moistureVal": "NDMI: +0.41 • SWIR (B11): 0.22",
+      "moistureDesc": "মাটিতে পর্যাপ্ত আর্দ্রতা রয়েছে; আগামী ৪–৫ দিন সেচ দেওয়ার প্রয়োজন নেই।",
+      "bands": {
+        "b3": "0.08 (শীর্ষ)",
+        "b4": "0.09 (শোষণ)",
+        "b8": "0.52 (বিচ্ছুরণ)",
+        "b11": "0.22 (জল)"
+      }
+    },
+    "nashik": {
+      "plot": "প্লট #56/D • নাসিক (মহারাষ্ট্র)",
+      "sensor": "কোপার্নিকাস সেন্টিনেল-2A (MSI লেভেল-2A)",
+      "pass": "২১ ফেব্রুয়ারি ২০২৪ • 10:52 UTC (মেঘ: 0.4%)",
+      "ndviVal": "0.61 (মানদণ্ড 0.62 • -2% স্বাভাবিক)",
+      "ndviDesc": "কন্দ বৃদ্ধির পর্যায়ে পেঁয়াজের জমিতে স্থিতিশীল ঘনত্ব। পাতা সোজা ও সুস্থ।",
+      "ndviSignal": "খাড়া পেঁয়াজ পাতার প্রতিফলন ভালো ভূমি আচ্ছাদন নির্দেশ করে।",
+      "cirVal": "NIR (B08): 0.48 • Red (B04): 0.10",
+      "cirDesc": "সুষম ইনফ্রারেড বিতরণ। পার্পল ব্লচ বা থ্রিপসের আক্রমণের কোনো লক্ষণ নেই।",
+      "cirSignal": "নিয়মিত ড্রিপ সেচের মাধ্যমে স্থিতিশীল আর্দ্রতা বজায় রয়েছে।",
+      "moistureVal": "NDMI: +0.33 • SWIR (B11): 0.24",
+      "moistureDesc": "ড্রিপ শেকড় অঞ্চলে স্থিতিশীল আর্দ্রতা বজায় রয়েছে; ঘাটতি খুবই সামান্য।",
+      "bands": {
+        "b3": "0.07 (শীর্ষ)",
+        "b4": "0.10 (শোষণ)",
+        "b8": "0.48 (বিচ্ছুরণ)",
+        "b11": "0.24 (জল)"
+      }
+    }
+  }
+};
 
     const SPECTRAL_DATA = {
       mandya: {
@@ -5708,7 +6642,8 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       }
       const footerBenchmark = document.getElementById('ts-benchmark');
       if (footerBenchmark) {
-        footerBenchmark.textContent = `Seasonal Benchmark: 0.70 • ${data.cropTitle || data.crop}`;
+        const tBench = (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang].seasonalBenchmarkPrefix) || "Seasonal Benchmark: 0.70 •";
+        footerBenchmark.textContent = `${tBench} ${data.cropTitle || data.crop}`;
       }
 
       // Weather Card
@@ -5742,25 +6677,7 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       document.getElementById('advice-meaning-body').textContent = data.meaning;
 
       // Satellite Spectral Modal Data (Check My Field)
-      const spec = SPECTRAL_DATA[regionKey] || SPECTRAL_DATA.mandya;
-      if (document.getElementById('sat-modal-plot')) {
-        document.getElementById('sat-modal-plot').textContent = spec.plot;
-        document.getElementById('sat-modal-sensor').textContent = spec.sensor;
-        document.getElementById('sat-modal-coords').textContent = spec.coords;
-        document.getElementById('sat-modal-pass').textContent = spec.pass;
-        document.getElementById('sat-modal-ndvi').textContent = spec.ndviVal;
-        document.getElementById('sat-modal-ndvi-desc').textContent = spec.ndviDesc;
-        document.getElementById('sat-modal-ndvi-signal').textContent = spec.ndviSignal;
-        document.getElementById('sat-modal-cir').textContent = spec.cirVal;
-        document.getElementById('sat-modal-cir-desc').textContent = spec.cirDesc;
-        document.getElementById('sat-modal-cir-signal').textContent = spec.cirSignal;
-        document.getElementById('sat-modal-moisture').textContent = spec.moistureVal;
-        document.getElementById('sat-modal-moisture-desc').textContent = spec.moistureDesc;
-        document.getElementById('sat-modal-b3').textContent = spec.bands.b3;
-        document.getElementById('sat-modal-b4').textContent = spec.bands.b4;
-        document.getElementById('sat-modal-b8').textContent = spec.bands.b8;
-        document.getElementById('sat-modal-b11').textContent = spec.bands.b11;
-      }
+      updateSpectralModalContent(regionKey);
 
       // Update detailed explanatory advice if advice view is active
       const advView = document.getElementById('view-advice');
@@ -5982,7 +6899,60 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       const deskLabel = document.getElementById('label-mode-desktop');
       if (deskLabel) deskLabel.textContent = t.modeDesktop || "Desktop";
 
+      // 13. Guide Modal ("How It Works")
+      const setTxt = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
+      setTxt('guide-modal-title', t.guideTitle);
+      setTxt('guide-step1-title', t.guideStep1Title);
+      setTxt('guide-step1-desc', t.guideStep1Desc);
+      setTxt('guide-step2-title', t.guideStep2Title);
+      setTxt('guide-step2-desc', t.guideStep2Desc);
+      setTxt('guide-step3-title', t.guideStep3Title);
+      setTxt('guide-step3-desc', t.guideStep3Desc);
+      setTxt('guide-btn-got-it', t.guideBtnGotIt);
+
+      // 14. Satellite Multispectral Inspector Modal ("Check My Field")
+      setTxt('sat-modal-title', t.satModalTitle);
+      setTxt('sat-modal-subtitle', t.satModalSub);
+      setTxt('sat-lbl-parcel', t.satLblParcel);
+      setTxt('sat-lbl-sensor', t.satLblSensor);
+      setTxt('sat-lbl-coords', t.satLblCoords);
+      setTxt('sat-lbl-pass', t.satLblPass);
+      setTxt('sat-sec1-title', t.satSec1Title);
+      setTxt('sat-lbl-signal', t.satLblSignal);
+      setTxt('sat-sec2-title', t.satSec2Title);
+      setTxt('sat-lbl-bio', t.satLblBio);
+      setTxt('sat-sec3-title', t.satSec3Title);
+      setTxt('sat-sec4-title', t.satSec4Title);
+      setTxt('sat-lbl-b3', t.satLblB3);
+      setTxt('sat-lbl-b4', t.satLblB4);
+      setTxt('sat-lbl-b8', t.satLblB8);
+      setTxt('sat-lbl-b11', t.satLblB11);
+      setTxt('sat-btn-return', t.satBtnReturn);
+      setTxt('sat-btn-ndvi', t.satBtnNdvi);
+      setTxt('sat-btn-cir', t.satBtnCir);
+
+      // 15. My Farm / Field Modal & Info Modal
+      setTxt('field-modal-title', t.fieldModalTitle);
+      setTxt('field-modal-subtitle', t.fieldModalSub);
+      setTxt('field-lbl-plot', t.fieldLblPlot);
+      setTxt('field-lbl-crop', t.fieldLblCrop);
+      setTxt('field-lbl-area', t.fieldLblArea);
+      setTxt('field-lbl-pass', t.fieldLblPass);
+      setTxt('field-sms-preview-title', t.fieldSmsPreview);
+      setTxt('field-btn-send-sms', t.sendSmsBtn);
+      setTxt('copy-sms-label', t.fieldBtnCopy);
+      setTxt('field-btn-return', t.satBtnReturn);
+      setTxt('field-btn-listen', t.fieldBtnListen);
+      setTxt('info-modal-close-btn', t.btnClose);
+
+      // 16. Satellite Card Toolbar & Graphs Button
+      setTxt('btn-open-trends-text', t.btnStatGraphs);
+      setTxt('radar-text', t.satRadarScan);
+      setTxt('sat-refresh-text', t.satRefresh);
+      setTxt('sat-layer-rgb-text', t.satLayerRgb);
+
       // Re-trigger selectRegion & advice render to update all dynamic localized contents
+      updateSpectralModalContent(currentRegionKey);
       selectRegion(currentRegionKey);
       renderDetailedExplanatoryAdvice(currentRegionKey);
       updateBriefAdviceModalContent(currentRegionKey);
@@ -6590,31 +7560,66 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       openModal('adviceModal');
     }
 
+    function updateSpectralModalContent(regionKey) {
+      const baseSpec = SPECTRAL_DATA[regionKey] || SPECTRAL_DATA.mandya;
+      const langSpecPack = SPECTRAL_DATA_TRANSLATIONS[currentLang] || SPECTRAL_DATA_TRANSLATIONS.en;
+      const spec = { ...baseSpec, ...(langSpecPack[regionKey] || {}) };
+      if (document.getElementById('sat-modal-plot')) {
+        document.getElementById('sat-modal-plot').textContent = spec.plot || '';
+        document.getElementById('sat-modal-sensor').textContent = spec.sensor || '';
+        document.getElementById('sat-modal-coords').textContent = spec.coords || '';
+        document.getElementById('sat-modal-pass').textContent = spec.pass || '';
+        document.getElementById('sat-modal-ndvi').textContent = spec.ndviVal || '';
+        document.getElementById('sat-modal-ndvi-desc').textContent = spec.ndviDesc || '';
+        document.getElementById('sat-modal-ndvi-signal').textContent = spec.ndviSignal || '';
+        document.getElementById('sat-modal-cir').textContent = spec.cirVal || '';
+        document.getElementById('sat-modal-cir-desc').textContent = spec.cirDesc || '';
+        document.getElementById('sat-modal-cir-signal').textContent = spec.cirSignal || '';
+        document.getElementById('sat-modal-moisture').textContent = spec.moistureVal || '';
+        document.getElementById('sat-modal-moisture-desc').textContent = spec.moistureDesc || '';
+        if (spec.bands) {
+          document.getElementById('sat-modal-b3').textContent = spec.bands.b3 || '';
+          document.getElementById('sat-modal-b4').textContent = spec.bands.b4 || '';
+          document.getElementById('sat-modal-b8').textContent = spec.bands.b8 || '';
+          document.getElementById('sat-modal-b11').textContent = spec.bands.b11 || '';
+        }
+      }
+    }
+
     function openModal(id) {
+      if (id === 'satelliteModal') {
+        updateSpectralModalContent(currentRegionKey);
+      }
+      const t = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
+      let rData = REGIONS_DATA[currentRegionKey] || REGIONS_DATA.mandya;
+      if (LANGUAGE_OVERRIDES[currentLang] && LANGUAGE_OVERRIDES[currentLang][currentRegionKey]) {
+        rData = { ...rData, ...LANGUAGE_OVERRIDES[currentLang][currentRegionKey] };
+      }
+
       if (id === 'healthModal') {
-        document.getElementById('info-modal-title').textContent = "1. Crop Health Inspector";
+        document.getElementById('info-modal-title').textContent = t.healthModalTitle || "1. Crop Health Inspector";
         document.getElementById('info-modal-body').innerHTML = `
-          <strong>Multispectral Chlorophyll Assessment:</strong><br>
-          Sentinel-2 vegetative index analysis shows 84% normal vigor in ${REGIONS_DATA[currentRegionKey].location}.<br><br>
-          <span class="inline-block px-2.5 py-1 bg-surface-container font-mono text-xs rounded border border-surface-variant">NDVI Index: ${REGIONS_DATA[currentRegionKey].metric}</span><br><br>
-          <em>Note:</em> Cloud-free reference pass. Ground walk recommended along perimeter to inspect localized soil moisture and early disease signs.
+          <strong>${t.healthModalSub || "Multispectral Chlorophyll Assessment:"}</strong><br>
+          ${t.healthModalBody1 || "Sentinel-2 vegetative index analysis shows 84% normal vigor in"} ${rData.location}.<br><br>
+          <span class="inline-block px-2.5 py-1 bg-surface-container font-mono text-xs rounded border border-surface-variant">NDVI: ${rData.metric}</span><br><br>
+          <em>${t.healthModalNote || "Note: Cloud-free reference pass. Ground walk recommended."}</em>
         `;
         id = 'infoModal';
       } else if (id === 'waterModal') {
-        document.getElementById('info-modal-title').textContent = "2. Should I Water?";
+        document.getElementById('info-modal-title').textContent = t.waterModalTitle || "2. Should I Water?";
         document.getElementById('info-modal-body').innerHTML = `
-          <strong>Root-Zone Moisture &amp; Evaporative Demand:</strong><br>
-          Current estimated soil moisture in upper 15 cm: <strong>Adequate</strong> for ${REGIONS_DATA[currentRegionKey].crop}.<br><br>
-          Upcoming rainfall outlook is dry (0 mm). If you observe surface cracking or afternoon leaf-wilting, apply 2.5 cm depth irrigation in late afternoon to minimize evaporation loss.
+          <strong>${t.waterModalSub || "Root-Zone Moisture & Evaporative Demand:"}</strong><br>
+          ${t.waterModalBody1 || "Current estimated soil moisture in upper 15 cm: Adequate for"} <strong>${rData.cropTitle || rData.crop}</strong>.<br><br>
+          ${t.waterModalBody2 || "Upcoming rainfall outlook is dry (0 mm). Apply 2.5 cm irrigation in late afternoon if surface wilting appears."}
         `;
         id = 'infoModal';
       } else if (id === 'weatherModal') {
-        document.getElementById('info-modal-title').textContent = "3. Weather & Spraying Windows";
+        document.getElementById('info-modal-title').textContent = t.weatherModalTitle || "3. Weather & Spraying Windows";
         document.getElementById('info-modal-body').innerHTML = `
-          <strong>72-Hour Spraying &amp; Field Operations:</strong><br>
-          Wind speed: 8 - 14 km/h (Favorable, low spray drift risk).<br>
-          Rain probability: Under 10%.<br>
-          Dew point: Normal seasonal condensation during early morning hours. Optimal spray window: 7:30 AM to 10:30 AM.
+          <strong>${t.weatherModalSub || "72-Hour Spraying & Field Operations:"}</strong><br>
+          ${t.weatherModalLine1 || "Wind speed: 8 - 14 km/h (Favorable, low spray drift risk)."}<br>
+          ${t.weatherModalLine2 || "Rain probability: Under 10%."}<br>
+          ${t.weatherModalLine3 || "Dew point: Normal seasonal condensation. Optimal spray window: 7:30 AM to 10:30 AM."}
         `;
         id = 'infoModal';
       }
