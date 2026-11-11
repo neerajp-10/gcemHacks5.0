@@ -8,11 +8,18 @@
 ## 📋 Table of Contents
 1. [Project Overview & Core Philosophy](#1-project-overview--core-philosophy)
    - [The Smallholder Reality](#the-smallholder-reality)
-   - [Earthworm's Three Pillars](#earthworms-three-pillars)
+   - [Earthworm's Core Pillars](#earthworms-core-pillars)
 2. [End-to-End System Workflow](#2-end-to-end-system-workflow)
    - [Complete Architectural Workflow Diagram](#complete-architectural-workflow-diagram)
    - [Data Lifecycle & Subsystems](#data-lifecycle--subsystems)
-3. [Low-Bandwidth Rural Agri-Telephony Subsystem](#3-low-bandwidth-rural-agri-telephony-subsystem)
+3. [Decoupled Agronomic Advice Architecture](#3-decoupled-agronomic-advice-architecture)
+   - [Brief Modal Summary vs. Deep Explanatory Part](#brief-modal-summary-vs-deep-explanatory-part)
+   - [Copernicus Sentinel-2 Biophysical Reflectance Physics](#copernicus-sentinel-2-biophysical-reflectance-physics)
+   - [Calibrated Canopy Reflectance Vigor Gauge](#calibrated-canopy-reflectance-vigor-gauge)
+   - [Subterranean Root-Zone Hydrology & Soil Percolation](#subterranean-root-zone-hydrology--soil-percolation)
+   - [Differential Agronomic Hypotheses & Probabilities](#differential-agronomic-hypotheses--probabilities)
+   - [4-Stage Time-Sensitive Action Plan](#4-stage-time-sensitive-action-plan)
+4. [Low-Bandwidth Rural Agri-Telephony Subsystem](#4-low-bandwidth-rural-agri-telephony-subsystem)
    - [Core Principle: Decoupled Web & Cellular Telephony](#core-principle-decoupled-web--cellular-telephony)
    - [Outbound Cellular SMS Advisory (160-Char Budget)](#outbound-cellular-sms-advisory-160-char-budget)
    - [Outbound Automated IVR Voice Phone Calls](#outbound-automated-ivr-voice-phone-calls)
@@ -22,40 +29,58 @@
      - [Inbound SMS Advisory Gateway (`/api/communications/incoming-sms`)](#inbound-sms-advisory-gateway)
    - [Multi-Lingual Neural Voice Synthesis Engine](#multi-lingual-neural-voice-synthesis-engine)
    - [Twilio Provider Credentials & Dual-Mode Telephony](#twilio-provider-credentials--dual-mode-telephony)
-4. [7 Vernacular Indian Languages Expansion](#4-7-vernacular-indian-languages-expansion)
+5. [7 Vernacular Indian Languages & Strict Native Isolation](#5-7-vernacular-indian-languages--strict-native-isolation)
    - [Language Matrix & Regional Dialects](#language-matrix--regional-dialects)
-   - [Unified Translation Architecture](#unified-translation-architecture)
-5. [Advanced Satellite Parcel Inspector](#5-advanced-satellite-parcel-inspector)
+   - [100% Native Language Isolation Architecture](#100-native-language-isolation-architecture)
+   - [Unified Translation & Deep Advice Profiles](#unified-translation--deep-advice-profiles)
+6. [Responsive Multi-Device Interface Architecture](#6-responsive-multi-device-interface-architecture)
+   - [Automatic Viewport Detection & Dynamic Adaptation](#automatic-viewport-detection--dynamic-adaptation)
+   - [Desktop 2-Column Workstation Dashboard](#desktop-2-column-workstation-dashboard)
+   - [Desktop 2-Column Explanatory Advice Workspace](#desktop-2-column-explanatory-advice-workspace)
+   - [Mobile Ergonomic Single-Column Stack & Bottom Navigation](#mobile-ergonomic-single-column-stack--bottom-navigation)
+   - [Persistent Manual Interface Mode Toggle](#persistent-manual-interface-mode-toggle)
+7. [Professional Visual Design & Dual Theme Engine](#7-professional-visual-design--dual-theme-engine)
+   - [Executive Mineral Sage Slate Canvas (`#E2EAE4`)](#executive-mineral-sage-slate-canvas-e2eae4)
+   - [Space-to-Soil Dark Command Console (`#0B140F`)](#space-to-soil-dark-command-console-0b140f)
+   - [1-Click Theme Switcher Engine](#1-click-theme-switcher-engine)
+8. [High-Precision Satellite & Rhizosphere Intro Screen](#8-high-precision-satellite--rhizosphere-intro-screen)
+   - [Copernicus Sentinel-2 Spacecraft Model](#copernicus-sentinel-2-spacecraft-model)
+   - [Volumetric Multispectral Scanning Beam & Reticle](#volumetric-multispectral-scanning-beam--reticle)
+   - [Stratified Soil Cross-Section & Rhizosphere Roots](#stratified-soil-cross-section--rhizosphere-roots)
+   - [Peristaltic Earthworm Mascot & Soil Aeration](#peristaltic-earthworm-mascot--soil-aeration)
+   - [Dynamic Telemetry Progression & Replay Engine](#dynamic-telemetry-progression--replay-engine)
+9. [Advanced Satellite Parcel Inspector](#9-advanced-satellite-parcel-inspector)
    - [5 Multispectral Satellite Layers](#5-multispectral-satellite-layers)
    - [Agronomic Significance & Interactive Visualizer](#agronomic-significance--interactive-visualizer)
-6. [Manual Land Boundary Marking & Dynamic Acreage Subsystem](#6-manual-land-boundary-marking--dynamic-acreage-subsystem)
-   - [Farmer-Centric Boundary Delineation Workflow](#farmer-centric-boundary-delineation-workflow)
-   - [Live Geodesic Acreage & Perimeter Math (WGS84 Spherical Shoelace)](#live-geodesic-acreage--perimeter-math-wgs84-spherical-shoelace)
-   - ["GPS My Spot" Geolocation Integration](#gps-my-spot-geolocation-integration)
-   - [Draggable Boundary Pins & Real-Time Geometry](#draggable-boundary-pins--real-time-geometry)
-   - [Save Parcel Modal & Cadastral Attributes](#save-parcel-modal--cadastral-attributes)
-   - [Dual-Layer Persistence (LocalStorage + REST API)](#dual-layer-persistence-localstorage--rest-api)
-   - [Quick-Toggle Custom Parcel Badges](#quick-toggle-custom-parcel-badges)
-7. [Libraries & Technologies Used](#7-libraries--technologies-used)
-   - [Backend Python Dependencies](#backend-python-dependencies)
-   - [Frontend Frameworks & Libraries](#frontend-frameworks--libraries)
-8. [Detailed Python Script & Codebase Documentation](#8-detailed-python-script--codebase-documentation)
-   - [Entrypoints & Server Configuration](#entrypoints--server-configuration)
-   - [API Route Handlers (FastAPI)](#api-route-handlers-fastapi)
-   - [Business Logic & Service Layer](#business-logic--service-layer)
-   - [Pydantic Domain Schemas](#pydantic-domain-schemas)
-   - [Automated Pytest Suite](#automated-pytest-suite)
-9. [Copernicus Sentinel Hub Live Satellite Integration](#9-copernicus-sentinel-hub-live-satellite-integration)
-   - [OAuth2 Client Credentials & Token Caching](#oauth2-client-credentials--token-caching)
-   - [Process API & True-Color Evalscript](#process-api--true-color-evalscript)
-   - [Regional Bounding Boxes & Dynamic Fallbacks](#regional-bounding-boxes--dynamic-fallbacks)
-10. [In-Depth Supabase Integration Architecture](#10-in-depth-supabase-integration-architecture)
+10. [Manual Land Boundary Marking & Dynamic Acreage Subsystem](#10-manual-land-boundary-marking--dynamic-acreage-subsystem)
+    - [Farmer-Centric Boundary Delineation Workflow](#farmer-centric-boundary-delineation-workflow)
+    - [Live Geodesic Acreage & Perimeter Math (WGS84 Spherical Shoelace)](#live-geodesic-acreage--perimeter-math-wgs84-spherical-shoelace)
+    - ["GPS My Spot" Geolocation Integration](#gps-my-spot-geolocation-integration)
+    - [Draggable Boundary Pins & Real-Time Geometry](#draggable-boundary-pins--real-time-geometry)
+    - [Save Parcel Modal & Cadastral Attributes](#save-parcel-modal--cadastral-attributes)
+    - [Dual-Layer Persistence (LocalStorage + REST API)](#dual-layer-persistence-localstorage--rest-api)
+    - [Quick-Toggle Custom Parcel Badges](#quick-toggle-custom-parcel-badges)
+11. [Libraries & Technologies Used](#11-libraries--technologies-used)
+    - [Backend Python Dependencies](#backend-python-dependencies)
+    - [Frontend Frameworks & Libraries](#frontend-frameworks--libraries)
+12. [Detailed Python Script & Codebase Documentation](#12-detailed-python-script--codebase-documentation)
+    - [Entrypoints & Server Configuration](#entrypoints--server-configuration)
+    - [API Route Handlers (FastAPI)](#api-route-handlers-fastapi)
+    - [Business Logic & Service Layer](#business-logic--service-layer)
+    - [Pydantic Domain Schemas](#pydantic-domain-schemas)
+    - [Automated Pytest Suite (34 Passed)](#automated-pytest-suite-34-passed)
+13. [Copernicus Sentinel Hub Live Satellite Integration](#13-copernicus-sentinel-hub-live-satellite-integration)
+    - [OAuth2 Client Credentials & Token Caching](#oauth2-client-credentials--token-caching)
+    - [Process API & True-Color Evalscript](#process-api--true-color-evalscript)
+    - [Regional Bounding Boxes & Dynamic Fallbacks](#regional-bounding-boxes--dynamic-fallbacks)
+14. [In-Depth Supabase Integration Architecture](#14-in-depth-supabase-integration-architecture)
     - [Non-Blocking Hybrid Storage Design](#non-blocking-hybrid-storage-design)
     - [PostgreSQL Database Schema (DDL)](#postgresql-database-schema-ddl)
     - [Connection Verification & Safe Probing](#connection-verification--safe-probing)
-11. [Deployment & Execution Instructions](#11-deployment--execution-instructions)
+15. [Deployment, Multi-Target Sync & Production Execution](#15-deployment-multi-target-sync--production-execution)
     - [Local Development & CLI Execution](#local-development--cli-execution)
-    - [Automated Testing](#automated-testing)
+    - [Automated Testing Execution](#automated-testing-execution)
+    - [Six-Target Distribution Synchronization](#six-target-distribution-synchronization)
     - [Vercel Serverless Production Deployment](#vercel-serverless-production-deployment)
 
 ---
@@ -70,13 +95,14 @@ Traditional commercial agri-tech platforms fail rural farmers due to three chron
 2. **The "Black Box" Trust Deficit**: Opaque AI recommendations (*"Spray 250ml fungicide on Tuesday"*) generate distrust because they do not explain *what* was detected, *why* it matters, or *how* the conclusion was reached.
 3. **Linguistic & Jargon Barriers**: Advisories delivered in technical English or academic terminology are inaccessible to vernacular-speaking farmers.
 
-### Earthworm's Three Pillars
-- **Decoupled Low-Bandwidth Delivery**: Advisories are delivered directly over cellular telecom networks (GSM/PSTN) via 160-character cellular SMS and automated IVR voice phone calls straight to the farmer's physical phone number (`+91 9731803808`). Zero internet access, smartphones, or web pages are required on the farmer's end.
-- **3-Stage Explainable Agronomy**: Every advisory translates raw sensor observations into three plain-language steps:
-  1. **Notice** (*What the satellite saw* – e.g., 14% drop in vegetation canopy greenness over 10 days).
-  2. **Meaning** (*Why it matters agronomically* – e.g., panicle moisture stress during critical tillering phase).
-  3. **Action** (*Exact next steps* – e.g., irrigate 4–5 cm immediately, withhold urea application).
-- **Comprehensive 7-Language Vernacular Support**: Native UI, audio speech streaming, SMS segments, and voice call readouts across **English**, **Kannada (ಕನ್ನಡ)**, **Hindi (हिन्दी)**, **Telugu (తెలుగు)**, **Tamil (தமிழ்)**, **Marathi (मराठी)**, and **Bengali (বাংলা)**.
+### Earthworm's Core Pillars
+- **Decoupled Low-Bandwidth Delivery**: Advisories are delivered directly over cellular telecom networks (GSM/PSTN) via 160-character cellular SMS and automated IVR voice phone calls straight to the farmer's physical phone number. Zero internet access, smartphones, or web pages are required on the farmer's end.
+- **Two-Tier Explainable Agronomy**:
+  1. **Quick Brief Modal**: High-impact, immediate takeaways (Notice $\rightarrow$ Meaning $\rightarrow$ Action) for rapid field decisions.
+  2. **Dedicated Explanatory Part (`view-advice`)**: Full scientific diagnostics, canopy biophysical physics, calibrated vigor scales, root-zone hydrology models, 3 differential agronomic hypotheses, and 4-step precision checklists.
+- **Comprehensive 7-Language Vernacular Support**: Native UI, audio speech streaming, SMS segments, and voice call readouts with **100% native language isolation** across **English**, **Kannada (ಕನ್ನಡ)**, **Hindi (हिन्दी)**, **Telugu (తెలుగు)**, **Tamil (தமிழ்)**, **Marathi (मराठी)**, and **Bengali (বাংলা)**.
+- **Adaptive Multi-Device Interface**: Seamlessly switches between an expansive 2-column Desktop Workstation and a single-handed Mobile Stack.
+- **Executive Glare-Free Design**: Professional mineral-sage slate canvas with instant 1-click toggle to a high-contrast Space-to-Soil Dark Command Console.
 
 ---
 
@@ -89,7 +115,7 @@ Traditional commercial agri-tech platforms fail rural farmers due to three chron
 |                                1. DATA ACQUISITION & REMOTE SENSING                                   |
 | - European Space Agency (ESA) Copernicus Sentinel-2 MSI (10m Multi-Spectral: B02, B03, B04, B08)     |
 | - Sentinel Hub Process API (services.sentinel-hub.com) with true-color BOA L2A Evalscript             |
-| - Open-Meteo Regional Agro-Meteorological Forecasts (Rainfall, Relative Humidity, Soil Temp)          |
+| - Open-Meteo Regional Agro-Meteorological Forecasts (Rainfall, Relative Humidity, Soil Temp, ET)      |
 +---------------------------------------------------+---------------------------------------------------+
                                                     |
                                                     v
@@ -99,9 +125,9 @@ Traditional commercial agri-tech platforms fail rural farmers due to three chron
 |   * NDVI = (NIR - Red) / (NIR + Red)               [Canopy Vigor & Biomass Density]                   |
 |   * CIR = NIR False Color Composite                [Leaf Cellular Structure & Health]                 |
 |   * NDWI = (NIR - SWIR) / (NIR + SWIR)             [Canopy Water Content & Moisture Stress]           |
-|   * SAR Proxy = Dual-Pol Backscatter Reflectance   [Root-Zone Soil Hydration Dynamics]                |
+|   * SAR Proxy = Dual-Pol Backscatter Reflectance   [Root-Zone Soil Dielectric Wetness]                |
 | - 10-Day Rolling Temporal Baseline Comparison (Flags early-stage water/nutrient stress anomalies)    |
-| - 3-Stage Explainable Agronomic Engine (Transforms indices into Notice -> Meaning -> Action)          |
+| - Two-Tier Explainable Engine: Brief 3-Stage Modal + Deep Explanatory Agronomic Part                  |
 +---------------------------------------------------+---------------------------------------------------+
                                                     |
                                                     v
@@ -131,19 +157,79 @@ Traditional commercial agri-tech platforms fail rural farmers due to three chron
 +----------------------------------------------------+  +-----------------------------------------------+
 |       5. EXTENSION WORKER / AGRONOMIST UI          |  |   6. LOW-BANDWIDTH CELLULAR TELECOM SUBSYSTEM |
 |      (Web Dashboard & Control Center)              |  |      (Farmer Feature Phone / Keypad Device)   |
-| - Leaflet Parcel Map & Boundary GeoJSON            |  | - Direct GSM/PSTN Cellular Delivery           |
-| - Multi-Layer Parcel Inspector:                    |  | - 160-character vernacular SMS text message   |
-|   * NDVI Heatmap, CIR Infrared, True Color RGB,    |  | - Automated inbound/outbound IVR voice calls  |
-|     Moisture Stress (NDWI), SAR Radar Proxy        |  | - Zero web browser, zero app, zero internet   |
-| - 20-Day NDVI Historical Trend Line                |  | - Standalone CLI: dispatch_advisory.py        |
-| - 3-Day Agro-Weather Outlook Cards                 |  | - Missed Call / IVR Dial-in Helpline          |
-| - 7-Language Vernacular Switcher                   |  | - Two-Way Inbound SMS Query Gateway           |
+| - Adaptive Viewport (Desktop 2-Col / Mobile 1-Col) |  | - Direct GSM/PSTN Cellular Delivery           |
+| - Dual Theme: Executive Sage vs Space Dark Console |  | - 160-character vernacular SMS text message   |
+| - Multi-Layer Parcel Inspector (5 Bands)           |  | - Automated inbound/outbound IVR voice calls  |
+| - Dedicated Explanatory Advice Screen (`view-adv`) |  | - Zero web browser, zero app, zero internet   |
+| - 4-Card KPI Strip & Calibrated Vigor Gauge        |  | - Standalone CLI: dispatch_advisory.py        |
+| - 3 Differential Hypotheses with Probabilities     |  | - Missed Call / IVR Dial-in Helpline          |
+| - 7-Language Native Switcher (0 cross-fallback)    |  | - Two-Way Inbound SMS Query Gateway           |
 +----------------------------------------------------+  +-----------------------------------------------+
 ```
 
 ---
 
-## 3. Low-Bandwidth Rural Agri-Telephony Subsystem
+## 3. Decoupled Agronomic Advice Architecture
+
+A key advancement in Earthworm is the architectural separation between the **Brief Summary Modal** and the **Dedicated Explanatory Advice Screen (`view-advice`)**:
+
+```
++---------------------------------------------------------------------------------------+
+|                                    USER INTERACTION FLOW                              |
+|                                                                                       |
+|   [ Dashboard Action Tile ] -----> Taps "View Advice" / Bottom Sheet Modal            |
+|                                    └──> BRIEF SUMMARY MODAL                           |
+|                                         ├── Notice (Observation)                      |
+|                                         ├── Meaning (Interpretation)                  |
+|                                         └── Action (Today's 3 Practical Steps)        |
+|                                                                                       |
+|   [ Advice Tab / "View Full Advice" ] --> Navigates to dedicated view:                |
+|                                    └──> EXPLANATORY ADVICE PART (#view-advice)        |
+|                                         ├── Section 1: Satellite Vigor Analysis       |
+|                                         ├── Section 2: Root-Zone & Field Causes       |
+|                                         ├── Section 3: 4-Step Field Action Plan       |
+|                                         └── Section 4: Handset Dispatch (SMS/Voice)   |
++---------------------------------------------------------------------------------------+
+```
+
+### Brief Modal Summary vs. Deep Explanatory Part
+- **Brief Modal (`#adviceModal`)**: Built for rapid field triage. Presents 3 concise bulleted items (`Notice`, `Meaning`, `Action`), current NDVI value, and quick voice readout. Does not overwhelm farmers or field workers with dense physics.
+- **Deep Explanatory Part (`#view-advice`)**: Activated by clicking the dedicated **Advice** navigation tab or the **"View Full Advice"** button. Contains complete scientific rationale, biophysical physics, calibrated vigor scales, hydrological models, hypotheses, and an actionable 4-step protocol.
+
+### Copernicus Sentinel-2 Biophysical Reflectance Physics
+Section 1 of the explanatory view breaks down the exact optical physics:
+- **Optical Instrument**: Copernicus Sentinel-2 Multispectral Instrument (MSI Level-2A) at 10-meter ground resolution.
+- **Mathematical Formula**:
+  $$\text{NDVI} = \frac{\text{NIR (Band 8, 842nm)} - \text{Red (Band 4, 665nm)}}{\text{NIR (Band 8, 842nm)} + \text{Red (Band 4, 665nm)}}$$
+- **Plant Physiology Explanation**: Healthy, turgid crop leaves contain water-filled spongy mesophyll cells reflecting $40\%\text{--}50\%$ of incoming Near-Infrared radiation, while chlorophyll-a/b pigments absorb visible Red light. When root-zone moisture declines, leaf guard cells close stomata, dropping cellular turgor and compressing mesophyll cell walls, causing NIR reflectance to dip days before visible human eye yellowing.
+
+### Calibrated Canopy Reflectance Vigor Gauge
+Features an interactive visual slider mapping live NDVI against calibrated crop baselines:
+- `0.0` Water / Fallow $\rightarrow$ `0.3` Sparse Canopy $\rightarrow$ `▲ Current: 0.58` $\rightarrow$ `▲ Target: 0.70` $\rightarrow$ `0.9` Dense Vegetative Canopy.
+- Includes pin tracking that dynamically repositions based on the parcel's observed NDVI.
+
+### Subterranean Root-Zone Hydrology & Soil Percolation
+Section 2 provides soil-depth analysis:
+- Profiles topsoil (0–15 cm) vs subsoil (15–40 cm) percolation rates.
+- Evaluates evapotranspiration (ET: ~4.2 mm/day) against soil water holding capacity.
+- Explains why elevation gradients (e.g. 1.8° ridge slope) accelerate moisture depletion.
+
+### Differential Agronomic Hypotheses & Probabilities
+Presents three ranked agronomic hypotheses with probabilistic confidence scores and field confirmation steps:
+1. **Hypothesis 1 (65% Probability)**: Sub-surface water drainage and micro-slope run-off. *Field Check: Dig 10cm test hole at 3 ridge points; check if soil crumbles without clumping.*
+2. **Hypothesis 2 (25% Probability)**: Drip irrigation emitter salt blockage or pressure differential. *Field Check: Inspect emitter flow rate on terminal lateral lines.*
+3. **Hypothesis 3 (10% Probability)**: Localized fungal / root-zone disease onset. *Field Check: Inspect lower leaf collar for water-soaked lesions or early blast spots.*
+
+### 4-Stage Time-Sensitive Action Plan
+Section 3 details an operational timetable:
+- **Step 1 (Immediate / Tomorrow Morning 7:30–9:00 AM)**: Ground parcel inspection and topsoil moisture feel-test.
+- **Step 2 (Days 1–2)**: Evening irrigation run adjustments to minimize evaporative loss.
+- **Step 3 (Days 2–3)**: Lateral line flushing and acid/salt emitter de-clogging.
+- **Step 4 (Day 5)**: Satellite overpass verification against next Sentinel-2 5-day cycle.
+
+---
+
+## 4. Low-Bandwidth Rural Agri-Telephony Subsystem
 
 ### Core Principle: Decoupled Web & Cellular Telephony
 A foundational architectural principle of Earthworm is the **strict separation between the administrative dashboard and last-mile farmer communication**:
@@ -196,7 +282,7 @@ python backend/dispatch_advisory.py --to "+919812345678" --farm nashik --lang mr
 ### Two-Way Low-Bandwidth Helpline Webhooks
 
 #### Missed Call / IVR Helpline (`POST /api/communications/incoming-call`)
-1. Smallholder farmers can give a **missed call** or dial the Earthworm helpline number.
+1. Smallholder farmers can give a **missed call** or dial the Earthworm helpline number (`1800-180-1551`).
 2. Twilio receives the cellular call and issues an HTTP POST webhook to `/api/communications/incoming-call`.
 3. The backend matches the caller's phone number or query parameters to their registered plot, synthesizes the latest advisory in their native language (e.g. Kannada), and returns the TwiML stream.
 4. The farmer hears the advisory and the call disconnects—costing the farmer ₹0.
@@ -219,7 +305,7 @@ The telephony subsystem dynamically detects the presence of live carrier credent
 
 ---
 
-## 4. 7 Vernacular Indian Languages Expansion
+## 5. 7 Vernacular Indian Languages & Strict Native Isolation
 
 Earthworm natively supports 7 major agrarian languages spoken across India's agricultural belts:
 
@@ -233,17 +319,140 @@ Earthworm natively supports 7 major agrarian languages spoken across India's agr
 | **`bn`** | Bengali | বাংলা | Burdwan, Lower Gangetic Plain, West Bengal (Rice, Jute) | `Google.bn-IN-Standard-A` |
 | **`en`** | English | Latin | Pan-India Scientific / Agronomist Reference | `Polly.Aditi` (`en-IN`) |
 
-Every linguistic profile includes full translations for:
-- 3-Stage Explainable Advisory (Notice, Meaning, Action).
-- 160-Character SMS segment preview.
-- High-fidelity voice call audio transcript.
-- Full dashboard navigation, buttons, weather badges, and telemetry labels.
+### 100% Native Language Isolation Architecture
+To eliminate cross-language contamination (e.g. Hindi paragraphs rendering under Kannada headers):
+- Regional packs are partitioned into independent data structures:
+  1. `TRANSLATIONS`: UI shell labels, buttons, and navigation terms.
+  2. `LANGUAGE_OVERRIDES`: Regional farm metadata (crop names, plot titles, advisory summaries, weather reports, and SMS previews).
+  3. `DEEP_ADVICE_TRANSLATIONS`: In-depth scientific biophysical explanations, soil hydrology models, 3 differential hypotheses, and 4-step action plans.
+- **Strict Verification**: Kannada (`kn`), Telugu (`te`), Tamil (`ta`), Marathi (`mr`), and Bengali (`bn`) maintain 100% native vocabulary across all 4 pilot regions (*Mandya*, *Ludhiana*, *Varanasi*, *Nashik*) with zero Devanagari character contamination in Dravidian or Bengali datasets.
 
 ---
 
-## 5. Advanced Satellite Parcel Inspector
+## 6. Responsive Multi-Device Interface Architecture
 
-The dashboard replaces redundant parcel info modals with the **Multispectral Satellite Parcel Inspector**, offering five analytical satellite imaging modes:
+Earthworm features an adaptive, dual-layout design system catering to both desktop workstations and mobile field devices:
+
+### Automatic Viewport Detection & Dynamic Adaptation
+- On initial page load, the application inspects `window.innerWidth`:
+  - $\ge 1024\text{px}$ (laptops & desktop displays) $\rightarrow$ automatically activates **Desktop Mode**.
+  - $< 1024\text{px}$ (smartphones & tablets) $\rightarrow$ automatically activates **Mobile Mode**.
+- Window resize listeners dynamically adapt the interface in real time unless the user has explicitly selected a manual mode override.
+- User choices are saved in `localStorage.earthworm_view_mode`.
+
+### Desktop 2-Column Workstation Dashboard
+In Desktop Mode (`max-w-7xl mx-auto px-6 pt-20 pb-12`):
+- **Top Navigation Bar (`#desktop-top-nav`)**: Displays centralized navigation pills (`Home`, `My Farm`, `Advice`) with active state highlights.
+- **Left Column (7 of 12 cols, ~58% width)**:
+  1. **Dynamic Live Satellite Viewer**: High-resolution `420px` height viewport with telemetry HUD, coordinate reticles, and spectral layer buttons.
+  2. **Regional 3-Day Agromet Forecast**: 3 clean day cards with temperature, precipitation, and agronomist recommendations.
+  3. **Kisan Call Centre & Mobile SMS Advisory Dispatch**: Direct toll-free helpline button and cellular SMS dispatch card.
+- **Right Column (5 of 12 cols, ~42% width)**:
+  1. **Farm / Region Selector**: Pilot region pills (`Mandya`, `Ludhiana`, `Varanasi`, `Nashik`) + custom parcel registration.
+  2. **Agronomic Advisory Overview**: High-priority alert badge, vegetative index metric bar, "View Full Advice" button, and voice advice readout.
+  3. **Three Practical Field Action Tiles**: Interactive diagnostic action steps.
+  4. **Direct Cellular SMS Input Form**: Mobile number input for zero-internet SMS delivery.
+
+### Desktop 2-Column Explanatory Advice Workspace
+When viewing `#view-advice` on Desktop:
+- **Top Row**: Full-width header with field switcher pills and 4-card KPI strip (`Observed NDVI`, `Crop Stage`, `Root-Zone Soil`, `72-hr Weather Risk`).
+- **Left Column (7 cols)**: Satellite vigor analysis, biophysical reflectance physics, calibrated vigor gauge, and root-zone hydrology models.
+- **Right Column (5 cols, sticky `lg:top-20`)**: Step-by-step 4-stage action plan with timeline badges + cellular SMS checklist dispatch and voice playback.
+
+### Mobile Ergonomic Single-Column Stack & Bottom Navigation
+In Mobile Mode (`max-w-[640px] mx-auto px-4 pt-20 pb-28`):
+- Strict single-column vertical flow prevents horizontal overflow or awkward side-by-side squishing.
+- Map height is constrained to `320px` for smooth touch panning.
+- Floating bottom navigation bar (`#bottom-nav-bar`) provides thumb-accessible `Home`, `My Farm`, and `Advice` tabs with safe-area bottom padding (`pb-28`).
+- Modals slide up as mobile bottom sheets (`rounded-t-3xl`) with backdrop blur.
+
+### Persistent Manual Interface Mode Toggle
+The header features an interactive mode toggle (`Mobile` / `Desktop`) allowing users on any screen size to preview the alternative interface layout on demand.
+
+---
+
+## 7. Professional Visual Design & Dual Theme Engine
+
+To eliminate harsh white glare and deliver an enterprise-grade experience, Earthworm provides a cohesive dual-theme system:
+
+```
++---------------------------------------------------------------------------------------+
+|                                    THEME ENGINE                                       |
+|                                                                                       |
+|   1. EXECUTIVE SAGE THEME (Default)                                                   |
+|      - App Canvas: Mineral Sage Slate (#E2EAE4)                                       |
+|      - Elevated Cards: Pure White (#FFFFFF) with subtle emerald borders               |
+|      - High-Contrast Text: Deep Forest Ink (#112318)                                  |
+|                                                                                       |
+|   2. SPACE DARK CONSOLE THEME (1-Click Toggle)                                        |
+|      - App Canvas: Deep Orbital Obsidian (#0B140F)                                    |
+|      - Elevated Cards: Forest Night (#122119) with glowing emerald borders            |
+|      - High-Contrast Text: Mint White (#EDF5F0) & Emerald (#34D399)                   |
+|                                                                                       |
+|   [ Header Toggle: 🌙 / ☀️ ] ---> Persists to localStorage.earthworm_theme             |
++---------------------------------------------------------------------------------------+
+```
+
+### Executive Mineral Sage Slate Canvas (`#E2EAE4`)
+- **Elimination of White Glare**: Replaces the stark white background (`#FAFAF6`) with an architectural mineral-sage slate canvas (`#E2EAE4`).
+- **Tactile Card Elevation**: Floating cards (`#FFFFFF`) pop forward with soft ambient shadows (`shadow-[0_2px_12px_rgba(0,40,20,0.04)]`) and crisp borders (`rgba(0, 82, 48, 0.10)`).
+- **Frosted Glassmorphism**: Header and navigation bars use frosted glass tinted with the sage tone (`rgba(226, 234, 228, 0.92)`).
+
+### Space-to-Soil Dark Command Console (`#0B140F`)
+- **Aerospace Atmosphere**: Transforms the interface into a satellite command console inspired by ESA and NASA mission rooms.
+- **Deep Obsidian Surfaces**: Canvas (`#0B140F`), cards (`#122119`), and input fields (`#172A1F`).
+- **Luminescent Telemetry**: NDVI scales, radar reticles, and spectral heatmaps glow with aerospace clarity.
+
+### 1-Click Theme Switcher Engine
+- Accessible via a dedicated theme button (`#theme-toggle-btn`) in the top navigation bar.
+- Toggles the `.dark` CSS class on `document.documentElement` without page reload.
+- Remembers user preference across sessions via `localStorage.getItem('earthworm_theme')`.
+
+---
+
+## 8. High-Precision Satellite & Rhizosphere Intro Screen
+
+Earthworm features an executive splash animation screen (`#intro-splash`) connecting space telemetry to underground biological fertility:
+
+### Copernicus Sentinel-2 Spacecraft Model
+- Vector-rendered Sentinel-2 satellite orbiting smoothly at top-left:
+  - Gold Multi-Layer Insulation (**MLI**) thermal foil face.
+  - Titanium chassis bus with attitude control thrusters.
+  - Multispectral Instrument (**MSI**) optical barrel with lens flare reflection.
+  - Dual photovoltaic solar array wings with silver grid lines.
+  - Phased telemetry antenna and animated green heartbeat beacon.
+
+### Volumetric Multispectral Scanning Beam & Reticle
+- Dual-band optical scan cone (NIR Band 8 842nm + Red Band 4 665nm) projecting downward to the field.
+- Dynamic radar wavefronts pulsing down along the beam.
+- Ground-tracking targeting reticle `[ · ]` sweeping the crop canopy with real-time coordinate coordinates.
+
+### Stratified Soil Cross-Section & Rhizosphere Roots
+- Replaces crude flat blocks with a rich geological cross-section:
+  - **Topsoil & Organic Humus (0–15 cm)**: Dark nutrient-rich loam.
+  - **Active Root Zone (15–35 cm)**: Aerated loam with delicate white-gold root capillaries (Rhizosphere).
+  - **Subsoil & Retentive Clay (35+ cm)**: Mineral clay with subtle glowing blue capillary moisture veins.
+
+### Peristaltic Earthworm Mascot & Soil Aeration
+- Anatomically refined biological emblem:
+  - 8 metameric segments with terracotta and amber shading.
+  - Velvet clitellum saddle band.
+  - Naturalist, friendly head profile with clean specular glint (zero cartoon googly eyes).
+  - Smooth peristaltic crawling movement along an excavated burrow tunnel, leaving behind aerated micro-pores and glowing nutrient bio-particles.
+
+### Dynamic Telemetry Progression & Replay Engine
+- Synchronized progress bar with authentic satellite acquisition phases:
+  1. `Calibrating Sentinel-2 MSI 10m Radiometer...`
+  2. `Analyzing Canopy Reflectance & NDVI Index...`
+  3. `Mapping Subterranean Root-Zone & Soil Moisture...`
+  4. `Agronomic Diagnostics Ready • Entering Dashboard...`
+- Replay button (`replaySplash()`) in header allows users to replay the 60fps hardware-accelerated animation anytime.
+
+---
+
+## 9. Advanced Satellite Parcel Inspector
+
+The dashboard replaces static modals with the **Multispectral Satellite Parcel Inspector**, offering five analytical satellite imaging modes:
 
 ```
 +-----------------------------------------------------------------------------------+
@@ -266,7 +475,7 @@ Each mode features:
 
 ---
 
-## 6. Manual Land Boundary Marking & Dynamic Acreage Subsystem
+## 10. Manual Land Boundary Marking & Dynamic Acreage Subsystem
 
 Smallholder farmers in India often cultivate fragmented, irregularly shaped plots where official cadastral boundaries differ from physical field bunds (*varambas* / *mees*). To give farmers direct control over their land monitoring, Earthworm features an interactive, high-precision **Manual Land Boundary Marker**.
 
@@ -309,7 +518,7 @@ For farmers walking their physical boundary bunds in the field with a smartphone
 
 ### Save Parcel Modal & Cadastral Attributes
 When the farmer taps **"Save Land"**:
-- Earthworm opens a glassmorphic dialog displaying verified boundary metrics:
+- Earthworm opens a dialog displaying verified boundary metrics:
   - Total Measured Acreage (e.g. `1.85 Acres (1 Ac, 34 Guntas)`).
   - Number of boundary corners & total perimeter.
 - Form fields allow the farmer to specify:
@@ -332,7 +541,7 @@ Saved parcels are immediately added to the bottom telemetry bar alongside defaul
 
 ---
 
-## 7. Libraries & Technologies Used
+## 11. Libraries & Technologies Used
 
 ### Backend Python Dependencies
 Defined in [backend/requirements.txt](file:///c:/Earthworm/backend/requirements.txt):
@@ -353,12 +562,12 @@ Defined in [backend/requirements.txt](file:///c:/Earthworm/backend/requirements.
 - **Vanilla Modern JavaScript**: Zero build steps; blazing-fast load times on low-bandwidth rural connections.
 - **Tailwind CSS (Custom Token Build)**: Responsive design system adhering to accessible contrast ratios and tactile touch targets.
 - **Leaflet.js (`v1.9.4`)**: Lightweight, mobile-friendly interactive mapping with custom parcel boundary GeoJSON layers.
-- **Google Fonts (Outfit & Inter)**: Crisp, modern typography engineered for readability across mobile screen densities.
-- **Google Material Symbols Outlined**: Intuitive agrarian and telephony iconography.
+- **Google Fonts (Outfit, Noto Sans & Inter)**: Crisp, modern typography engineered for readability across regional Indian scripts.
+- **Google Material Symbols Outlined**: Intuitive agrarian, weather, and telephony iconography.
 
 ---
 
-## 8. Detailed Python Script & Codebase Documentation
+## 12. Detailed Python Script & Codebase Documentation
 
 ### Entrypoints & Server Configuration
 
@@ -437,19 +646,19 @@ Standalone CLI script for headless, browser-free low-bandwidth dispatch. Support
 - [backend/app/schemas/farm.py](file:///c:/Earthworm/backend/app/schemas/farm.py): `FarmBase`, `FarmResponse`, `FarmListResponse`, `CustomMarkerPoint`, `CustomLandMarker`.
 - [backend/app/schemas/advisory.py](file:///c:/Earthworm/backend/app/schemas/advisory.py): `AdvisoryResponse`, `ObservationPoint`, `ObservationsResponse`, `WeatherDay`, `WeatherResponse`.
 
-### Automated Pytest Suite
+### Automated Pytest Suite (34 Passed)
 Located in [backend/tests/](file:///c:/Earthworm/backend/tests/):
 - `test_communications.py`: Validates status endpoint, SMS simulation, IVR call generation, unified low-bandwidth dispatch, incoming call/SMS webhooks, and TwiML rendering (7 tests).
-- `test_farms.py`: Tests farm listings, advisory localization, NDVI observations, weather endpoints, and custom land marker lifecycle (9 tests).
+- `test_farms.py`: Tests farm listings, advisory localization, NDVI observations, weather endpoints, and custom land marker lifecycle (10 tests).
 - `test_health.py`: Validates health checks and route 404 handlers (4 tests).
 - `test_sentinel.py`: Validates Sentinel Hub diagnostics and image serving (3 tests).
 - `test_supabase.py`: Tests credential safety and mock connection states (5 tests).
 - `test_vercel.py`: Validates serverless entrypoint routing (5 tests).
-- **Total: 33 Automated Tests Passing.**
+- **Total: 34 Automated Tests Passing.**
 
 ---
 
-## 9. Copernicus Sentinel Hub Live Satellite Integration
+## 13. Copernicus Sentinel Hub Live Satellite Integration
 
 ### OAuth2 Client Credentials & Token Caching
 Sentinel Hub authentication utilizes OAuth2 Client Credentials (`POST https://services.sentinel-hub.com/oauth/token`):
@@ -484,7 +693,7 @@ function evaluatePixel(sample) {
 
 ---
 
-## 10. In-Depth Supabase Integration Architecture
+## 14. In-Depth Supabase Integration Architecture
 
 ### Non-Blocking Hybrid Storage Design
 Earthworm guarantees 100% application uptime regardless of database connectivity:
@@ -529,7 +738,7 @@ The probe at `GET /api/health/db` tests database accessibility via PostgREST sch
 
 ---
 
-## 11. Deployment & Execution Instructions
+## 15. Deployment, Multi-Target Sync & Production Execution
 
 ### Local Development & CLI Execution
 
@@ -554,11 +763,20 @@ The probe at `GET /api/health/db` tests database accessibility via PostgREST sch
    - Swagger Documentation: [http://127.0.0.1:8080/docs](http://127.0.0.1:8080/docs)
    - Telephony Status: [http://127.0.0.1:8080/api/communications/status](http://127.0.0.1:8080/api/communications/status)
 
-### Automated Testing
-Execute all 33 automated tests across health, farms, Sentinel Hub, Supabase, Vercel, and low-bandwidth communications:
+### Automated Testing Execution
+Execute all 34 automated tests across health, farms, Sentinel Hub, Supabase, Vercel, and low-bandwidth communications:
 ```powershell
-pytest -v
+backend\.venv\Scripts\pytest backend\tests -v
 ```
+
+### Six-Target Distribution Synchronization
+To support direct execution, static web servers, and Vercel edge deployment without desynchronization, Earthworm maintains byte-for-byte consistency across 6 frontend targets:
+1. `c:\Earthworm\frontend\index.html` (Primary master template)
+2. `c:\Earthworm\frontend\code.html`
+3. `c:\Earthworm\index.html` (Root Vercel edge entrypoint)
+4. `c:\Earthworm\code.html`
+5. `c:\Earthworm\backend\index.html` (FastAPI static mount)
+6. `c:\Earthworm\backend\frontend\index.html`
 
 ### Vercel Serverless Production Deployment
 Earthworm is pre-configured for zero-configuration serverless deployment to **Vercel**:
