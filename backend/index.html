@@ -252,27 +252,56 @@
 
 /* Interface Mode Switching Styles (Mobile vs Desktop) */
     .mode-desktop #header-inner {
-      max-width: 80rem !important; /* max-w-7xl */
-      padding-left: 1.5rem !important;
-      padding-right: 1.5rem !important;
+      max-width: 1440px !important;
+      padding-left: 2rem !important;
+      padding-right: 2rem !important;
     }
     .mode-desktop #main-content {
-      max-width: 80rem !important; /* max-w-7xl */
-      padding-left: 1.5rem !important;
-      padding-right: 1.5rem !important;
-      padding-bottom: 3.5rem !important;
+      max-width: 1440px !important;
+      padding-left: 2rem !important;
+      padding-right: 2rem !important;
+      padding-top: 5.5rem !important;
+      padding-bottom: 4rem !important;
       border-left-width: 0 !important;
       border-right-width: 0 !important;
       box-shadow: none !important;
+    }
+    .mode-desktop #main-sections-wrapper {
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: flex-start !important;
+      gap: 2rem !important;
+    }
+    .mode-desktop #desktop-sidebar-rail {
+      display: flex !important;
+    }
+    .mode-desktop #desktop-sidebar-farms-slot #farm-pills-container {
+      grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+      gap: 0.65rem !important;
     }
     .mode-desktop #bottom-nav-bar {
       display: none !important;
     }
     .mode-desktop #desktop-top-nav {
-      display: flex !important;
+      display: none !important; /* Replaced cleanly by Left Navigation Rail */
     }
     .mode-desktop #satellite-canvas {
-      height: 380px !important;
+      height: 340px !important;
+    }
+    .mode-desktop #advisory-section,
+    .mode-desktop #satellite-card,
+    .mode-desktop #actions-section,
+    .mode-desktop #weather-section,
+    .mode-desktop #support-section {
+      height: 100% !important;
+    }
+    .mode-mobile #desktop-sidebar-rail {
+      display: none !important;
+    }
+    .mode-mobile #main-sections-wrapper {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 1.5rem !important;
     }
     html.dark #advisory-section {
       background: #122119 !important;
@@ -916,40 +945,67 @@
 
   <!-- MAIN SCROLLABLE CONTENT -->
   <main id="main-content" class="flex-1 flex flex-col relative w-full px-4 pt-20 pb-28 bg-surface max-w-[640px] mx-auto transition-all duration-300 sm:border-x sm:border-surface-variant/40 sm:shadow-[0_0_40px_rgba(0,0,0,0.06)]">
-    <div class="flex flex-col gap-4 w-full" id="main-sections-wrapper">
+    <div class="flex flex-col gap-6 w-full" id="main-sections-wrapper">
+
+      <!-- LEFT NAVIGATION & PARCEL RAIL (Desktop Workspace Mode) -->
+      <aside id="desktop-sidebar-rail" class="hidden w-72 xl:w-80 shrink-0 flex-col gap-5 lg:sticky lg:top-20">
+        <!-- Workspace Navigation Card -->
+        <nav class="bg-surface-container-lowest rounded-3xl p-3 border border-surface-variant shadow-sm flex flex-col gap-1.5" aria-label="Primary Workspace Navigation">
+          <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-secondary">Workspace</div>
+          <button onclick="switchTab('home')" id="stab-home" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-primary bg-surface-container transition-all cursor-pointer text-left" type="button">
+            <span class="material-symbols-outlined text-[20px]">home</span>
+            <span id="snav-label-home">Home</span>
+          </button>
+          <button onclick="switchTab('myfarm')" id="stab-myfarm" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container/60 transition-colors cursor-pointer text-left" type="button">
+            <span class="material-symbols-outlined text-[20px]">agriculture</span>
+            <span id="snav-label-myfarm">My Farm</span>
+          </button>
+          <button onclick="switchTab('advice')" id="stab-advice" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container/60 transition-colors cursor-pointer text-left" type="button">
+            <span class="material-symbols-outlined text-[20px]">wb_incandescent</span>
+            <span id="snav-label-advice">Advice</span>
+          </button>
+        </nav>
+
+        <!-- Sidebar Farm Selector Slot -->
+        <div id="desktop-sidebar-farms-slot" class="w-full"></div>
+
+        <!-- Sidebar Prototype Disclosure Slot -->
+        <div id="desktop-sidebar-notice-slot" class="w-full"></div>
+      </aside>
+
+      <!-- MAIN WORKSPACE PANE (Holds View Home & View Advice) -->
+      <div id="desktop-main-pane" class="flex-1 min-w-0 flex flex-col gap-6 w-full">
 
       <!-- VIEW: HOME (Main Satellite & Agro-Met Dashboard) -->
       <div id="view-home" class="flex flex-col gap-5 sm:gap-6 w-full">
-        <!-- EXECUTIVE HEADER STRIP: HERO + PROTOTYPE DISCLOSURE INTEGRATED -->
-      <section id="hero-section" class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4 pt-1 pb-2 border-b border-surface-variant/50">
-        <div class="flex flex-col gap-1.5">
-          <div class="inline-flex items-center gap-1.5 self-start px-2.5 py-0.5 rounded-full bg-surface-container text-primary text-[11px] font-bold tracking-wide">
-            <span class="material-symbols-outlined text-[14px]">satellite_alt</span>
-            <span id="hero-tag">Space &amp; Weather Observations</span>
-          </div>
-          <h1 class="text-[22px] sm:text-[26px] font-black text-on-surface leading-tight tracking-tight" id="hero-title">
-            Understand Your Crops Before Problems Grow.
-          </h1>
-          <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed" id="hero-subtitle">
-            Free space-based vegetative index and agrometeorological insights for Indian farmers.
-          </p>
+        <!-- EXECUTIVE HERO GREETING -->
+      <section id="hero-section" class="flex flex-col gap-1.5 pb-1">
+        <div class="inline-flex items-center gap-1.5 self-start px-3 py-1 rounded-full bg-surface-container text-primary text-[11px] font-bold tracking-wide">
+          <span class="material-symbols-outlined text-[14px]">satellite_alt</span>
+          <span id="hero-tag">Space &amp; Weather Observations</span>
         </div>
-
-        <!-- Discreet Prototype Verification Notice Card -->
-        <div id="top-banner" class="bg-surface-container-low/90 border-l-4 border-primary rounded-xl px-3.5 py-2.5 flex items-start gap-2.5 shadow-2xs text-xs text-on-surface-variant lg:max-w-sm shrink-0">
-          <span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">verified_user</span>
-          <div class="leading-snug">
-            <span class="font-bold text-on-surface" id="banner-title">Prototype Demonstration Data</span>:
-            <span id="banner-text">Satellite reflectance &amp; agromet observations. Always verify ground conditions before applying treatments.</span>
-          </div>
-        </div>
+        <h1 class="text-2xl sm:text-[28px] font-black text-on-surface leading-tight tracking-tight" id="hero-title">
+          Understand Your Crops Before Problems Grow.
+        </h1>
+        <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed" id="hero-subtitle">
+          Free space-based vegetative index and agrometeorological insights for Indian farmers.
+        </p>
       </section>
 
       <!-- MOBILE SECTIONS CONTAINER (Linear Stack) -->
-      <div id="mobile-sections-container" class="flex flex-col gap-5 w-full">
+      <div id="mobile-sections-container" class="flex flex-col gap-6 w-full">
+      <!-- PROTOTYPE DISCLOSURE NOTICE -->
+      <div id="top-banner" class="bg-surface-container-lowest border-l-4 border-primary rounded-2xl p-4 flex items-start gap-2.5 shadow-xs text-xs text-on-surface-variant border border-surface-variant">
+        <span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">verified_user</span>
+        <div class="leading-relaxed">
+          <span class="font-bold text-on-surface" id="banner-title">Prototype Demonstration Data</span>:
+          <span id="banner-text">Satellite reflectance &amp; agromet observations. Always verify ground conditions before applying treatments.</span>
+        </div>
+      </div>
+
 
         <!-- 2. DYNAMIC LIVE SATELLITE VIEWER -->
-        <div class="relative w-full rounded-2xl overflow-hidden bg-surface-container-lowest border border-surface-variant shadow-sm transition-all" id="satellite-card">
+        <div class="relative w-full rounded-3xl overflow-hidden bg-surface-container-lowest border border-surface-variant shadow-sm transition-all flex flex-col justify-between" id="satellite-card">
         
         <!-- SATELLITE TOOLBAR: TELEMETRY & CONTROLS -->
         <div class="p-3 sm:p-4 bg-surface-container-low border-b border-surface-variant flex flex-col gap-3">
@@ -1265,8 +1321,8 @@
       </div>
 
       <!-- 3. PAN-INDIA REACH & INTERACTIVE FARM SELECTOR -->
-      <section id="farms-section" class="flex flex-col gap-3 bg-surface-container-low p-4 sm:p-5 rounded-3xl border border-surface-variant shadow-xs">
-        <div class="flex items-center justify-between">
+      <section id="farms-section" class="flex flex-col gap-3 bg-surface-container-lowest p-4 sm:p-5 rounded-3xl border border-surface-variant shadow-sm">
+        <div class="flex items-center justify-between flex-wrap gap-2">
           <div class="flex items-center gap-2">
             <span class="material-symbols-outlined text-primary text-[20px]">pin_drop</span>
             <span class="text-xs font-bold uppercase tracking-wider text-on-surface" id="region-selector-header">Select Field (Pan-India)</span>
@@ -1364,7 +1420,7 @@
         </div>
 
         <!-- Action Buttons with Enhanced Color & Contrast -->
-        <div class="flex flex-col sm:flex-row gap-2.5 pt-1">
+        <div class="flex flex-col sm:flex-row gap-3 pt-2 mt-auto">
           <button class="flex-1 min-h-[48px] px-4 rounded-xl bg-gradient-to-r from-emerald-700 via-emerald-800 to-teal-800 hover:from-emerald-800 hover:to-teal-900 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 active:scale-[0.99] shadow-md hover:shadow-lg transition-all cursor-pointer whitespace-nowrap" onclick="openBriefAdviceModal()" type="button" id="btn-brief-advice-trigger">
             <span class="material-symbols-outlined text-[18px]">summarize</span>
             <span id="btn-view-advice">View Advice (Brief)</span>
@@ -1377,7 +1433,7 @@
       </section>
 
       <!-- 5. THREE PRACTICAL ACTION TILES WITH VIBRANT THEMES -->
-      <section id="actions-section" class="rounded-3xl bg-surface-container-lowest p-5 border border-surface-variant shadow-sm flex flex-col gap-3.5">
+      <section id="actions-section" class="rounded-3xl bg-surface-container-lowest p-5 sm:p-6 border border-surface-variant shadow-sm flex flex-col justify-between gap-3.5">
         <div class="flex items-center justify-between">
           <h3 class="text-base font-black text-on-surface tracking-tight" id="tiles-header">Three Practical Field Actions</h3>
           <span class="text-xs font-semibold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">Tap tile to inspect</span>
@@ -1427,42 +1483,42 @@
       </section>
 
       <!-- 6. 3-DAY WEATHER OUTLOOK -->
-      <section id="weather-section" class="rounded-3xl bg-surface-container p-5 border border-surface-variant flex flex-col gap-3.5 shadow-sm">
-        <div class="flex items-center justify-between">
+      <section id="weather-section" class="rounded-3xl bg-surface-container-lowest p-5 sm:p-6 border border-surface-variant flex flex-col justify-between gap-4 shadow-sm">
+        <div class="flex items-center justify-between gap-2">
           <div class="flex items-center gap-1.5">
             <span class="material-symbols-outlined text-primary text-[18px]">wb_sunny</span>
             <span class="text-xs font-bold text-primary uppercase tracking-wide" id="weather-source-tag">Regional 3-Day Outlook (Open-Meteo Demonstration)</span>
           </div>
-          <span class="text-[11px] text-secondary" id="weather-demo-tag">Demonstration</span>
+          <span class="text-[11px] font-medium text-secondary shrink-0" id="weather-demo-tag">Demonstration</span>
         </div>
-        <div class="grid grid-cols-3 gap-2 text-center" id="forecast-grid">
-          <div class="bg-surface-container-lowest p-2.5 rounded-xl border border-surface-variant flex flex-col items-center">
+        <div class="grid grid-cols-3 gap-2.5 text-center" id="forecast-grid">
+          <div class="bg-surface-container-low/70 p-3 rounded-2xl border border-surface-variant flex flex-col items-center">
             <span class="text-[11px] font-semibold text-secondary">Day 1</span>
             <span class="material-symbols-outlined text-tertiary-container my-1 text-[22px]">sunny</span>
             <span class="text-sm font-bold text-on-surface">31° / 21°</span>
             <span class="text-[10px] text-primary font-medium">0 mm rain</span>
           </div>
-          <div class="bg-surface-container-lowest p-2.5 rounded-xl border border-surface-variant flex flex-col items-center">
+          <div class="bg-surface-container-low/70 p-3 rounded-2xl border border-surface-variant flex flex-col items-center">
             <span class="text-[11px] font-semibold text-secondary">Day 2</span>
             <span class="material-symbols-outlined text-tertiary-container my-1 text-[22px]">partly_cloudy_day</span>
             <span class="text-sm font-bold text-on-surface">32° / 20°</span>
             <span class="text-[10px] text-primary font-medium">0 mm rain</span>
           </div>
-          <div class="bg-surface-container-lowest p-2.5 rounded-xl border border-surface-variant flex flex-col items-center">
+          <div class="bg-surface-container-low/70 p-3 rounded-2xl border border-surface-variant flex flex-col items-center">
             <span class="text-[11px] font-semibold text-secondary">Day 3</span>
             <span class="material-symbols-outlined text-secondary my-1 text-[22px]">cloud</span>
             <span class="text-sm font-bold text-on-surface">30° / 22°</span>
             <span class="text-[10px] text-secondary font-medium">&lt;1 mm rain</span>
           </div>
         </div>
-        <div class="bg-surface-container-high px-3 py-2 rounded-xl text-on-surface text-xs flex items-center gap-2" id="weather-recommendation">
+        <div class="bg-surface-container-low px-3.5 py-2.5 rounded-2xl text-on-surface text-xs flex items-center gap-2 border border-surface-variant/60 mt-auto" id="weather-recommendation">
           <span class="material-symbols-outlined text-primary text-[18px] shrink-0">check_circle</span>
           <span class="leading-tight">Stable dry weather next 3 days. Suitable for weed clearing and ground parcel inspection.</span>
         </div>
       </section>
 
       <!-- 7. FARMER CALL CENTRE SUPPORT & AUDIO ACCESS -->
-      <section id="support-section" class="rounded-3xl bg-surface-container-lowest p-5 border border-surface-variant shadow-sm flex flex-col gap-4">
+      <section id="support-section" class="rounded-3xl bg-surface-container-lowest p-5 sm:p-6 border border-surface-variant shadow-sm flex flex-col justify-between gap-4">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container shrink-0">
@@ -1536,15 +1592,20 @@
       </div>
       <!-- END MOBILE SECTIONS CONTAINER -->
 
-      <!-- DESKTOP TOP FULL-WIDTH FARM SELECTOR BAR -->
-      <div id="desktop-farms-slot" class="hidden w-full"></div>
+      <!-- DESKTOP BENTO WORKSPACE GRID (Activated in desktop mode) -->
+      <div id="desktop-grid-container" class="hidden flex-col gap-6 w-full">
+        <!-- Bento Row 1: Primary Satellite Stage (7 cols) + Agronomic Decision Card (5 cols) -->
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 w-full items-stretch">
+          <div id="desktop-r1-left" class="xl:col-span-7 flex flex-col"></div>
+          <div id="desktop-r1-right" class="xl:col-span-5 flex flex-col"></div>
+        </div>
 
-      <!-- DESKTOP GRID CONTAINER (Balanced 7/5 Two-Column Dashboard, activated in desktop mode) -->
-      <div id="desktop-grid-container" class="hidden grid-cols-1 lg:grid-cols-12 gap-7 w-full items-start">
-        <!-- Left Main Column (7 of 12 cols, ~58% width: Satellite + Weather) -->
-        <div id="desktop-col-left" class="lg:col-span-7 flex flex-col gap-6"></div>
-        <!-- Right Decision Column (5 of 12 cols, ~42% width: Advisory + Actions + Support) -->
-        <div id="desktop-col-right" class="lg:col-span-5 flex flex-col gap-6"></div>
+        <!-- Bento Row 2: Three Balanced Operations, Weather & Telephony Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 w-full items-stretch">
+          <div id="desktop-r2-col1" class="flex flex-col"></div>
+          <div id="desktop-r2-col2" class="flex flex-col"></div>
+          <div id="desktop-r2-col3" class="flex flex-col"></div>
+        </div>
       </div>
 
       </div>
@@ -1890,7 +1951,11 @@
 
         </div>
 
+      </div>
       <!-- END VIEW: ADVICE -->
+
+      </div>
+      <!-- END MAIN WORKSPACE PANE -->
 
     </div>
   </main>
@@ -6692,7 +6757,7 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       `;
       const grid = document.getElementById('forecast-grid');
       grid.innerHTML = data.days.map(d => `
-        <div class="bg-surface-container-lowest p-2.5 rounded-xl border border-surface-variant flex flex-col items-center">
+        <div class="bg-surface-container-low/70 p-3 rounded-2xl border border-surface-variant flex flex-col items-center">
           <span class="text-[11px] font-semibold text-secondary">${d.day}</span>
           <span class="material-symbols-outlined text-tertiary-container my-1 text-[22px]">${d.icon}</span>
           <span class="text-sm font-bold text-on-surface">${d.temp}</span>
@@ -6763,16 +6828,22 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       // 4. Navigation (Desktop & Mobile)
       const dHome = document.getElementById('dnav-label-home');
       if (dHome) dHome.textContent = t.navHome || "Home";
+      const sHome = document.getElementById('snav-label-home');
+      if (sHome) sHome.textContent = t.navHome || "Home";
       const mHome = document.getElementById('nav-label-home');
       if (mHome) mHome.textContent = t.navHome || "Home";
 
       const dFarm = document.getElementById('dnav-label-myfarm');
       if (dFarm) dFarm.textContent = t.navMyFarm || "My Farm";
+      const sFarm = document.getElementById('snav-label-myfarm');
+      if (sFarm) sFarm.textContent = t.navMyFarm || "My Farm";
       const mFarm = document.getElementById('nav-label-myfarm');
       if (mFarm) mFarm.textContent = t.navMyFarm || "My Farm";
 
       const dAdv = document.getElementById('dnav-label-advice');
       if (dAdv) dAdv.textContent = t.navAdvice || "Advice";
+      const sAdv = document.getElementById('snav-label-advice');
+      if (sAdv) sAdv.textContent = t.navAdvice || "Advice";
       const mAdv = document.getElementById('nav-label-advice');
       if (mAdv) mAdv.textContent = t.navAdvice || "Advice";
 
@@ -9702,6 +9773,14 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
             del.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-secondary hover:text-primary hover:bg-surface-container transition-colors cursor-pointer";
           }
         }
+        const sel = document.getElementById('stab-' + t);
+        if (sel) {
+          if (t === tab) {
+            sel.className = "flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-primary bg-surface-container transition-all cursor-pointer text-left shadow-2xs";
+          } else {
+            sel.className = "flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container/60 transition-colors cursor-pointer text-left";
+          }
+        }
       });
 
       const viewHome = document.getElementById('view-home');
@@ -10180,7 +10259,7 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       const headerInner = document.getElementById('header-inner');
       if (headerInner) {
         if (isDesktop) {
-          headerInner.className = "h-16 px-4 sm:px-6 flex items-center justify-between gap-3 max-w-7xl mx-auto transition-all duration-300";
+          headerInner.className = "h-16 px-6 lg:px-8 flex items-center justify-between gap-3 max-w-[1440px] mx-auto transition-all duration-300";
         } else {
           headerInner.className = "h-16 px-4 flex items-center justify-between gap-2 max-w-[640px] mx-auto transition-all duration-300";
         }
@@ -10190,7 +10269,7 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       const mainContent = document.getElementById('main-content');
       if (mainContent) {
         if (isDesktop) {
-          mainContent.className = "flex-1 flex flex-col relative w-full px-4 sm:px-6 pt-20 pb-12 bg-surface max-w-7xl mx-auto transition-all duration-300";
+          mainContent.className = "flex-1 flex flex-col relative w-full px-6 lg:px-8 pt-24 pb-16 bg-surface max-w-[1440px] mx-auto transition-all duration-300";
         } else {
           mainContent.className = "flex-1 flex flex-col relative w-full px-4 pt-20 pb-28 bg-surface max-w-[640px] mx-auto transition-all duration-300 sm:border-x sm:border-surface-variant/40 sm:shadow-[0_0_40px_rgba(0,0,0,0.06)]";
         }
@@ -10229,41 +10308,44 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         }
       }
 
-      // Rearrange Dashboard Sections between Mobile Stack and Desktop Grid
+      // Rearrange Dashboard Sections between Mobile Stack and Desktop Left-Rail Bento Workspace
       const satCard = document.getElementById('satellite-card');
       const farmsSec = document.getElementById('farms-section');
       const advSec = document.getElementById('advisory-section');
       const actSec = document.getElementById('actions-section');
       const weaSec = document.getElementById('weather-section');
       const supSec = document.getElementById('support-section');
+      const topBanner = document.getElementById('top-banner');
 
       const mobileCont = document.getElementById('mobile-sections-container');
-      const desktopFarmsSlot = document.getElementById('desktop-farms-slot');
+      const sidebarFarmsSlot = document.getElementById('desktop-sidebar-farms-slot');
+      const sidebarNoticeSlot = document.getElementById('desktop-sidebar-notice-slot');
       const desktopCont = document.getElementById('desktop-grid-container');
-      const colLeft = document.getElementById('desktop-col-left');
-      const colRight = document.getElementById('desktop-col-right');
+      const r1Left = document.getElementById('desktop-r1-left');
+      const r1Right = document.getElementById('desktop-r1-right');
+      const r2Col1 = document.getElementById('desktop-r2-col1');
+      const r2Col2 = document.getElementById('desktop-r2-col2');
+      const r2Col3 = document.getElementById('desktop-r2-col3');
 
-      if (mobileCont && desktopCont && colLeft && colRight) {
+      if (mobileCont && desktopCont && r1Left && r1Right && r2Col1 && r2Col2 && r2Col3) {
         if (isDesktop) {
           mobileCont.classList.add('hidden');
           mobileCont.classList.remove('flex');
-          if (desktopFarmsSlot) {
-            desktopFarmsSlot.classList.remove('hidden');
-            if (farmsSec) desktopFarmsSlot.appendChild(farmsSec);
-          }
           desktopCont.classList.remove('hidden');
-          desktopCont.classList.add('grid');
+          desktopCont.classList.add('flex');
 
-          if (satCard) colLeft.appendChild(satCard);
-          if (weaSec) colLeft.appendChild(weaSec);
+          if (sidebarFarmsSlot && farmsSec) sidebarFarmsSlot.appendChild(farmsSec);
+          if (sidebarNoticeSlot && topBanner) sidebarNoticeSlot.appendChild(topBanner);
 
-          if (advSec) colRight.appendChild(advSec);
-          if (actSec) colRight.appendChild(actSec);
-          if (supSec) colRight.appendChild(supSec);
+          if (satCard) r1Left.appendChild(satCard);
+          if (advSec) r1Right.appendChild(advSec);
+
+          if (actSec) r2Col1.appendChild(actSec);
+          if (weaSec) r2Col2.appendChild(weaSec);
+          if (supSec) r2Col3.appendChild(supSec);
         } else {
-          if (desktopFarmsSlot) desktopFarmsSlot.classList.add('hidden');
           desktopCont.classList.add('hidden');
-          desktopCont.classList.remove('grid');
+          desktopCont.classList.remove('flex');
           mobileCont.classList.remove('hidden');
           mobileCont.classList.add('flex');
 
@@ -10273,13 +10355,14 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
           if (actSec) mobileCont.appendChild(actSec);
           if (weaSec) mobileCont.appendChild(weaSec);
           if (supSec) mobileCont.appendChild(supSec);
+          if (topBanner) mobileCont.appendChild(topBanner);
         }
       }
 
       // Sizing for Satellite Viewport
       const satCanvas = document.getElementById('satellite-canvas');
       if (satCanvas) {
-        satCanvas.style.height = isDesktop ? '380px' : '';
+        satCanvas.style.height = isDesktop ? '340px' : '';
       }
 
       // Invalidate Leaflet map size so it fits the new container dimensions
