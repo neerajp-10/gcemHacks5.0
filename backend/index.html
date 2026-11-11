@@ -272,7 +272,24 @@
       display: flex !important;
     }
     .mode-desktop #satellite-canvas {
-      height: 420px !important;
+      height: 380px !important;
+    }
+    html.dark #advisory-section {
+      background: #122119 !important;
+      border-color: rgba(16, 185, 129, 0.28) !important;
+    }
+    html.dark #advisory-section .from-emerald-50,
+    html.dark #actions-section button {
+      background: #172a1f !important;
+      border-color: rgba(16, 185, 129, 0.2) !important;
+    }
+    html.dark #advisory-metric,
+    html.dark #btn-audio-voice {
+      color: #edf5f0 !important;
+    }
+    html.dark #btn-audio-voice {
+      background: #1d3427 !important;
+      border-color: rgba(245, 158, 11, 0.35) !important;
     }
     /* Centered Modals in Desktop Mode */
     .mode-desktop .fixed.inset-0.z-50.flex.flex-col.justify-end {
@@ -320,6 +337,21 @@
     }
     .mode-mobile .lg\:sticky {
       position: static !important;
+    }
+    .mode-mobile #hero-section {
+      flex-direction: column !important;
+      align-items: stretch !important;
+    }
+    .mode-mobile #top-banner {
+      max-width: 100% !important;
+    }
+    .mode-mobile #farm-pills-container {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+    @media (max-width: 540px) {
+      .mode-mobile #farm-pills-container {
+        grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+      }
     }
   </style>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -817,7 +849,7 @@
           <span class="text-xl font-extrabold tracking-tight text-primary leading-none">EARTHWORM</span>
           <div class="flex items-center gap-1.5 mt-0.5">
             <span class="text-[10px] font-semibold text-on-surface-variant tracking-wider uppercase leading-tight">Agri-Sat</span>
-            <span id="api-status-pill" class="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-surface-container text-secondary flex items-center gap-1">
+            <span id="api-status-pill" class="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-surface-container text-secondary hidden sm:flex items-center gap-1">
               <span class="w-1.5 h-1.5 rounded-full bg-primary" id="api-status-dot"></span>
               <span id="api-status-text">Checking API...</span>
             </span>
@@ -887,38 +919,40 @@
     <div class="flex flex-col gap-4 w-full" id="main-sections-wrapper">
 
       <!-- VIEW: HOME (Main Satellite & Agro-Met Dashboard) -->
-      <div id="view-home" class="flex flex-col gap-4 w-full">
-        <!-- TOP BANNER: HONEST PROTOTYPE DISCLOSURE -->
-      <div id="top-banner" class="bg-surface-container-high border-l-4 border-primary rounded-r-xl p-2.5 flex items-start gap-2 shadow-sm text-xs text-on-surface-variant">
-        <span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">verified_user</span>
-        <div>
-          <span class="font-bold text-on-surface" id="banner-title">Prototype Demonstration Data</span>:
-          <span id="banner-text">Satellite reflectance & agromet observations. Always verify ground conditions before applying treatments.</span>
+      <div id="view-home" class="flex flex-col gap-5 sm:gap-6 w-full">
+        <!-- EXECUTIVE HEADER STRIP: HERO + PROTOTYPE DISCLOSURE INTEGRATED -->
+      <section id="hero-section" class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4 pt-1 pb-2 border-b border-surface-variant/50">
+        <div class="flex flex-col gap-1.5">
+          <div class="inline-flex items-center gap-1.5 self-start px-2.5 py-0.5 rounded-full bg-surface-container text-primary text-[11px] font-bold tracking-wide">
+            <span class="material-symbols-outlined text-[14px]">satellite_alt</span>
+            <span id="hero-tag">Space &amp; Weather Observations</span>
+          </div>
+          <h1 class="text-[22px] sm:text-[26px] font-black text-on-surface leading-tight tracking-tight" id="hero-title">
+            Understand Your Crops Before Problems Grow.
+          </h1>
+          <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed" id="hero-subtitle">
+            Free space-based vegetative index and agrometeorological insights for Indian farmers.
+          </p>
         </div>
-      </div>
 
-      <!-- HERO HEADLINE & VALUE INTRO -->
-      <section id="hero-section" class="flex flex-col gap-1 pt-1">
-        <div class="inline-flex items-center gap-1.5 self-start px-2.5 py-0.5 rounded-full bg-surface-container text-primary text-[11px] font-semibold">
-          <span class="material-symbols-outlined text-[14px]">satellite_alt</span>
-          <span id="hero-tag">Space &amp; Weather Observations</span>
+        <!-- Discreet Prototype Verification Notice Card -->
+        <div id="top-banner" class="bg-surface-container-low/90 border-l-4 border-primary rounded-xl px-3.5 py-2.5 flex items-start gap-2.5 shadow-2xs text-xs text-on-surface-variant lg:max-w-sm shrink-0">
+          <span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">verified_user</span>
+          <div class="leading-snug">
+            <span class="font-bold text-on-surface" id="banner-title">Prototype Demonstration Data</span>:
+            <span id="banner-text">Satellite reflectance &amp; agromet observations. Always verify ground conditions before applying treatments.</span>
+          </div>
         </div>
-        <h1 class="text-[22px] sm:text-[24px] font-extrabold text-on-surface leading-tight" id="hero-title">
-          Understand Your Crops Before Problems Grow.
-        </h1>
-        <p class="text-sm text-on-surface-variant leading-relaxed" id="hero-subtitle">
-          Free space-based vegetative index and agrometeorological insights for Indian farmers.
-        </p>
       </section>
 
       <!-- MOBILE SECTIONS CONTAINER (Linear Stack) -->
-      <div id="mobile-sections-container" class="flex flex-col gap-4 w-full">
+      <div id="mobile-sections-container" class="flex flex-col gap-5 w-full">
 
         <!-- 2. DYNAMIC LIVE SATELLITE VIEWER -->
         <div class="relative w-full rounded-2xl overflow-hidden bg-surface-container-lowest border border-surface-variant shadow-sm transition-all" id="satellite-card">
         
         <!-- SATELLITE TOOLBAR: TELEMETRY & CONTROLS -->
-        <div class="p-2.5 bg-surface-container-low border-b border-surface-variant flex flex-col gap-2">
+        <div class="p-3 sm:p-4 bg-surface-container-low border-b border-surface-variant flex flex-col gap-3">
           <!-- Top Row: Satellite Beacon & Action Buttons -->
           <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-1.5">
@@ -950,7 +984,7 @@
           </div>
 
           <!-- Bottom Row: Multi-Spectral Layer Selector Tabs -->
-          <div class="flex items-center gap-1 overflow-x-auto pb-0.5 no-scrollbar">
+          <div class="flex items-center gap-1.5 overflow-x-auto lg:flex-wrap pb-0.5 no-scrollbar">
             <button class="sat-layer-btn active text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-primary text-on-primary shadow-sm flex items-center gap-1 shrink-0 transition-all cursor-pointer" onclick="switchSatelliteLayer('true-color')" id="layer-btn-true-color">
               <span class="material-symbols-outlined text-[13px]">palette</span>
               <span id="sat-layer-rgb-text">Natural RGB</span>
@@ -1182,7 +1216,7 @@
         </div>
 
         <!-- SATELLITE FOOTER INTERACTIVE BAR / OPTION TOGGLE -->
-        <div id="satellite-footer-bar" class="px-3 py-2 bg-surface-container-low border-t border-surface-variant transition-all">
+        <div id="satellite-footer-bar" class="px-4 py-3 bg-surface-container-low border-t border-surface-variant transition-all relative z-10">
           <div class="flex items-center justify-between gap-2" id="footer-standard-mode">
             <div class="flex items-center gap-2">
               <span class="material-symbols-outlined text-primary text-[18px]">show_chart</span>
@@ -1216,7 +1250,7 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="p-3 bg-surface-container-lowest border-t border-surface-variant flex flex-col gap-2.5">
+        <div class="p-3.5 sm:p-4 bg-surface-container-lowest border-t border-surface-variant flex flex-col gap-3">
           <div class="grid grid-cols-2 gap-2">
             <button class="min-h-[48px] rounded-xl bg-primary text-on-primary font-semibold text-sm flex items-center justify-center gap-2 active:bg-primary-container shadow-sm transition-colors cursor-pointer" onclick="openModal('satelliteModal')" type="button">
               <span id="btn-check-field">Check My Field</span>
@@ -1231,7 +1265,7 @@
       </div>
 
       <!-- 3. PAN-INDIA REACH & INTERACTIVE FARM SELECTOR -->
-      <section id="farms-section" class="flex flex-col gap-2 bg-surface-container-low p-3.5 rounded-2xl border border-surface-variant/80">
+      <section id="farms-section" class="flex flex-col gap-3 bg-surface-container-low p-4 sm:p-5 rounded-3xl border border-surface-variant shadow-xs">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="material-symbols-outlined text-primary text-[20px]">pin_drop</span>
@@ -1244,7 +1278,7 @@
             </button>
           </div>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1" id="farm-pills-container">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1" id="farm-pills-container">
           <button class="region-pill active-pill p-2.5 rounded-xl border text-left flex items-start gap-2.5 transition-all bg-primary-container text-on-primary border-primary min-h-[48px]" id="pill-mandya" onclick="selectRegion('mandya')" type="button">
             <span class="material-symbols-outlined text-[20px] shrink-0 mt-0.5">rice_bowl</span>
             <div class="flex flex-col min-w-0">
@@ -1289,16 +1323,16 @@
       </section>
 
       <!-- 4. CONCISE ADVISORY CARD (CLEAN, VIBRANT & ACTIONABLE PREVIEW) -->
-      <section id="advisory-section" class="rounded-3xl bg-gradient-to-br from-surface-container-lowest via-emerald-50/30 to-surface-container-lowest p-4 sm:p-5 border-2 border-emerald-600/30 shadow-md flex flex-col gap-3.5 relative overflow-hidden">
+      <section id="advisory-section" class="rounded-3xl bg-gradient-to-br from-surface-container-lowest via-emerald-50/30 to-surface-container-lowest p-5 sm:p-6 border-2 border-emerald-600/25 shadow-md flex flex-col gap-4 relative overflow-hidden">
         <!-- Top decorative color accent bar -->
         <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-amber-500"></div>
 
-        <div class="flex items-center justify-between pt-1">
-          <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 text-white text-xs font-black shadow-xs" id="alert-badge-wrap">
+        <div class="flex items-center justify-between flex-wrap gap-2 pt-1">
+          <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 text-white text-[11px] font-black shadow-xs whitespace-nowrap" id="alert-badge-wrap">
             <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
             <span id="alert-badge">ATTENTION • ACTION RECOMMENDED</span>
           </div>
-          <span class="text-[11px] font-bold text-emerald-900 bg-emerald-100/90 border border-emerald-300 px-2.5 py-0.5 rounded-full">Agromet Summary</span>
+          <span class="text-[11px] font-bold text-emerald-900 bg-emerald-100/90 border border-emerald-300 px-2.5 py-0.5 rounded-full whitespace-nowrap">Agromet Summary</span>
         </div>
 
         <div class="flex flex-col gap-1">
@@ -1331,11 +1365,11 @@
 
         <!-- Action Buttons with Enhanced Color & Contrast -->
         <div class="flex flex-col sm:flex-row gap-2.5 pt-1">
-          <button class="flex-1 min-h-[48px] rounded-xl bg-gradient-to-r from-emerald-700 via-emerald-800 to-teal-800 hover:from-emerald-800 hover:to-teal-900 text-white font-bold text-sm flex items-center justify-center gap-2 active:scale-[0.99] shadow-md hover:shadow-lg transition-all cursor-pointer" onclick="openBriefAdviceModal()" type="button" id="btn-brief-advice-trigger">
+          <button class="flex-1 min-h-[48px] px-4 rounded-xl bg-gradient-to-r from-emerald-700 via-emerald-800 to-teal-800 hover:from-emerald-800 hover:to-teal-900 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 active:scale-[0.99] shadow-md hover:shadow-lg transition-all cursor-pointer whitespace-nowrap" onclick="openBriefAdviceModal()" type="button" id="btn-brief-advice-trigger">
             <span class="material-symbols-outlined text-[18px]">summarize</span>
             <span id="btn-view-advice">View Advice (Brief)</span>
           </button>
-          <button class="min-h-[48px] px-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 text-amber-950 border border-amber-300 font-bold text-sm flex items-center justify-center gap-1.5 shadow-xs active:scale-[0.99] transition-all cursor-pointer" id="btn-audio-voice" onclick="toggleAudioAdvice()" type="button">
+          <button class="min-h-[48px] px-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 text-amber-950 border border-amber-300 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs active:scale-[0.99] transition-all cursor-pointer whitespace-nowrap" id="btn-audio-voice" onclick="toggleAudioAdvice()" type="button">
             <span class="material-symbols-outlined text-[18px] text-amber-700" id="audio-icon">volume_up</span>
             <span id="btn-audio-listen">Listen Voice Advice</span>
           </button>
@@ -1343,7 +1377,7 @@
       </section>
 
       <!-- 5. THREE PRACTICAL ACTION TILES WITH VIBRANT THEMES -->
-      <section id="actions-section" class="flex flex-col gap-2.5">
+      <section id="actions-section" class="rounded-3xl bg-surface-container-lowest p-5 border border-surface-variant shadow-sm flex flex-col gap-3.5">
         <div class="flex items-center justify-between">
           <h3 class="text-base font-black text-on-surface tracking-tight" id="tiles-header">Three Practical Field Actions</h3>
           <span class="text-xs font-semibold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">Tap tile to inspect</span>
@@ -1393,7 +1427,7 @@
       </section>
 
       <!-- 6. 3-DAY WEATHER OUTLOOK -->
-      <section id="weather-section" class="rounded-2xl bg-surface-container p-4 border border-surface-variant flex flex-col gap-3 shadow-sm">
+      <section id="weather-section" class="rounded-3xl bg-surface-container p-5 border border-surface-variant flex flex-col gap-3.5 shadow-sm">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-1.5">
             <span class="material-symbols-outlined text-primary text-[18px]">wb_sunny</span>
@@ -1428,7 +1462,7 @@
       </section>
 
       <!-- 7. FARMER CALL CENTRE SUPPORT & AUDIO ACCESS -->
-      <section id="support-section" class="rounded-2xl bg-surface-container-lowest p-4 border border-surface-variant shadow-sm flex flex-col gap-3">
+      <section id="support-section" class="rounded-3xl bg-surface-container-lowest p-5 border border-surface-variant shadow-sm flex flex-col gap-4">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container shrink-0">
@@ -1502,12 +1536,15 @@
       </div>
       <!-- END MOBILE SECTIONS CONTAINER -->
 
-      <!-- DESKTOP GRID CONTAINER (2-Column Dashboard, activated in desktop mode) -->
-      <div id="desktop-grid-container" class="hidden grid-cols-1 lg:grid-cols-12 gap-6 w-full items-start">
-        <!-- Left Main Column (approx 7 of 12 cols, ~60%) -->
-        <div id="desktop-col-left" class="lg:col-span-7 xl:col-span-8 flex flex-col gap-5"></div>
-        <!-- Right Sidebar Column (approx 5 of 12 cols, ~40%) -->
-        <div id="desktop-col-right" class="lg:col-span-5 xl:col-span-4 flex flex-col gap-5"></div>
+      <!-- DESKTOP TOP FULL-WIDTH FARM SELECTOR BAR -->
+      <div id="desktop-farms-slot" class="hidden w-full"></div>
+
+      <!-- DESKTOP GRID CONTAINER (Balanced 7/5 Two-Column Dashboard, activated in desktop mode) -->
+      <div id="desktop-grid-container" class="hidden grid-cols-1 lg:grid-cols-12 gap-7 w-full items-start">
+        <!-- Left Main Column (7 of 12 cols, ~58% width: Satellite + Weather) -->
+        <div id="desktop-col-left" class="lg:col-span-7 flex flex-col gap-6"></div>
+        <!-- Right Decision Column (5 of 12 cols, ~42% width: Advisory + Actions + Support) -->
+        <div id="desktop-col-right" class="lg:col-span-5 flex flex-col gap-6"></div>
       </div>
 
       </div>
@@ -1516,7 +1553,7 @@
       <!-- ======================================================== -->
       <!-- VIEW: ADVICE (DEDICATED EXPLANATORY AGRONOMIC INTELLIGENCE) -->
       <!-- ======================================================== -->
-      <div id="view-advice" class="hidden flex-col gap-4 w-full animate-fadeIn pb-6">
+      <div id="view-advice" class="hidden flex-col gap-6 w-full animate-fadeIn pb-8">
         
         <!-- Top Sticky Action Bar / Header -->
         <div class="rounded-2xl bg-surface-container-lowest p-4 sm:p-5 border border-surface-variant shadow-sm flex flex-col gap-3.5">
@@ -10201,6 +10238,7 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       const supSec = document.getElementById('support-section');
 
       const mobileCont = document.getElementById('mobile-sections-container');
+      const desktopFarmsSlot = document.getElementById('desktop-farms-slot');
       const desktopCont = document.getElementById('desktop-grid-container');
       const colLeft = document.getElementById('desktop-col-left');
       const colRight = document.getElementById('desktop-col-right');
@@ -10209,25 +10247,29 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         if (isDesktop) {
           mobileCont.classList.add('hidden');
           mobileCont.classList.remove('flex');
+          if (desktopFarmsSlot) {
+            desktopFarmsSlot.classList.remove('hidden');
+            if (farmsSec) desktopFarmsSlot.appendChild(farmsSec);
+          }
           desktopCont.classList.remove('hidden');
           desktopCont.classList.add('grid');
 
           if (satCard) colLeft.appendChild(satCard);
           if (weaSec) colLeft.appendChild(weaSec);
-          if (supSec) colLeft.appendChild(supSec);
 
-          if (farmsSec) colRight.appendChild(farmsSec);
           if (advSec) colRight.appendChild(advSec);
           if (actSec) colRight.appendChild(actSec);
+          if (supSec) colRight.appendChild(supSec);
         } else {
+          if (desktopFarmsSlot) desktopFarmsSlot.classList.add('hidden');
           desktopCont.classList.add('hidden');
           desktopCont.classList.remove('grid');
           mobileCont.classList.remove('hidden');
           mobileCont.classList.add('flex');
 
-          if (satCard) mobileCont.appendChild(satCard);
           if (farmsSec) mobileCont.appendChild(farmsSec);
           if (advSec) mobileCont.appendChild(advSec);
+          if (satCard) mobileCont.appendChild(satCard);
           if (actSec) mobileCont.appendChild(actSec);
           if (weaSec) mobileCont.appendChild(weaSec);
           if (supSec) mobileCont.appendChild(supSec);
@@ -10237,7 +10279,7 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       // Sizing for Satellite Viewport
       const satCanvas = document.getElementById('satellite-canvas');
       if (satCanvas) {
-        satCanvas.style.height = isDesktop ? '420px' : '';
+        satCanvas.style.height = isDesktop ? '380px' : '';
       }
 
       // Invalidate Leaflet map size so it fits the new container dimensions
