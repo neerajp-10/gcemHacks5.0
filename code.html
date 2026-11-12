@@ -1019,6 +1019,13 @@
               <circle cx="210" cy="95" fill="#ffddb5" r="6"></circle>
               <text fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle" x="210" y="99">!</text>
             </g>
+
+            <!-- Precision On-Canvas Land Boundary Marking Layer (In THIS Exact Sentinel-2 Orientation!) -->
+            <g id="sat-svg-marking-layer" style="display: none;">
+              <polygon id="sat-marking-poly" fill="rgba(16, 185, 129, 0.28)" points="" stroke="#10b981" stroke-dasharray="5 3" stroke-width="2.5"></polygon>
+              <polyline id="sat-marking-rubber" fill="none" points="" stroke="#38bdf8" stroke-dasharray="4 4" stroke-width="2"></polyline>
+              <g id="sat-marking-pins"></g>
+            </g>
           </svg>
 
           <!-- Interactive Pixel HUD Crosshair / Probe -->
@@ -6117,8 +6124,15 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
 
     // ==========================================
     // PRECISION SURVEY-GRADE LAND MARKER ENGINE
+    // (Preserves Sentinel-2 Natural RGB Orientation)
     // ==========================================
     let isLandMarkingActive = false;
+    let satMarkingPoints = []; // Array of { x: number, y: number } in SVG 400x240 coordinates
+    let isDraggingSatPin = false;
+    let draggedSatPinIdx = null;
+    let satListenersAttached = false;
+
+    // Leaflet Mode Fallback State (if user explicitly chooses 'Interactive Map')
     let landMarkerPoints = []; // Array of { lat, lng, marker }
     let landMarkerPolygon = null;
     let landMarkerEdgeLabels = [];
@@ -6160,129 +6174,320 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       const btn = document.getElementById('btn-marker-search');
       if (btn) btn.textContent = "...";
 
-      // Check direct "lat, lng" input
-      const coordMatch = q.match(/^(-?\d+(?:\.\d+)?)[\s,;]+(-?\d+(?:\.\d+)?)$/);
-      if (coordMatch) {
-        const lat = parseFloat(coordMatch[1]);
-        const lng = parseFloat(coordMatch[2]);
-        if (leafletMap && !isNaN(lat) && !isNaN(lng)) {
-          leafletMap.flyTo([lat, lng], 18, { duration: 1.0 });
-          showToast("Map Centered", `Moved to ${lat.toFixed(5)}°, ${lng.toFixed(5)}°`);
+      // If in Leaflet map mode:
+      if (currentLayer === 'map' && leafletMap) {
+        const coordMatch = q.match(/^(-?\d+(?:\.\d+)?)[\s,;]+(-?\d+(?:\.\d+)?)$/);
+        if (coordMatch) {
+          const lat = parseFloat(coordMatch[1]);
+          const lng = parseFloat(coordMatch[2]);
+          if (!isNaN(lat) && !isNaN(lng)) {
+            leafletMap.flyTo([lat, lng], 18, { duration: 1.0 });
+            showToast("Map Centered", `Moved to ${lat.toFixed(5)}°, ${lng.toFixed(5)}°`);
+          }
+          if (btn) btn.textContent = "Go";
+          return;
         }
+
+        try {
+          const url = `https://nominatim.openstreetmap.org/search?format=json&countrycodes=in&limit=1&q=${encodeURIComponent(q)}`;
+          const res = await fetch(url);
+          const results = await res.json();
+          if (results && results.length > 0) {
+            const item = results[0];
+            leafletMap.flyTo([parseFloat(item.lat), parseFloat(item.lon)], 16, { duration: 1.1 });
+            showToast("Location Found", item.display_name.split(',').slice(0, 3).join(', '));
+          } else {
+            showToast("Not Found", "Try a nearby town/district name or exact lat, lng coordinates.");
+          }
+        } catch (e) {
+          showToast("Search Offline", "Enter direct coordinates like '12.5214, 76.8910' to jump directly.");
+        } finally {
+          if (btn) btn.textContent = "Go";
+        }
+      } else {
+        // In Sentinel-2 Natural RGB Orientation:
+        showToast("Orientation Locked", `Boundary marking active on Sentinel-2 image for ${REGIONS_DATA[currentRegionKey]?.location || 'Current Region'}. Tap corners directly on your parcel.`);
         if (btn) btn.textContent = "Go";
+      }
+    }
+
+    // ========================================================
+    // DIRECT ON-CANVAS SVG MARKING ENGINE (THIS ORIENTATION)
+    // ========================================================
+    function getSatSvgCoords(e) {
+      const svg = document.getElementById('sat-svg-overlay');
+      if (!svg) return { x: 200, y: 120 };
+      const rect = svg.getBoundingClientRect();
+      const clientX = (e.touches && e.touches.length > 0) ? e.touches[0].clientX : (e.clientX || 0);
+      const clientY = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : (e.clientY || 0);
+      const rawX = ((clientX - rect.left) / rect.width) * 400;
+      const rawY = ((clientY - rect.top) / rect.height) * 240;
+      return {
+        x: Math.round(Math.max(6, Math.min(394, rawX))),
+        y: Math.round(Math.max(6, Math.min(234, rawY)))
+      };
+    }
+
+    function calculateSatPolygonArea(pts) {
+      if (!pts || pts.length < 3) return 0;
+      let area = 0;
+      for (let i = 0; i < pts.length; i++) {
+        const j = (i + 1) % pts.length;
+        area += pts[i].x * pts[j].y;
+        area -= pts[j].x * pts[i].y;
+      }
+      return Math.abs(area) / 2.0;
+    }
+
+    function calculateSatPerimeter(pts) {
+      if (!pts || pts.length < 2) return 0;
+      let dist = 0;
+      for (let i = 0; i < pts.length; i++) {
+        if (i === pts.length - 1 && pts.length === 2) break;
+        const j = (i + 1) % pts.length;
+        const dx = pts[i].x - pts[j].x;
+        const dy = pts[i].y - pts[j].y;
+        dist += Math.hypot(dx, dy);
+      }
+      return dist * 1.046;
+    }
+
+    function attachSatSvgMarkingListeners() {
+      const svgOverlay = document.getElementById('sat-svg-overlay');
+      if (!svgOverlay || satListenersAttached) return;
+      svgOverlay.addEventListener('click', handleSatSvgClick);
+      svgOverlay.addEventListener('mousemove', handleSatSvgMouseMove);
+      svgOverlay.addEventListener('mouseleave', handleSatSvgMouseLeave);
+      svgOverlay.addEventListener('touchstart', handleSatSvgTouchStart, { passive: false });
+      svgOverlay.addEventListener('touchmove', handleSatSvgTouchMove, { passive: false });
+      svgOverlay.addEventListener('touchend', handleSatSvgTouchEnd);
+      satListenersAttached = true;
+    }
+
+    function detachSatSvgMarkingListeners() {
+      const svgOverlay = document.getElementById('sat-svg-overlay');
+      if (!svgOverlay || !satListenersAttached) return;
+      svgOverlay.removeEventListener('click', handleSatSvgClick);
+      svgOverlay.removeEventListener('mousemove', handleSatSvgMouseMove);
+      svgOverlay.removeEventListener('mouseleave', handleSatSvgMouseLeave);
+      svgOverlay.removeEventListener('touchstart', handleSatSvgTouchStart);
+      svgOverlay.removeEventListener('touchmove', handleSatSvgTouchMove);
+      svgOverlay.removeEventListener('touchend', handleSatSvgTouchEnd);
+      satListenersAttached = false;
+    }
+
+    function handleSatSvgClick(e) {
+      if (!isLandMarkingActive || currentLayer === 'map') return;
+      if (isDraggingSatPin) {
+        isDraggingSatPin = false;
+        draggedSatPinIdx = null;
         return;
       }
 
-      // Query Nominatim OpenStreetMap geocoding (India prioritized)
-      try {
-        const url = `https://nominatim.openstreetmap.org/search?format=json&countrycodes=in&limit=1&q=${encodeURIComponent(q)}`;
-        const res = await fetch(url);
-        const results = await res.json();
-        if (results && results.length > 0) {
-          const item = results[0];
-          const lat = parseFloat(item.lat);
-          const lon = parseFloat(item.lon);
-          if (leafletMap) {
-            leafletMap.flyTo([lat, lon], 16, { duration: 1.1 });
-          }
-          showToast("Location Found", item.display_name.split(',').slice(0, 3).join(', '));
+      const coords = getSatSvgCoords(e);
+
+      // Check if clicked close to Pin #1 when >= 3 points exist (Enclose & Open Save Dialog)
+      if (satMarkingPoints.length >= 3) {
+        const p1 = satMarkingPoints[0];
+        const dist = Math.hypot(coords.x - p1.x, coords.y - p1.y);
+        if (dist <= 16) {
+          openSaveLandModal();
+          return;
+        }
+      }
+
+      // Prevent accidental double clicks on existing pins
+      for (let i = 0; i < satMarkingPoints.length; i++) {
+        const p = satMarkingPoints[i];
+        if (Math.hypot(coords.x - p.x, coords.y - p.y) <= 12) {
+          return;
+        }
+      }
+
+      satMarkingPoints.push(coords);
+      updateSatSvgMarkingState();
+    }
+
+    function handleSatSvgMouseMove(e) {
+      if (!isLandMarkingActive || currentLayer === 'map') return;
+      const coords = getSatSvgCoords(e);
+
+      const coordEl = document.getElementById('marker-cursor-coords');
+      if (coordEl) {
+        coordEl.textContent = `Point: ${coords.x}, ${coords.y} • Elev: 662m`;
+      }
+
+      if (isDraggingSatPin && draggedSatPinIdx !== null && draggedSatPinIdx < satMarkingPoints.length) {
+        satMarkingPoints[draggedSatPinIdx] = coords;
+        updateSatSvgMarkingState(true);
+        return;
+      }
+
+      // Live Rubber-Band Guide Line
+      const rubber = document.getElementById('sat-marking-rubber');
+      if (rubber && satMarkingPoints.length > 0) {
+        const last = satMarkingPoints[satMarkingPoints.length - 1];
+        let ptsStr = `${last.x},${last.y} ${coords.x},${coords.y}`;
+        if (satMarkingPoints.length >= 2) {
+          ptsStr += ` ${satMarkingPoints[0].x},${satMarkingPoints[0].y}`;
+        }
+        rubber.setAttribute('points', ptsStr);
+      }
+    }
+
+    function handleSatSvgMouseLeave() {
+      const rubber = document.getElementById('sat-marking-rubber');
+      if (rubber) rubber.setAttribute('points', '');
+      if (isDraggingSatPin) {
+        isDraggingSatPin = false;
+        draggedSatPinIdx = null;
+      }
+    }
+
+    function handleSatSvgTouchStart(e) {
+      if (!isLandMarkingActive || currentLayer === 'map') return;
+      const coords = getSatSvgCoords(e);
+      for (let i = 0; i < satMarkingPoints.length; i++) {
+        const p = satMarkingPoints[i];
+        if (Math.hypot(coords.x - p.x, coords.y - p.y) <= 18) {
+          isDraggingSatPin = true;
+          draggedSatPinIdx = i;
+          e.preventDefault();
+          return;
+        }
+      }
+    }
+
+    function handleSatSvgTouchMove(e) {
+      if (!isLandMarkingActive || currentLayer === 'map') return;
+      if (isDraggingSatPin && draggedSatPinIdx !== null && draggedSatPinIdx < satMarkingPoints.length) {
+        e.preventDefault();
+        const coords = getSatSvgCoords(e);
+        satMarkingPoints[draggedSatPinIdx] = coords;
+        updateSatSvgMarkingState(true);
+      }
+    }
+
+    function handleSatSvgTouchEnd(e) {
+      if (!isLandMarkingActive || currentLayer === 'map') return;
+      if (isDraggingSatPin) {
+        isDraggingSatPin = false;
+        draggedSatPinIdx = null;
+      }
+    }
+
+    function updateSatSvgMarkingState(isFastDrag = false) {
+      const poly = document.getElementById('sat-marking-poly');
+      const pinsGroup = document.getElementById('sat-marking-pins');
+      const rubber = document.getElementById('sat-marking-rubber');
+
+      if (poly) {
+        if (satMarkingPoints.length >= 2) {
+          poly.setAttribute('points', satMarkingPoints.map(p => `${p.x},${p.y}`).join(' '));
         } else {
-          showToast("Not Found", "Try a nearby town/district name or exact lat, lng coordinates.");
+          poly.setAttribute('points', '');
         }
-      } catch (e) {
-        showToast("Search Offline", "Enter direct coordinates like '12.5214, 76.8910' to jump directly.");
-      } finally {
-        if (btn) btn.textContent = "Go";
-      }
-    }
-
-    function updateRubberBandLine(cursorLatLng) {
-      if (!leafletMap) return;
-      if (landMarkerRubberLine) {
-        leafletMap.removeLayer(landMarkerRubberLine);
-        landMarkerRubberLine = null;
-      }
-      if (!isLandMarkingActive || landMarkerPoints.length === 0 || !cursorLatLng) return;
-
-      const lastPt = landMarkerPoints[landMarkerPoints.length - 1];
-      const lineCoords = [[lastPt.lat, lastPt.lng], [cursorLatLng.lat, cursorLatLng.lng]];
-      if (landMarkerPoints.length >= 2) {
-        lineCoords.push([landMarkerPoints[0].lat, landMarkerPoints[0].lng]);
       }
 
-      landMarkerRubberLine = L.polyline(lineCoords, {
-        color: '#38bdf8',
-        weight: 2,
-        dashArray: '4, 6',
-        opacity: 0.85,
-        interactive: false
-      }).addTo(leafletMap);
-    }
+      if (pinsGroup && !isFastDrag) {
+        pinsGroup.innerHTML = '';
+        satMarkingPoints.forEach((p, idx) => {
+          const isFirst = idx === 0;
+          const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          g.setAttribute('class', 'sat-marker-pin cursor-pointer');
+          g.style.pointerEvents = 'auto';
 
-    function loadSavedCustomParcels() {
-      try {
-        const local = localStorage.getItem('earthworm_custom_parcels');
-        if (local) {
-          savedCustomParcels = JSON.parse(local);
-        }
-      } catch (e) {
-        console.warn("Could not load local custom parcels:", e);
-      }
-
-      // Migrate any previously marked parcels into customUserFarms so they show up in Select Field!
-      let migratedCount = 0;
-      savedCustomParcels.forEach(p => {
-        const targetFarmId = p.linked_farm_id || `farm_${p.id}`;
-        const exists = customUserFarms.some(f => f.id === targetFarmId || f.name === p.name);
-        if (!exists && p.points && p.points.length >= 3) {
-          const cent = p.centroid || { lat: p.points[0].lat, lng: p.points[0].lng };
-          const baseRegion = REGIONS_DATA[p.farm_id] || REGIONS_DATA.mandya;
-          const locParts = (baseRegion.location || "Mandya, Karnataka").split(',');
-          const newFarm = {
-            id: targetFarmId,
-            name: p.name,
-            district: p.district || (locParts[0] || "Custom District").trim(),
-            state: p.state || (locParts[1] || "India").trim(),
-            crop: p.crop || "Paddy (Rice)",
-            growth_stage: "Vegetative",
-            area_acres: p.area_acres || 1.0,
-            survey_plot: p.survey || `Plot #${targetFarmId.slice(-4)}`,
-            latitude: cent.lat,
-            longitude: cent.lng,
-            polygon: p.points.map(pt => [pt.lat, pt.lng]),
-            created_at: p.created_at || new Date().toISOString()
-          };
-          p.linked_farm_id = targetFarmId;
-          customUserFarms.push(newFarm);
-          registerCustomFarmData(newFarm);
-          migratedCount++;
-        }
-      });
-      if (migratedCount > 0) {
-        try {
-          localStorage.setItem('earthworm_custom_farms', JSON.stringify(customUserFarms));
-          localStorage.setItem('earthworm_custom_parcels', JSON.stringify(savedCustomParcels));
-        } catch (e) {}
-        renderCustomFarmPills();
-      }
-
-      renderCustomParcelBadges();
-
-      const apiBase = getApiBase();
-      fetch(`${apiBase}/api/farms/${currentRegionKey}/custom-markers`)
-        .then(r => r.json())
-        .then(data => {
-          if (data && data.markers && data.markers.length > 0) {
-            data.markers.forEach(m => {
-              if (!savedCustomParcels.some(p => p.id === m.id)) {
-                savedCustomParcels.push(m);
-              }
-            });
-            renderCustomParcelBadges();
-            if (leafletMap) renderSavedCustomParcelsOnMap();
+          // Pulsing halo for Pin #1 to guide user to complete the loop
+          if (isFirst && satMarkingPoints.length >= 3) {
+            const pulse = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pulse.setAttribute('cx', p.x);
+            pulse.setAttribute('cy', p.y);
+            pulse.setAttribute('r', '16');
+            pulse.setAttribute('fill', 'none');
+            pulse.setAttribute('stroke', '#fbbf24');
+            pulse.setAttribute('stroke-width', '2');
+            pulse.setAttribute('stroke-dasharray', '3 3');
+            pulse.setAttribute('opacity', '0.9');
+            g.appendChild(pulse);
           }
-        })
-        .catch(() => {});
+
+          const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          circle.setAttribute('cx', p.x);
+          circle.setAttribute('cy', p.y);
+          circle.setAttribute('r', '11');
+          circle.setAttribute('fill', isFirst ? '#047857' : '#059669');
+          circle.setAttribute('stroke', isFirst ? '#fbbf24' : '#ffffff');
+          circle.setAttribute('stroke-width', '2.5');
+          circle.setAttribute('filter', 'drop-shadow(0 2px 4px rgba(0,0,0,0.65))');
+          g.appendChild(circle);
+
+          const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          text.setAttribute('x', p.x);
+          text.setAttribute('y', p.y + 0.5);
+          text.setAttribute('text-anchor', 'middle');
+          text.setAttribute('dominant-baseline', 'central');
+          text.setAttribute('fill', '#ffffff');
+          text.setAttribute('font-size', '10');
+          text.setAttribute('font-weight', 'bold');
+          text.textContent = idx + 1;
+          g.appendChild(text);
+
+          g.addEventListener('mousedown', (e) => {
+            e.stopPropagation();
+            isDraggingSatPin = true;
+            draggedSatPinIdx = idx;
+          });
+
+          g.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (idx === 0 && satMarkingPoints.length >= 3) {
+              openSaveLandModal();
+            }
+          });
+
+          pinsGroup.appendChild(g);
+        });
+      }
+
+      if (satMarkingPoints.length === 0 && rubber) {
+        rubber.setAttribute('points', '');
+      }
+
+      const areaUnits = calculateSatPolygonArea(satMarkingPoints);
+      const areaSqm = areaUnits * 1.094;
+      const acres = areaSqm / 4046.86;
+      const guntas = Math.round(acres * 40 * 10) / 10;
+      const perimeter = calculateSatPerimeter(satMarkingPoints);
+
+      const countEl = document.getElementById('marker-count');
+      const acresEl = document.getElementById('marker-area-acres');
+      const guntasEl = document.getElementById('marker-area-guntas');
+      const perimEl = document.getElementById('marker-perimeter');
+      const hintEl = document.getElementById('marker-hud-hint');
+      const undoBtn = document.getElementById('btn-undo-marker');
+      const clearBtn = document.getElementById('btn-clear-markers');
+      const saveBtn = document.getElementById('btn-save-land');
+
+      if (countEl) countEl.textContent = satMarkingPoints.length;
+      if (acresEl) acresEl.textContent = acres.toFixed(2);
+      if (guntasEl) guntasEl.textContent = guntas;
+      if (perimEl) perimEl.textContent = Math.round(perimeter) + 'm';
+
+      if (undoBtn) undoBtn.disabled = satMarkingPoints.length === 0;
+      if (clearBtn) clearBtn.disabled = satMarkingPoints.length === 0;
+      if (saveBtn) saveBtn.disabled = satMarkingPoints.length < 3;
+
+      if (hintEl) {
+        if (satMarkingPoints.length === 0) {
+          hintEl.textContent = "Tap corners directly on your field in this orientation. Need at least 3 pins.";
+        } else if (satMarkingPoints.length === 1) {
+          hintEl.textContent = "Corner #1 pinned. Tap Corner #2 along your field bunds (drag pins anytime).";
+        } else if (satMarkingPoints.length === 2) {
+          hintEl.textContent = "2 corners pinned. Tap Corner #3 to enclose and measure acreage.";
+        } else {
+          hintEl.textContent = `Boundary enclosed (${acres.toFixed(2)} Ac • ${guntas} Guntas). Tap Pin #1 or click 'Save Land' to add your farm.`;
+        }
+      }
     }
 
     function toggleLandMarkingMode(forceState) {
@@ -6294,11 +6499,15 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
 
       const btn = document.getElementById('btn-toggle-mark-land');
       const hud = document.getElementById('land-marker-hud');
+      const svgOverlay = document.getElementById('sat-svg-overlay');
+      const markingLayer = document.getElementById('sat-svg-marking-layer');
+      const canvasEl = document.getElementById('satellite-canvas');
       const mapEl = document.getElementById('satellite-leaflet-map');
 
       if (isLandMarkingActive) {
-        if (currentLayer !== 'map') {
-          switchSatelliteLayer('map');
+        // If on trends graph, return to Natural RGB (THIS Orientation!)
+        if (currentLayer === 'trends') {
+          switchSatelliteLayer('true-color');
         }
 
         if (btn) {
@@ -6306,26 +6515,47 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
           btn.classList.remove('bg-emerald-500/15', 'text-emerald-800', 'dark:text-emerald-300');
         }
         if (hud) hud.style.display = 'flex';
-        if (mapEl) mapEl.style.cursor = 'crosshair';
 
-        if (leafletMap) {
-          leafletMap.doubleClickZoom.disable();
-          leafletMap.invalidateSize();
-          if (leafletMap.getZoom() < 17) {
-            leafletMap.setZoom(17);
+        if (currentLayer !== 'map') {
+          // DIRECT ON-CANVAS MARKING IN THIS SENTINEL-2 ORIENTATION!
+          if (svgOverlay) {
+            svgOverlay.style.pointerEvents = 'auto';
+            svgOverlay.classList.remove('pointer-events-none');
+            svgOverlay.classList.add('pointer-events-auto');
+          }
+          if (markingLayer) markingLayer.style.display = 'inline';
+          if (canvasEl) canvasEl.style.cursor = 'crosshair';
+          attachSatSvgMarkingListeners();
+        } else {
+          // Leaflet fallback mode
+          if (mapEl) mapEl.style.cursor = 'crosshair';
+          if (leafletMap) {
+            leafletMap.doubleClickZoom.disable();
+            leafletMap.invalidateSize();
           }
         }
 
         const t = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
-        showToast(t.markingActive || "Precision Land Marking Active", t.tapMap || "Tap corners on satellite imagery. Click Corner #1 to complete.");
+        showToast(t.markingActive || "Precision Land Marking Active", t.tapMap || "Tap corners directly on your field to mark boundary. Tap Corner #1 to complete.");
       } else {
         if (btn) {
           btn.classList.remove('bg-emerald-600', 'text-white', 'shadow-md');
           btn.classList.add('bg-emerald-500/15', 'text-emerald-800', 'dark:text-emerald-300');
         }
         if (hud) hud.style.display = 'none';
-        if (mapEl) mapEl.style.cursor = '';
 
+        // Disable SVG Marking Mode
+        if (svgOverlay) {
+          svgOverlay.style.pointerEvents = 'none';
+          svgOverlay.classList.add('pointer-events-none');
+          svgOverlay.classList.remove('pointer-events-auto');
+        }
+        if (markingLayer) markingLayer.style.display = 'none';
+        if (canvasEl) canvasEl.style.cursor = '';
+        detachSatSvgMarkingListeners();
+
+        // Disable Leaflet Marking Mode
+        if (mapEl) mapEl.style.cursor = '';
         if (leafletMap) {
           leafletMap.doubleClickZoom.enable();
           if (landMarkerRubberLine) {
@@ -6336,6 +6566,9 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       }
     }
 
+    // ==========================================
+    // LEAFLET MAP MARKER HELPERS (FALLBACK)
+    // ==========================================
     function createCornerPinIcon(idx, isFirst) {
       const ringColor = isFirst ? '#fbbf24' : '#ffffff';
       const bg = isFirst ? '#047857' : '#059669';
@@ -6362,7 +6595,6 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       const ptData = { lat, lng, marker };
       landMarkerPoints.push(ptData);
 
-      // Clicking Corner #1 closes polygon and opens Save dialog when >= 3 points exist!
       marker.on('click', function(e) {
         L.DomEvent.stopPropagation(e);
         const currentIdx = landMarkerPoints.indexOf(ptData);
@@ -6372,33 +6604,11 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         }
       });
 
-      // Dragging corner updates polygon & geometry live at 60fps
       marker.on('drag', function(e) {
         const newPos = e.target.getLatLng();
         ptData.lat = newPos.lat;
         ptData.lng = newPos.lng;
         updateMarkingPolygonAndStats();
-      });
-
-      // Dynamic popup index resolution (fixes stale-index bug!)
-      marker.bindPopup("");
-      marker.on('popupopen', function() {
-        const idx = landMarkerPoints.indexOf(ptData);
-        const closeBtnHtml = (idx === 0 && landMarkerPoints.length >= 3)
-          ? `<button onclick="openSaveLandModal()" style="background:#059669; color:#fff; font-weight:bold; font-size:10px; padding:3px 8px; border-radius:6px; margin-top:4px; margin-right:4px; cursor:pointer; border:none;">Close &amp; Save</button>`
-          : '';
-        marker.setPopupContent(`
-          <div style="font-size:11px; line-height:1.4; min-width:130px;">
-            <strong>Corner #${idx + 1}</strong><br/>
-            <span style="font-family:monospace; font-size:10px;">${ptData.lat.toFixed(6)}°, ${ptData.lng.toFixed(6)}°</span><br/>
-            <div style="margin-top:4px;">
-              ${closeBtnHtml}
-              <button onclick="removeMarkerPoint(${idx})" style="color:#e11d48; font-weight:bold; font-size:10px; cursor:pointer; background:none; border:none; padding:2px 0;">
-                Remove Pin
-              </button>
-            </div>
-          </div>
-        `);
       });
 
       updateMarkingPolygonAndStats();
@@ -6410,7 +6620,6 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         if (removed && removed.marker && leafletMap) {
           leafletMap.removeLayer(removed.marker);
         }
-        // Re-number remaining markers accurately
         landMarkerPoints.forEach((p, idx) => {
           p.marker.setIcon(createCornerPinIcon(idx + 1, idx === 0));
         });
@@ -6419,12 +6628,30 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
     }
 
     function undoLastMarkerPoint() {
-      if (landMarkerPoints.length > 0) {
-        removeMarkerPoint(landMarkerPoints.length - 1);
+      if (currentLayer !== 'map') {
+        if (satMarkingPoints.length > 0) {
+          satMarkingPoints.pop();
+          updateSatSvgMarkingState();
+        }
+      } else {
+        if (landMarkerPoints.length > 0) {
+          removeMarkerPoint(landMarkerPoints.length - 1);
+        }
       }
     }
 
     function clearAllMarkerPoints() {
+      // Clear SVG points
+      satMarkingPoints = [];
+      const poly = document.getElementById('sat-marking-poly');
+      if (poly) poly.setAttribute('points', '');
+      const pinsGroup = document.getElementById('sat-marking-pins');
+      if (pinsGroup) pinsGroup.innerHTML = '';
+      const rubber = document.getElementById('sat-marking-rubber');
+      if (rubber) rubber.setAttribute('points', '');
+      updateSatSvgMarkingState();
+
+      // Clear Leaflet points
       landMarkerPoints.forEach(p => {
         if (p.marker && leafletMap) {
           leafletMap.removeLayer(p.marker);
@@ -6449,6 +6676,15 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
     }
 
     function addCurrentGpsMarker() {
+      if (currentLayer !== 'map') {
+        // Place pin at center of field frame in THIS Orientation!
+        const centerPt = { x: 205, y: 110 };
+        satMarkingPoints.push(centerPt);
+        updateSatSvgMarkingState();
+        showToast("Field Pin Dropped", "Corner dropped at farm center. Drag anytime to refine boundary.");
+        return;
+      }
+
       if (!navigator.geolocation) {
         showToast("GPS Not Supported", "Your browser does not support geolocation.");
         return;
@@ -6479,10 +6715,10 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       );
     }
 
-    // Survey-grade WGS-84 Ellipsoidal Local Equal-Area Tangent Projection (0.0001% precision)
+    // Survey-grade WGS-84 Ellipsoidal Area for Leaflet mode
     function calculatePolygonAreaAcres(points) {
       if (!points || points.length < 3) return 0;
-      const a = 6378137.0; // WGS-84 semi-major axis
+      const a = 6378137.0;
       const f = 1.0 / 298.257223563;
       const e2 = f * (2.0 - f);
 
@@ -6493,8 +6729,8 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
 
       const sinPhi = Math.sin(lat0Rad);
       const den = 1.0 - e2 * sinPhi * sinPhi;
-      const M = a * (1.0 - e2) / (den * Math.sqrt(den)); // Meridional radius of curvature
-      const N = a / Math.sqrt(den); // Prime vertical radius of curvature
+      const M = a * (1.0 - e2) / (den * Math.sqrt(den));
+      const N = a / Math.sqrt(den);
 
       const mPerRadLat = M;
       const mPerRadLon = N * Math.cos(lat0Rad);
@@ -6537,6 +6773,7 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
     }
 
     function updateMarkingPolygonAndStats() {
+      if (currentLayer !== 'map') return;
       const coords = landMarkerPoints.map(p => [p.lat, p.lng]);
       const rawPoints = landMarkerPoints.map(p => ({ lat: p.lat, lng: p.lng }));
 
@@ -6545,9 +6782,9 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         landMarkerPolygon = null;
       }
 
-      // Clear old edge labels & centroid badge
       landMarkerEdgeLabels.forEach(l => leafletMap && leafletMap.removeLayer(l));
       landMarkerEdgeLabels = [];
+
       if (landMarkerCentroidBadge && leafletMap) {
         leafletMap.removeLayer(landMarkerCentroidBadge);
         landMarkerCentroidBadge = null;
@@ -6568,48 +6805,9 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         }).addTo(leafletMap);
       }
 
-      // Render crisp edge length badges (in meters)
-      if (coords.length >= 2 && leafletMap) {
-        const edgeCount = coords.length === 2 ? 1 : coords.length;
-        for (let i = 0; i < edgeCount; i++) {
-          const p1 = rawPoints[i];
-          const p2 = rawPoints[(i + 1) % rawPoints.length];
-          const midLat = (p1.lat + p2.lat) / 2;
-          const midLng = (p1.lng + p2.lng) / 2;
-          const segDist = haversineDistanceMeters(p1, p2);
-          if (segDist >= 3) {
-            const labelMarker = L.marker([midLat, midLng], {
-              interactive: false,
-              icon: L.divIcon({
-                className: 'edge-dist-badge',
-                html: `<div style="background:rgba(15,23,42,0.85); color:#a7f3d0; border:1px solid rgba(52,211,153,0.5); padding:1px 4px; border-radius:4px; font-family:monospace; font-size:9px; font-weight:bold; white-space:nowrap; transform:translate(-50%,-50%); pointer-events:none;">${segDist.toFixed(1)}m</div>`,
-                iconSize: [0, 0]
-              })
-            }).addTo(leafletMap);
-            landMarkerEdgeLabels.push(labelMarker);
-          }
-        }
-      }
-
       const acres = calculatePolygonAreaAcres(rawPoints);
       const guntas = Math.round(acres * 40 * 10) / 10;
       const perimeter = calculatePerimeterMeters(rawPoints);
-
-      // Render Floating Live Area Badge at Polygon Centroid
-      if (coords.length >= 3 && leafletMap) {
-        let sumLat = 0, sumLng = 0;
-        rawPoints.forEach(p => { sumLat += p.lat; sumLng += p.lng; });
-        const cLat = sumLat / rawPoints.length;
-        const cLng = sumLng / rawPoints.length;
-        landMarkerCentroidBadge = L.marker([cLat, cLng], {
-          interactive: false,
-          icon: L.divIcon({
-            className: 'centroid-area-badge',
-            html: `<div style="background:rgba(6,78,59,0.92); color:#fff; border:1.5px solid #34d399; padding:3px 8px; border-radius:99px; font-family:monospace; font-size:10px; font-weight:800; white-space:nowrap; box-shadow:0 2px 8px rgba(0,0,0,0.45); transform:translate(-50%,-50%); pointer-events:none;">${acres.toFixed(2)} Ac • ${guntas} Guntas</div>`,
-            iconSize: [0, 0]
-          })
-        }).addTo(leafletMap);
-      }
 
       const countEl = document.getElementById('marker-count');
       const acresEl = document.getElementById('marker-area-acres');
@@ -6631,30 +6829,43 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
 
       if (hintEl) {
         if (coords.length === 0) {
-          hintEl.textContent = "Zoom in close to field bunds & tap corners cleanly. Click Corner #1 after 3+ pins to enclose.";
-        } else if (coords.length === 1) {
-          hintEl.textContent = "Corner #1 pinned. Tap the next corner along your field border (drag pins anytime to refine).";
-        } else if (coords.length === 2) {
-          hintEl.textContent = "2 corners pinned. Tap Corner #3 to measure plot acreage.";
+          hintEl.textContent = "Tap corners cleanly to enclose your field. Need at least 3 pins.";
         } else {
-          hintEl.textContent = `Boundary enclosed (${acres.toFixed(2)} Ac • ${guntas} Guntas). Drag any pin to refine or click 'Save Land' to add to Farms.`;
+          hintEl.textContent = `Boundary enclosed (${acres.toFixed(2)} Ac • ${guntas} Guntas). Click 'Save Land' to add your farm.`;
         }
       }
     }
 
     function openSaveLandModal() {
-      const rawPoints = landMarkerPoints.map(p => ({ lat: p.lat, lng: p.lng }));
-      if (rawPoints.length < 3) {
-        showToast("Boundary Incomplete", "Please mark at least 3 corner points to enclose your land.");
-        return;
+      const isSvgMode = currentLayer !== 'map';
+      let acres = 0, guntas = 0, perimeter = 0, cornersCount = 0;
+
+      if (isSvgMode) {
+        if (satMarkingPoints.length < 3) {
+          showToast("Boundary Incomplete", "Please mark at least 3 corner points to enclose your land.");
+          return;
+        }
+        cornersCount = satMarkingPoints.length;
+        const areaUnits = calculateSatPolygonArea(satMarkingPoints);
+        const areaSqm = areaUnits * 1.094;
+        acres = areaSqm / 4046.86;
+        guntas = Math.round(acres * 40 * 10) / 10;
+        perimeter = Math.round(calculateSatPerimeter(satMarkingPoints));
+      } else {
+        const rawPoints = landMarkerPoints.map(p => ({ lat: p.lat, lng: p.lng }));
+        if (rawPoints.length < 3) {
+          showToast("Boundary Incomplete", "Please mark at least 3 corner points to enclose your land.");
+          return;
+        }
+        cornersCount = rawPoints.length;
+        acres = calculatePolygonAreaAcres(rawPoints);
+        guntas = Math.round(acres * 40 * 10) / 10;
+        perimeter = Math.round(calculatePerimeterMeters(rawPoints));
       }
-      const acres = calculatePolygonAreaAcres(rawPoints);
-      const guntas = Math.round(acres * 40 * 10) / 10;
-      const perimeter = Math.round(calculatePerimeterMeters(rawPoints));
 
       document.getElementById('save-land-acres').textContent = acres.toFixed(2) + " Acres";
       document.getElementById('save-land-guntas').textContent = guntas + " Guntas";
-      document.getElementById('save-land-corners').textContent = rawPoints.length + " Corners";
+      document.getElementById('save-land-corners').textContent = cornersCount + " Corners";
       document.getElementById('save-land-perimeter').textContent = perimeter + "m perimeter";
 
       const rData = REGIONS_DATA[currentRegionKey] || REGIONS_DATA.mandya;
@@ -6667,33 +6878,7 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       if (distInput) distInput.value = defaultDist;
       if (stateInput) stateInput.value = defaultState;
 
-      document.getElementById('save-land-name').value = `My ${defaultDist} Plot`;
-
-      // Try subtle non-blocking reverse geocode of centroid for true district/village lookup
-      let sumLat = 0, sumLng = 0;
-      rawPoints.forEach(p => { sumLat += p.lat; sumLng += p.lng; });
-      const cLat = sumLat / rawPoints.length;
-      const cLng = sumLng / rawPoints.length;
-      fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${cLat}&lon=${cLng}`)
-        .then(r => r.json())
-        .then(geoRes => {
-          if (geoRes && geoRes.address) {
-            const addr = geoRes.address;
-            const foundPlace = addr.village || addr.town || addr.city || addr.state_district || addr.county;
-            const foundState = addr.state;
-            if (foundPlace && distInput) {
-              distInput.value = foundPlace;
-              const nameEl = document.getElementById('save-land-name');
-              if (nameEl && nameEl.value.startsWith('My ')) {
-                nameEl.value = `My ${foundPlace} Plot`;
-              }
-            }
-            if (foundState && stateInput) {
-              stateInput.value = foundState;
-            }
-          }
-        })
-        .catch(() => {});
+      document.getElementById('save-land-name').value = `My ${defaultDist} Field`;
 
       openModal('saveLandModal');
     }
@@ -6706,20 +6891,51 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       const survey = document.getElementById('save-land-survey').value.trim();
       const notes = document.getElementById('save-land-notes').value.trim();
 
-      const rawPoints = landMarkerPoints.map(p => ({ lat: p.lat, lng: p.lng }));
-      const acres = calculatePolygonAreaAcres(rawPoints);
-      const hectares = acres * 0.404686;
+      const isSvgMode = currentLayer !== 'map';
+      let acres = 0, hectares = 0;
+      let satPolyStr = "";
+      let centroid = { x: 205, y: 90 };
+      let geoCentroid = { lat: 12.518, lng: 76.885 };
+      let pointsData = [];
 
-      let sumLat = 0, sumLng = 0;
-      rawPoints.forEach(p => { sumLat += p.lat; sumLng += p.lng; });
-      const centroid = {
-        lat: sumLat / rawPoints.length,
-        lng: sumLng / rawPoints.length
-      };
+      const baseGeo = REGION_GEO[currentRegionKey] || REGION_GEO.mandya;
+      geoCentroid = { lat: baseGeo.lat, lng: baseGeo.lon };
+
+      if (isSvgMode) {
+        if (satMarkingPoints.length < 3) return;
+        const areaUnits = calculateSatPolygonArea(satMarkingPoints);
+        const areaSqm = areaUnits * 1.094;
+        acres = areaSqm / 4046.86;
+        hectares = areaSqm / 10000;
+        satPolyStr = satMarkingPoints.map(p => `${p.x},${p.y}`).join(' ');
+
+        let sumX = 0, sumY = 0;
+        satMarkingPoints.forEach(p => { sumX += p.x; sumY += p.y; });
+        centroid = {
+          x: Math.round(sumX / satMarkingPoints.length),
+          y: Math.round(sumY / satMarkingPoints.length)
+        };
+        pointsData = satMarkingPoints.map(p => ({ x: p.x, y: p.y }));
+      } else {
+        const rawPoints = landMarkerPoints.map(p => ({ lat: p.lat, lng: p.lng }));
+        if (rawPoints.length < 3) return;
+        acres = calculatePolygonAreaAcres(rawPoints);
+        hectares = acres * 0.404686;
+        let sumLat = 0, sumLng = 0;
+        rawPoints.forEach(p => { sumLat += p.lat; sumLng += p.lng; });
+        geoCentroid = {
+          lat: sumLat / rawPoints.length,
+          lng: sumLng / rawPoints.length
+        };
+        satPolyStr = "115,40 295,35 315,140 135,150";
+        centroid = { x: 205, y: 90 };
+        pointsData = rawPoints;
+      }
 
       const timestampId = Date.now().toString(36);
       const parcelId = "plot_user_" + timestampId;
       const newFarmId = "custom_marked_" + timestampId;
+      const currentSatImg = (REGIONS_DATA[currentRegionKey] && REGIONS_DATA[currentRegionKey].satImage) || "assets/mandya.jpg";
 
       const parcelObj = {
         id: parcelId,
@@ -6733,24 +6949,28 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         notes: notes,
         area_acres: parseFloat(acres.toFixed(2)),
         area_hectares: parseFloat(hectares.toFixed(2)),
-        points: rawPoints,
-        centroid: centroid,
+        points: pointsData,
+        satPolygon: satPolyStr,
+        alertMarker: { cx: centroid.x, cy: centroid.y },
+        centroid: geoCentroid,
         created_at: new Date().toISOString()
       };
 
-      // 1. Register as a FULL Monitored Farm Card in Select Field (customUserFarms)
+      // 1. Register as a Monitored Farm Card in Select Field (customUserFarms)
       const newFarm = {
         id: newFarmId,
         name: name,
         district: district,
         state: state,
         crop: crop,
-        growth_stage: "Vegetative",
+        growth_stage: "Active Vegetative",
         area_acres: parseFloat(acres.toFixed(2)),
         survey_plot: survey || `Plot #${timestampId.slice(-4).toUpperCase()}`,
-        latitude: centroid.lat,
-        longitude: centroid.lng,
-        polygon: rawPoints.map(pt => [pt.lat, pt.lng]),
+        latitude: geoCentroid.lat,
+        longitude: geoCentroid.lng,
+        satPolygon: satPolyStr,
+        alertMarker: { cx: centroid.x, cy: centroid.y },
+        satImage: currentSatImg,
         created_at: new Date().toISOString()
       };
 
@@ -6768,7 +6988,7 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         localStorage.setItem('earthworm_custom_parcels', JSON.stringify(savedCustomParcels));
       } catch (e) {}
 
-      // 3. Sync both endpoints to backend API (non-blocking)
+      // 3. Backend sync non-blocking
       const apiBase = getApiBase();
       if (backendAvailable) {
         try {
@@ -6781,11 +7001,11 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
               district: district,
               state: state,
               crop: crop,
-              growth_stage: "Vegetative",
+              growth_stage: "Active Vegetative",
               area_hectares: parseFloat(hectares.toFixed(2)),
               survey_plot: newFarm.survey_plot,
-              latitude: centroid.lat,
-              longitude: centroid.lng
+              latitude: geoCentroid.lat,
+              longitude: geoCentroid.lng
             })
           });
           await fetch(`${apiBase}/api/farms/custom-marker`, {
@@ -6802,15 +7022,13 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       toggleLandMarkingMode(false);
       clearAllMarkerPoints();
 
-      // Switch active selected field directly to the newly added custom farm!
+      // Switch active selected field directly to the newly added custom farm in THIS ORIENTATION!
       await selectRegion(newFarmId);
       renderCustomFarmPills();
-      renderSavedCustomParcelsOnMap();
       renderCustomParcelBadges();
 
-      showToast("Land Added to My Farms!", `${name} (${acres.toFixed(2)} Acres) is now actively monitored.`);
+      showToast("Land Added to My Farms!", `${name} (${acres.toFixed(2)} Acres) is now actively monitored in this orientation.`);
 
-      // Scroll briefly on mobile or desktop if needed so user sees the newly added farm card
       const farmPillEl = document.getElementById(`pill-${newFarmId}`);
       if (farmPillEl) {
         farmPillEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -6824,27 +7042,28 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
 
       savedCustomParcels.forEach(parcel => {
         if ((parcel.farm_id === currentRegionKey || parcel.linked_farm_id === currentRegionKey) && parcel.points && parcel.points.length >= 3) {
-          const latLngs = parcel.points.map(p => [p.lat, p.lng]);
-          const poly = L.polygon(latLngs, {
-            color: '#059669',
-            weight: 3,
-            dashArray: '5, 3',
-            fillColor: '#10b981',
-            fillOpacity: 0.25
-          }).addTo(leafletMap);
+          const latLngs = parcel.points.filter(p => p.lat !== undefined).map(p => [p.lat, p.lng]);
+          if (latLngs.length >= 3) {
+            const poly = L.polygon(latLngs, {
+              color: '#059669',
+              weight: 3,
+              dashArray: '5, 3',
+              fillColor: '#10b981',
+              fillOpacity: 0.25
+            }).addTo(leafletMap);
 
-          poly.bindPopup(`
-            <div style="font-size:11px; line-height:1.4;">
-              <strong style="color:#065f46;">${parcel.name}</strong><br/>
-              Crop: ${parcel.crop}<br/>
-              Area: <strong>${parcel.area_acres} Acres</strong> (${Math.round(parcel.area_acres * 40)} Guntas)<br/>
-              <button onclick="deleteCustomParcel('${parcel.id}')" style="color:#e11d48; font-weight:bold; font-size:10px; margin-top:4px; cursor:pointer;">
-                Delete Parcel
-              </button>
-            </div>
-          `);
-
-          savedParcelLayers.push(poly);
+            poly.bindPopup(`
+              <div style="font-size:11px; line-height:1.4;">
+                <strong style="color:#065f46;">${parcel.name}</strong><br/>
+                Crop: ${parcel.crop}<br/>
+                Area: <strong>${parcel.area_acres} Acres</strong> (${Math.round(parcel.area_acres * 40)} Guntas)<br/>
+                <button onclick="deleteCustomParcel('${parcel.id}')" style="color:#e11d48; font-weight:bold; font-size:10px; margin-top:4px; cursor:pointer;">
+                  Delete Parcel
+                </button>
+              </div>
+            `);
+            savedParcelLayers.push(poly);
+          }
         }
       });
     }
@@ -6856,7 +7075,6 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         localStorage.setItem('earthworm_custom_parcels', JSON.stringify(savedCustomParcels));
       } catch (e) {}
 
-      // Also remove linked farm from customUserFarms if present
       if (target && target.linked_farm_id) {
         customUserFarms = customUserFarms.filter(f => f.id !== target.linked_farm_id);
         try { localStorage.setItem('earthworm_custom_farms', JSON.stringify(customUserFarms)); } catch (e) {}
@@ -6898,16 +7116,42 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
           demoBtn.classList.add('bg-primary/40');
           demoBtn.textContent = REGIONS_DATA[currentRegionKey] ? REGIONS_DATA[currentRegionKey].parcel : "Plot #142/A";
         }
+        const rData = REGIONS_DATA[currentRegionKey] || REGIONS_DATA.mandya;
+        const poly = document.getElementById('parcel-polygon');
+        if (poly && rData.satPolygon) {
+          poly.setAttribute('points', rData.satPolygon);
+          poly.setAttribute('stroke', '#ffddb5');
+          poly.setAttribute('fill', 'rgba(232, 162, 58, 0.18)');
+        }
+        const alertMarker = document.getElementById('parcel-alert-marker');
+        if (alertMarker && rData.alertMarker) {
+          alertMarker.setAttribute('transform', `translate(${rData.alertMarker.cx - 210}, ${rData.alertMarker.cy - 95})`);
+          alertMarker.style.display = 'block';
+        }
         if (leafletMap) {
           const geo = REGION_GEO[currentRegionKey] || REGION_GEO.mandya;
           leafletMap.flyTo([geo.lat, geo.lon], geo.zoom, { duration: 1.0 });
         }
       } else {
-        const found = savedCustomParcels.find(p => p.id === targetId);
+        const found = savedCustomParcels.find(p => p.id === targetId || p.linked_farm_id === targetId);
         if (found) {
           if (demoBtn) {
             demoBtn.classList.add('bg-surface-variant/40');
             demoBtn.classList.remove('bg-primary/40');
+          }
+          // Display Custom Parcel Polygon in THIS EXACT SENTINEL-2 ORIENTATION!
+          const poly = document.getElementById('parcel-polygon');
+          if (poly) {
+            poly.setAttribute('points', found.satPolygon || "115,40 295,35 315,140 135,150");
+            poly.setAttribute('stroke', '#10b981');
+            poly.setAttribute('fill', 'rgba(16, 185, 129, 0.28)');
+          }
+          const alertMarker = document.getElementById('parcel-alert-marker');
+          if (alertMarker) {
+            if (found.alertMarker) {
+              alertMarker.setAttribute('transform', `translate(${found.alertMarker.cx - 210}, ${found.alertMarker.cy - 95})`);
+            }
+            alertMarker.style.display = 'block';
           }
           if (leafletMap && found.centroid) {
             leafletMap.flyTo([found.centroid.lat, found.centroid.lng], 17, { duration: 1.0 });
@@ -6917,6 +7161,83 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       }
       renderCustomParcelBadges();
     }
+
+    function loadSavedCustomParcels() {
+      try {
+        const local = localStorage.getItem('earthworm_custom_parcels');
+        if (local) {
+          savedCustomParcels = JSON.parse(local);
+        }
+      } catch (e) {
+        console.warn("Could not load local custom parcels:", e);
+      }
+
+      // Ensure any legacy custom parcels receive proper Sentinel-2 orientation coordinates
+      let migratedCount = 0;
+      savedCustomParcels.forEach(p => {
+        if (!p.satPolygon) {
+          p.satPolygon = "115,40 295,35 315,140 135,150";
+        }
+        if (!p.alertMarker) {
+          p.alertMarker = { cx: 205, cy: 90 };
+        }
+        const targetFarmId = p.linked_farm_id || `farm_${p.id}`;
+        const exists = customUserFarms.some(f => f.id === targetFarmId || f.name === p.name);
+        if (!exists && (p.satPolygon || (p.points && p.points.length >= 3))) {
+          const cent = p.centroid || { lat: 12.518, lng: 76.885 };
+          const baseRegion = REGIONS_DATA[p.farm_id] || REGIONS_DATA.mandya;
+          const locParts = (baseRegion.location || "Mandya, Karnataka").split(',');
+          const newFarm = {
+            id: targetFarmId,
+            name: p.name,
+            district: p.district || (locParts[0] || "Custom District").trim(),
+            state: p.state || (locParts[1] || "India").trim(),
+            crop: p.crop || "Paddy (Rice)",
+            growth_stage: "Active Vegetative",
+            area_acres: p.area_acres || 1.48,
+            survey_plot: p.survey || `Plot #${targetFarmId.slice(-4).toUpperCase()}`,
+            latitude: cent.lat,
+            longitude: cent.lng,
+            satPolygon: p.satPolygon,
+            alertMarker: p.alertMarker,
+            satImage: baseRegion.satImage || "assets/mandya.jpg",
+            created_at: p.created_at || new Date().toISOString()
+          };
+          p.linked_farm_id = targetFarmId;
+          customUserFarms.push(newFarm);
+          registerCustomFarmData(newFarm);
+          migratedCount++;
+        }
+      });
+      if (migratedCount > 0) {
+        try {
+          localStorage.setItem('earthworm_custom_farms', JSON.stringify(customUserFarms));
+          localStorage.setItem('earthworm_custom_parcels', JSON.stringify(savedCustomParcels));
+        } catch (e) {}
+        renderCustomFarmPills();
+      }
+
+      renderCustomParcelBadges();
+
+      const apiBase = getApiBase();
+      fetch(`${apiBase}/api/farms/${currentRegionKey}/custom-markers`)
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.markers && data.markers.length > 0) {
+            data.markers.forEach(m => {
+              if (!savedCustomParcels.some(p => p.id === m.id)) {
+                if (!m.satPolygon) m.satPolygon = "115,40 295,35 315,140 135,150";
+                if (!m.alertMarker) m.alertMarker = { cx: 205, cy: 90 };
+                savedCustomParcels.push(m);
+              }
+            });
+            renderCustomParcelBadges();
+            if (leafletMap) renderSavedCustomParcelsOnMap();
+          }
+        })
+        .catch(() => {});
+    }
+
 
     async function refreshSatellitePass() {
       const spinIcon = document.getElementById('refresh-icon');
@@ -7058,14 +7379,22 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       }
 
       const poly = document.getElementById('parcel-polygon');
-      if (poly && data.satPolygon) {
-        poly.setAttribute('points', data.satPolygon);
+      if (poly) {
+        if (data.satPolygon) {
+          poly.setAttribute('points', data.satPolygon);
+          poly.style.display = 'block';
+        }
       }
 
       const alertMarker = document.getElementById('parcel-alert-marker');
-      if (alertMarker && data.alertMarker) {
-        alertMarker.setAttribute('transform', `translate(${data.alertMarker.cx - 210}, ${data.alertMarker.cy - 95})`);
+      if (alertMarker) {
+        if (data.alertMarker) {
+          alertMarker.setAttribute('transform', `translate(${data.alertMarker.cx - 210}, ${data.alertMarker.cy - 95})`);
+          alertMarker.style.display = 'block';
+        }
       }
+
+      renderCustomParcelBadges();
 
       // Statistical Trends Chart update
       if (currentLayer === 'trends') {
@@ -10354,10 +10683,10 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         plotTitle: `${farm.name} (${farm.district}, ${farm.state})`,
         cropTitle: `${farm.crop} • ${farm.growth_stage || 'Active Growth'}`,
         area: `${area} Acres (~${(area * 0.4047).toFixed(2)} Ha)`,
-        satImage: "assets/mandya.jpg",
+        satImage: farm.satImage || (REGIONS_DATA[currentRegionKey] ? REGIONS_DATA[currentRegionKey].satImage : "assets/mandya.jpg"),
         satPass: `${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} • Sentinel-2 Pass`,
-        satPolygon: "115,40 295,35 315,140 135,150",
-        alertMarker: { cx: 205, cy: 90 },
+        satPolygon: farm.satPolygon || "115,40 295,35 315,140 135,150",
+        alertMarker: farm.alertMarker || { cx: 205, cy: 90 },
         advisoryTitle: `${farm.name}: Crop Monitoring Active`,
         advisoryDesc: `Status: Multispectral Sentinel-2 monitoring active for ${farm.crop}. Canopy greenness is healthy and optimal. Ground walk recommended to inspect perimeter soil moisture.`,
         metric: "0.68 (Optimal Vigor • Baseline 0.70)",
