@@ -477,13 +477,13 @@ Each mode features:
 
 ## 10. Manual Land Boundary Marking & Dynamic Acreage Subsystem
 
-Smallholder farmers in India often cultivate fragmented, irregularly shaped plots where official cadastral boundaries differ from physical field bunds (*varambas* / *mees*). To give farmers direct control over their land monitoring while strictly preserving their familiar satellite imagery perspective, Earthworm features an interactive, high-precision **Manual Land Boundary Marker with Canonical Sentinel-2 Orientation Lock**.
+Smallholder farmers in India often cultivate fragmented, irregularly shaped plots where official cadastral boundaries differ from physical field bunds (*varambas* / *mees*). To give farmers direct control over their land monitoring, Earthworm features an interactive, high-precision **Manual Land Boundary Marker on High-Resolution Satellite Maps**.
 
-### 10.1 Canonical Sentinel-2 Natural RGB Orientation Lock
-- **Visual Stability**: Previously, activating land boundary marking forcefully switched the viewer away to external map tiles with disparate zooms and disorientation. In Earthworm's upgraded engine, **Natural RGB Sentinel-2 satellite imagery (`mandya.jpg` / `{region}.jpg`) is the canonical primary orientation**.
-- **No Disorienting Layer Swaps**: Tapping "Mark Land" keeps the viewer locked in **THIS exact Sentinel-2 orientation**, displaying the cadastral field boundaries, warning pulse marker, and orbital telemetry without jumping to unfamiliar angles.
-- **Direct On-Canvas SVG Drawing**: Farmers can place boundary corner pins directly onto the Sentinel-2 satellite image canvas in its native coordinate space ($400 	imes 240$ SVG viewport), with real-time rubber-band guidelines and draggable numbered pins.
-- **Calibrated Multi-Spectral Synchronization**: Any custom marked farm remains perfectly oriented whether viewing True-Color (Natural RGB), NDVI Heatmaps, or Infrared (CIR) composites.
+### 10.1 Interactive Boundary Marking Engine
+- **Full Pan, Zoom & Search Freedom**: Tapping **"Mark Land"** automatically opens the **Interactive Satellite Map** (Esri World Imagery) with zero locking restrictions. Farmers can pan freely across their village, zoom directly into physical field bunds up to zoom level 21, and use the search bar or GPS to locate their plot.
+- **Non-Blocking Click Propagation**: Map layers and polygons are rendered with `interactive: false` so mouse clicks and taps are never intercepted or swallowed. Farmers can drop boundary pins anywhere across the map without obstruction.
+- **Dynamic Draggable Corner Pins**: Numbered markers (①, ②, ③...) with a gold-haloed Pin 1 guide the farmer to enclose the field. All pins are fully draggable with real-time rubber-band guidance.
+- **Automatic Registration into SELECT FIELD (PAN-INDIA)**: Once saved, the marked field is immediately registered as a monitored farm card in the primary "SELECT FIELD" grid, automatically selected, and monitored with tailored crop advisories.
 
 ### Farmer-Centric Boundary Delineation Workflow
 1. The farmer taps the **"Mark Land"** (`ಜಮೀನು ಗುರುತಿಸಿ` / `जमीन चिह्नित करें`) button on the Copernicus Sentinel-2 satellite card header.
