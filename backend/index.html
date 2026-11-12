@@ -1429,7 +1429,7 @@
         </button>
 
         <!-- Tile 2: Sky/Azure Blue Theme -->
-        <button class="w-full p-3.5 rounded-2xl bg-gradient-to-r from-sky-50/50 via-surface-container-lowest to-surface-container-lowest border border-sky-200/90 shadow-sm flex items-start gap-3.5 text-left hover:border-sky-400 hover:shadow-md active:bg-sky-50/30 transition-all min-h-[48px] cursor-pointer group" onclick="openModal('waterModal')" type="button">
+        <button class="w-full p-3.5 rounded-2xl bg-gradient-to-r from-sky-50/50 via-surface-container-lowest to-surface-container-lowest border border-sky-200/90 shadow-sm flex items-start gap-3.5 text-left hover:border-sky-400 hover:shadow-md active:bg-sky-50/30 transition-all min-h-[48px] cursor-pointer group" onclick="openPumpTimerModal()" type="button">
           <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-700 flex items-center justify-center shrink-0 text-white shadow-md group-hover:scale-105 transition-transform">
             <span class="material-symbols-outlined text-[24px]">water_drop</span>
           </div>
@@ -1843,20 +1843,149 @@
               </ul>
             </div>
 
-            <!-- Step 2 Card -->
-            <div class="p-3.5 rounded-xl bg-surface-container-low border-l-4 border-amber-500 flex flex-col gap-1.5">
+            <!-- Step 2 Card with Embedded Smart Pump Timer & Water Savings Calculator -->
+            <div class="p-3.5 sm:p-4 rounded-xl bg-surface-container-low border-l-4 border-amber-500 flex flex-col gap-3">
               <div class="flex items-center justify-between">
-                <span class="font-bold text-xs text-amber-800 flex items-center gap-1.5">
-                  <span class="material-symbols-outlined text-[16px]">water_drop</span>
+                <span class="font-bold text-xs sm:text-sm text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[18px]">water_drop</span>
                   <span id="adv-step2-title">Step 2: Calibrated Irrigation Correction</span>
                 </span>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/10 text-amber-800 font-mono" id="adv-step2-time">Tomorrow Evening 5:00 – 7:00 PM</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/10 text-amber-800 dark:text-amber-300 font-mono" id="adv-step2-time">Tomorrow Evening 5:00 – 7:00 PM</span>
               </div>
               <ul class="text-xs text-on-surface-variant space-y-1 list-disc pl-4" id="adv-step2-items">
                 <li><strong>Irrigate during late afternoon / evening:</strong> Avoid midday watering which loses 30%–35% of volume to atmospheric evaporative heat and shocks delicate root hairs.</li>
                 <li>Apply 25–30 mm equivalent water depth (run drip system for ~2.5 hours) with priority distribution to rows along the eastern lateral line.</li>
                 <li>Flush lateral end-caps and clean sub-main filters to clear silt clogging.</li>
               </ul>
+
+              <!-- Embedded Interactive Pump Timer & Water Savings Calculator -->
+              <div id="adv-step2-pump-calculator" class="mt-1 pt-3 border-t border-amber-500/20 flex flex-col gap-3 bg-surface-container-lowest/80 rounded-xl p-3 border border-surface-variant">
+                <div class="flex items-center justify-between gap-2 flex-wrap">
+                  <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-lg bg-emerald-600/15 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0">
+                      <span class="material-symbols-outlined text-[18px]">timer</span>
+                    </div>
+                    <div>
+                      <h4 class="text-xs font-bold text-on-surface">Precision Pump Timer &amp; Water Calculator</h4>
+                      <p class="text-[10px] text-secondary" id="step2-pump-farm-meta">Mandya, Karnataka • Parcel #142/A • Paddy (1.85 Ha)</p>
+                    </div>
+                  </div>
+                  <button type="button" onclick="openPumpTimerModal()" class="text-[10px] font-bold px-2 py-1 rounded bg-surface-container hover:bg-surface-variant text-primary flex items-center gap-1 transition-colors cursor-pointer">
+                    <span class="material-symbols-outlined text-[12px]">open_in_full</span>
+                    <span>Expand</span>
+                  </button>
+                </div>
+
+                <!-- Interactive Controls (Pills) -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <!-- Target Area -->
+                  <div class="flex flex-col gap-1 p-2 rounded-lg bg-surface-container-low border border-surface-variant/70">
+                    <label class="text-[10px] font-bold text-secondary uppercase flex items-center gap-1">
+                      <span class="material-symbols-outlined text-[13px] text-primary">crop_free</span>
+                      <span>Target Area</span>
+                    </label>
+                    <div class="grid grid-cols-2 gap-1 bg-surface-container rounded-md p-0.5 text-[10px] font-bold">
+                      <button type="button" onclick="setPumpTargetArea('stress')" id="step2-target-stress" class="py-1 px-1.5 rounded transition-all cursor-pointer truncate bg-primary text-on-primary">
+                        Stress (25%)
+                      </button>
+                      <button type="button" onclick="setPumpTargetArea('full')" id="step2-target-full" class="py-1 px-1.5 rounded transition-all cursor-pointer truncate text-on-surface hover:text-primary">
+                        Full (100%)
+                      </button>
+                    </div>
+                    <span class="text-[9px] text-secondary" id="step2-target-ha-label">Active: 0.46 Ha</span>
+                  </div>
+
+                  <!-- Pump Power (HP) -->
+                  <div class="flex flex-col gap-1 p-2 rounded-lg bg-surface-container-low border border-surface-variant/70">
+                    <label class="text-[10px] font-bold text-secondary uppercase flex items-center gap-1">
+                      <span class="material-symbols-outlined text-[13px] text-primary">bolt</span>
+                      <span>Pump Power</span>
+                    </label>
+                    <div class="grid grid-cols-3 gap-1 bg-surface-container rounded-md p-0.5 text-[10px] font-bold text-center">
+                      <button type="button" onclick="setPumpHp(3)" id="step2-hp-3" class="py-1 rounded transition-all cursor-pointer text-on-surface hover:text-primary">3 HP</button>
+                      <button type="button" onclick="setPumpHp(5)" id="step2-hp-5" class="py-1 rounded transition-all cursor-pointer bg-primary text-on-primary">5 HP</button>
+                      <button type="button" onclick="setPumpHp(7.5)" id="step2-hp-75" class="py-1 rounded transition-all cursor-pointer text-on-surface hover:text-primary">7.5 HP</button>
+                    </div>
+                    <span class="text-[9px] text-secondary" id="step2-discharge-label">Discharge: 4,400 L/min</span>
+                  </div>
+
+                  <!-- Delivery Method -->
+                  <div class="flex flex-col gap-1 p-2 rounded-lg bg-surface-container-low border border-surface-variant/70">
+                    <label class="text-[10px] font-bold text-secondary uppercase flex items-center gap-1">
+                      <span class="material-symbols-outlined text-[13px] text-primary">water</span>
+                      <span>Delivery Method</span>
+                    </label>
+                    <div class="grid grid-cols-2 gap-1 bg-surface-container rounded-md p-0.5 text-[10px] font-bold">
+                      <button type="button" onclick="setPumpDeliveryMethod('drip')" id="step2-delivery-drip" class="py-1 px-1.5 rounded transition-all cursor-pointer truncate bg-primary text-on-primary">
+                        Drip / Pipe
+                      </button>
+                      <button type="button" onclick="setPumpDeliveryMethod('channel')" id="step2-delivery-channel" class="py-1 px-1.5 rounded transition-all cursor-pointer truncate text-on-surface hover:text-primary">
+                        Channel / Furrow
+                      </button>
+                    </div>
+                    <span class="text-[9px] text-secondary" id="step2-eff-label">Eff: 85% (Optimal)</span>
+                  </div>
+                </div>
+
+                <!-- 3 Metrics Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <!-- Recommended Runtime -->
+                  <div class="p-2.5 rounded-lg bg-surface-container-lowest border-2 border-emerald-500/30 flex flex-col justify-between">
+                    <span class="text-[10px] font-bold text-secondary uppercase tracking-wider flex items-center justify-between">
+                      <span>Runtime</span>
+                      <span class="material-symbols-outlined text-emerald-600 text-[15px]">timelapse</span>
+                    </span>
+                    <span class="text-xl font-extrabold text-primary font-mono my-0.5" id="step2-runtime-display">26 mins</span>
+                    <span class="text-[9px] text-secondary" id="step2-liters-display">Need: 33,416 L</span>
+                  </div>
+
+                  <!-- Best Window -->
+                  <div class="p-2.5 rounded-lg bg-surface-container-lowest border border-surface-variant flex flex-col justify-between">
+                    <span class="text-[10px] font-bold text-secondary uppercase tracking-wider flex items-center justify-between">
+                      <span>Best Window</span>
+                      <span class="material-symbols-outlined text-amber-500 text-[15px]">wb_twilight</span>
+                    </span>
+                    <span class="text-xs sm:text-sm font-extrabold text-on-surface font-mono my-0.5">06:00 AM – 08:30 AM</span>
+                    <span class="text-[9px] text-emerald-700 dark:text-emerald-300 font-semibold">Avoids midday loss</span>
+                  </div>
+
+                  <!-- Water Saved vs. Flood -->
+                  <div class="p-2.5 rounded-lg bg-surface-container-lowest border border-surface-variant flex flex-col justify-between">
+                    <span class="text-[10px] font-bold text-secondary uppercase tracking-wider flex items-center justify-between">
+                      <span>Water Saved</span>
+                      <span class="text-[9px] font-bold px-1 rounded bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 font-mono" id="step2-pct-saved-badge">96% Saved</span>
+                    </span>
+                    <span class="text-xl font-extrabold text-emerald-600 font-mono my-0.5" id="step2-saved-display">799.1k Liters</span>
+                    <span class="text-[9px] text-secondary" id="step2-flood-display">Flood: 832,500 L</span>
+                  </div>
+                </div>
+
+                <!-- Monospace SMS Preview with Live Character Counter -->
+                <div class="flex flex-col gap-1">
+                  <div class="flex items-center justify-between text-[10px]">
+                    <span class="font-bold text-secondary flex items-center gap-1">
+                      <span class="material-symbols-outlined text-[13px] text-primary">sms</span>
+                      <span>Low-Bandwidth SMS Alert Payload</span>
+                    </span>
+                    <span class="font-mono text-[9px] font-bold text-emerald-600" id="step2-sms-char-count">112 / 160 chars</span>
+                  </div>
+                  <div class="bg-slate-900 rounded-lg p-2.5 font-mono text-[11px] text-emerald-300 border border-emerald-500/30 leading-snug break-words select-all" id="step2-sms-preview">
+                    [EARTHWORM] Mandya, Karnataka Parcel #142/A: Run 5HP pump for 26 mins (Stress Zone (25%)) before 8:30 AM. Saves 96% water. Reply 1 when done.
+                  </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row items-center gap-2 pt-0.5">
+                  <button type="button" onclick="sendPumpTimerSms()" class="w-full sm:flex-1 min-h-[38px] rounded-lg bg-primary text-on-primary font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs hover:bg-primary-container transition-all cursor-pointer">
+                    <span class="material-symbols-outlined text-[16px]">send</span>
+                    <span>Send Pump Timer via SMS</span>
+                  </button>
+                  <button type="button" onclick="speakPumpTimerVoice()" class="w-full sm:w-auto px-3 min-h-[38px] rounded-lg bg-surface-container hover:bg-surface-variant text-on-surface font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer border border-surface-variant" id="step2-btn-voice">
+                    <span class="material-symbols-outlined text-[16px] text-primary" id="step2-voice-icon">volume_up</span>
+                    <span id="step2-voice-text">Hear Voice Timer Alert</span>
+                  </button>
+                </div>
+              </div>
             </div>
 
             <!-- Step 3 Card -->
@@ -2216,7 +2345,183 @@
     </div>
   </div>
 
-  <!-- Modal: Twilio SMS & Voice Communication Dispatcher -->
+    <!-- Modal: Smart Pump Timer & Water Savings Calculator -->
+  <div class="fixed inset-0 z-50 bg-inverse-surface/60 backdrop-blur-xs flex flex-col justify-end sm:justify-center p-0 sm:p-4 hidden opacity-0 transition-opacity duration-200" id="pumpTimerModal" onclick="if(event.target === this) closeModal('pumpTimerModal')">
+    <div class="w-full max-w-[620px] mx-auto bg-surface-container-lowest rounded-t-3xl sm:rounded-3xl p-5 sm:p-6 flex flex-col gap-4 shadow-2xl border-t sm:border border-surface-variant max-h-[92vh] overflow-y-auto">
+      
+      <!-- Modal Header -->
+      <div class="flex items-start justify-between gap-3 border-b border-surface-variant pb-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-800 text-white flex items-center justify-center shrink-0 shadow-md">
+            <span class="material-symbols-outlined text-[24px]">timer</span>
+          </div>
+          <div class="flex flex-col min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h3 class="text-base sm:text-lg font-bold text-on-surface tracking-tight truncate">
+                Smart Pump Timer &amp; Water Savings
+              </h3>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 font-mono">
+                AI Precision
+              </span>
+            </div>
+            <p class="text-xs text-secondary truncate" id="modal-pump-farm-meta">
+              Mandya, Karnataka • Parcel #142/A • Paddy (1.85 Ha)
+            </p>
+          </div>
+        </div>
+        <button onclick="closeModal('pumpTimerModal')" class="w-9 h-9 rounded-full bg-surface-container hover:bg-surface-variant text-on-surface flex items-center justify-center transition-colors cursor-pointer shrink-0" type="button" aria-label="Close Calculator">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Interactive Controls Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <!-- 1. Target Area -->
+        <div class="flex flex-col gap-1.5 p-3 rounded-xl bg-surface-container-low border border-surface-variant/80">
+          <label class="text-[11px] font-bold text-secondary uppercase tracking-wider flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px] text-primary">crop_free</span>
+            <span>Target Area</span>
+          </label>
+          <div class="grid grid-cols-2 gap-1 bg-surface-container rounded-lg p-0.5 text-xs font-bold">
+            <button type="button" onclick="setPumpTargetArea('stress')" id="modal-target-stress" class="py-1.5 px-2 rounded-md transition-all cursor-pointer truncate bg-primary text-on-primary shadow-xs">
+              Stress Zone (25%)
+            </button>
+            <button type="button" onclick="setPumpTargetArea('full')" id="modal-target-full" class="py-1.5 px-2 rounded-md transition-all cursor-pointer truncate text-on-surface hover:text-primary">
+              Full Field (100%)
+            </button>
+          </div>
+          <span class="text-[10px] text-secondary" id="modal-target-ha-label">
+            Active: <strong class="text-on-surface">0.46 Ha</strong> (~1.1 Acres)
+          </span>
+        </div>
+
+        <!-- 2. Pump Power (HP) -->
+        <div class="flex flex-col gap-1.5 p-3 rounded-xl bg-surface-container-low border border-surface-variant/80">
+          <label class="text-[11px] font-bold text-secondary uppercase tracking-wider flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px] text-primary">bolt</span>
+            <span>Pump Power (HP)</span>
+          </label>
+          <div class="grid grid-cols-3 gap-1 bg-surface-container rounded-lg p-0.5 text-xs font-bold text-center">
+            <button type="button" onclick="setPumpHp(3)" id="modal-hp-3" class="py-1.5 px-1 rounded-md transition-all cursor-pointer text-on-surface hover:text-primary">3 HP</button>
+            <button type="button" onclick="setPumpHp(5)" id="modal-hp-5" class="py-1.5 px-1 rounded-md transition-all cursor-pointer bg-primary text-on-primary shadow-xs">5 HP</button>
+            <button type="button" onclick="setPumpHp(7.5)" id="modal-hp-75" class="py-1.5 px-1 rounded-md transition-all cursor-pointer text-on-surface hover:text-primary">7.5 HP</button>
+          </div>
+          <span class="text-[10px] text-secondary" id="modal-discharge-label">
+            Discharge: <strong class="text-on-surface">4,400 L/min</strong>
+          </span>
+        </div>
+
+        <!-- 3. Delivery Method -->
+        <div class="flex flex-col gap-1.5 p-3 rounded-xl bg-surface-container-low border border-surface-variant/80">
+          <label class="text-[11px] font-bold text-secondary uppercase tracking-wider flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px] text-primary">water</span>
+            <span>Delivery Method</span>
+          </label>
+          <div class="grid grid-cols-2 gap-1 bg-surface-container rounded-lg p-0.5 text-xs font-bold">
+            <button type="button" onclick="setPumpDeliveryMethod('drip')" id="modal-delivery-drip" class="py-1.5 px-2 rounded-md transition-all cursor-pointer truncate bg-primary text-on-primary shadow-xs">
+              Drip / Pipe
+            </button>
+            <button type="button" onclick="setPumpDeliveryMethod('channel')" id="modal-delivery-channel" class="py-1.5 px-2 rounded-md transition-all cursor-pointer truncate text-on-surface hover:text-primary">
+              Channel / Furrow
+            </button>
+          </div>
+          <span class="text-[10px] text-secondary" id="modal-eff-label">
+            Efficiency: <strong class="text-on-surface">85% (Optimal)</strong>
+          </span>
+        </div>
+      </div>
+
+      <!-- 3 Summary Metric Cards Banner -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+        <!-- Recommended Runtime -->
+        <div class="p-3.5 rounded-xl bg-surface-container-lowest border-2 border-emerald-500/30 flex flex-col justify-between shadow-xs">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold text-secondary uppercase tracking-wider">
+              Recommended Runtime
+            </span>
+            <span class="material-symbols-outlined text-emerald-600 text-[18px]">timelapse</span>
+          </div>
+          <div class="my-1.5">
+            <span class="text-2xl font-extrabold text-primary tracking-tight font-mono" id="modal-runtime-display">
+              26 mins
+            </span>
+          </div>
+          <span class="text-[10px] text-secondary" id="modal-liters-display">
+            Net Need: <strong class="text-on-surface">33,416 L</strong>
+          </span>
+        </div>
+
+        <!-- Best Irrigation Window -->
+        <div class="p-3.5 rounded-xl bg-surface-container-lowest border border-surface-variant flex flex-col justify-between shadow-xs">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold text-secondary uppercase tracking-wider">
+              Best Window
+            </span>
+            <span class="material-symbols-outlined text-amber-500 text-[18px]">wb_twilight</span>
+          </div>
+          <div class="my-1.5">
+            <span class="text-base sm:text-lg font-extrabold text-on-surface tracking-tight font-mono">
+              06:00 AM – 08:30 AM
+            </span>
+          </div>
+          <span class="text-[10px] text-emerald-700 dark:text-emerald-300 font-semibold">
+            Avoids daytime evaporation (-32%)
+          </span>
+        </div>
+
+        <!-- Water Saved vs. Flood -->
+        <div class="p-3.5 rounded-xl bg-surface-container-lowest border border-surface-variant flex flex-col justify-between shadow-xs">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold text-secondary uppercase tracking-wider">
+              Water Saved vs. Flood
+            </span>
+            <span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 font-mono" id="modal-pct-saved-badge">
+              96% Saved
+            </span>
+          </div>
+          <div class="my-1.5">
+            <span class="text-2xl font-extrabold text-emerald-600 tracking-tight font-mono" id="modal-saved-display">
+              799.1k Liters
+            </span>
+          </div>
+          <span class="text-[10px] text-secondary" id="modal-flood-display">
+            Flood Base: <span class="line-through">832,500 L</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Monospace Compressed SMS Payload Box -->
+      <div class="flex flex-col gap-1.5">
+        <div class="flex items-center justify-between text-[11px]">
+          <span class="font-bold text-secondary flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px] text-primary">sms</span>
+            <span>Compressed Low-Bandwidth SMS Payload</span>
+          </span>
+          <span class="font-mono text-[10px] font-bold text-emerald-600" id="modal-sms-char-count">
+            112 / 160 chars
+          </span>
+        </div>
+        <div class="bg-slate-900 rounded-xl p-3 font-mono text-[11px] sm:text-xs text-emerald-300 border border-emerald-500/30 leading-relaxed break-words select-all shadow-inner" id="modal-sms-preview">
+          [EARTHWORM] Mandya, Karnataka Parcel #142/A: Run 5HP pump for 26 mins (Stress Zone (25%)) before 8:30 AM. Saves 96% water. Reply 1 when done.
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row items-center gap-2 pt-1">
+        <button type="button" onclick="sendPumpTimerSms()" class="w-full sm:flex-1 min-h-[46px] rounded-xl bg-primary text-on-primary font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm hover:bg-primary-container transition-all cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]">send</span>
+          <span>Send Pump Timer via SMS</span>
+        </button>
+
+        <button type="button" onclick="speakPumpTimerVoice()" class="w-full sm:w-auto px-4 min-h-[46px] rounded-xl bg-surface-container hover:bg-surface-variant text-on-surface font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer border border-surface-variant" id="modal-btn-voice">
+          <span class="material-symbols-outlined text-[18px] text-primary" id="modal-voice-icon">volume_up</span>
+          <span id="modal-voice-text">Hear Voice Timer Alert</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+<!-- Modal: Twilio SMS & Voice Communication Dispatcher -->
   <div class="fixed inset-0 z-50 bg-inverse-surface/60 backdrop-blur-xs flex flex-col justify-end hidden opacity-0 transition-opacity duration-200" id="twilioModal">
     <div class="w-full max-w-[640px] mx-auto bg-surface-container-lowest rounded-t-3xl p-5 flex flex-col gap-4 max-h-[90vh] overflow-y-auto shadow-2xl border-t border-surface-variant">
       
@@ -7166,6 +7471,7 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       if (advView && !advView.classList.contains('hidden') && typeof renderDetailedExplanatoryAdvice === 'function') {
         renderDetailedExplanatoryAdvice(regionKey);
       }
+      updatePumpTimerCalculator(regionKey);
     }
 
     function changeLanguage(langCode) {
@@ -7726,7 +8032,14 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       }
     }
 
-    function promptAndSendFarmerSms() {
+    let activeCustomSmsText = null;
+
+    function promptAndSendFarmerSms(customPayload = null) {
+      if (customPayload) {
+        activeCustomSmsText = customPayload;
+      } else {
+        activeCustomSmsText = null;
+      }
       const saved = getStoredFarmerPhone();
       const inlineInput = document.getElementById('farmer-phone-input');
       const inlineVal = inlineInput ? inlineInput.value.trim() : '';
@@ -7761,7 +8074,8 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       sendAutomaticFarmerSms(phone);
     }
 
-    async function sendAutomaticFarmerSms(targetPhone = null) {
+    async function sendAutomaticFarmerSms(targetPhone = null, customPayload = null) {
+      if (customPayload) activeCustomSmsText = customPayload;
       const inlineInput = document.getElementById('farmer-phone-input');
       let rawPhone = targetPhone || (inlineInput ? inlineInput.value.trim() : '');
 
@@ -7807,7 +8121,7 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       }
       if (label) label.textContent = "Dispatching...";
 
-      const smsText = getActiveSmsPreview();
+      const smsText = activeCustomSmsText || getActiveSmsPreview();
       const apiBase = getApiBase();
 
       const statusCard = document.getElementById('farmer-sms-status');
@@ -8087,14 +8401,9 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
           <em>${t.healthModalNote || "Note: Cloud-free reference pass. Ground walk recommended."}</em>
         `;
         id = 'infoModal';
-      } else if (id === 'waterModal') {
-        document.getElementById('info-modal-title').textContent = t.waterModalTitle || "2. Should I Water?";
-        document.getElementById('info-modal-body').innerHTML = `
-          <strong>${t.waterModalSub || "Root-Zone Moisture & Evaporative Demand:"}</strong><br>
-          ${t.waterModalBody1 || "Current estimated soil moisture in upper 15 cm: Adequate for"} <strong>${rData.cropTitle || rData.crop}</strong>.<br><br>
-          ${t.waterModalBody2 || "Upcoming rainfall outlook is dry (0 mm). Apply 2.5 cm irrigation in late afternoon if surface wilting appears."}
-        `;
-        id = 'infoModal';
+      } else if (id === 'waterModal' || id === 'pumpTimerModal') {
+        openPumpTimerModal();
+        return;
       } else if (id === 'weatherModal') {
         document.getElementById('info-modal-title').textContent = t.weatherModalTitle || "3. Weather & Spraying Windows";
         document.getElementById('info-modal-body').innerHTML = `
@@ -10812,6 +11121,358 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         setViewMode('desktop', true);
       }
     });
+  
+    // ==========================================
+    // SMART PUMP TIMER & WATER SAVINGS CALCULATOR
+    // ==========================================
+    const PUMP_FARM_DATA = {
+      mandya: {
+        parcelId: "Parcel #142/A",
+        location: "Mandya, Karnataka",
+        crop: "Paddy (Sona Masoori)",
+        totalHectares: 1.85,
+        waterDeficitMm: 8.5
+      },
+      ludhiana: {
+        parcelId: "Parcel #89/C",
+        location: "Ludhiana, Punjab",
+        crop: "Wheat (PBW 343)",
+        totalHectares: 2.40,
+        waterDeficitMm: 4.2
+      },
+      varanasi: {
+        parcelId: "Parcel #214/B",
+        location: "Varanasi, UP",
+        crop: "Mustard & Vegetables",
+        totalHectares: 1.20,
+        waterDeficitMm: 5.0
+      },
+      nashik: {
+        parcelId: "Parcel #56/D",
+        location: "Nashik, Maharashtra",
+        crop: "Onion / Grapes",
+        totalHectares: 1.60,
+        waterDeficitMm: 6.0
+      }
+    };
+
+    const pumpCalcState = {
+      targetArea: 'stress', // 'stress' (25%) or 'full' (100%)
+      pumpHp: 5,            // 3, 5, or 7.5
+      deliveryMethod: 'drip' // 'drip' (0.85) or 'channel' (1.15)
+    };
+
+    let pumpSpeechActive = false;
+
+    function getFarmMetadata(regionKey = currentRegionKey) {
+      if (PUMP_FARM_DATA[regionKey]) {
+        return { ...PUMP_FARM_DATA[regionKey] };
+      }
+      const data = REGIONS_DATA[regionKey] || {};
+      let ha = 1.5;
+      if (typeof data.totalHectares === 'number') {
+        ha = data.totalHectares;
+      } else if (data.area) {
+        const match = data.area.match(/([\d.]+)\s*Hectares/i);
+        if (match) ha = parseFloat(match[1]);
+        else {
+          const matchAc = data.area.match(/([\d.]+)\s*Acres/i);
+          if (matchAc) ha = parseFloat(matchAc[1]) * 0.4047;
+        }
+      }
+      return {
+        parcelId: data.parcel || (data.plotTitle ? `Parcel ${data.plotTitle}` : 'Custom Plot'),
+        location: data.location || 'India',
+        crop: data.cropTitle || data.crop || 'Field Crop',
+        totalHectares: Math.round(ha * 100) / 100 || 1.5,
+        waterDeficitMm: data.waterDeficitMm || 7.5
+      };
+    }
+
+    function calculatePumpTimer(farm, state = pumpCalcState) {
+      const dischargeMap = { 3: 2700, 5: 4400, 7.5: 6500 };
+      const effMap = { drip: 0.85, channel: 1.15 };
+
+      const areaMultiplier = state.targetArea === 'stress' ? 0.25 : 1.0;
+      const activeHa = Math.max(0.1, farm.totalHectares * areaMultiplier);
+      const effFactor = effMap[state.deliveryMethod] || 0.85;
+      const discharge = dischargeMap[state.pumpHp] || 4400;
+
+      // 1 ha = 10,000 m2; 1 mm depth over 1 m2 = 1 Liter
+      const reqLiters = Math.round(activeHa * 10000 * farm.waterDeficitMm * effFactor);
+      const runtimeMins = Math.max(5, Math.round(reqLiters / discharge));
+
+      let fmtRuntime = `${runtimeMins} mins`;
+      if (runtimeMins >= 60) {
+        const hrs = Math.floor(runtimeMins / 60);
+        const remainingMins = runtimeMins % 60;
+        fmtRuntime = remainingMins > 0 ? `${hrs} hr ${remainingMins} mins` : `${hrs} hr`;
+      }
+
+      // Traditional Flood Irrigation baseline (45mm baseline over 100% total hectares)
+      const flood = Math.round(farm.totalHectares * 10000 * 45);
+      const savedLiters = Math.max(0, flood - reqLiters);
+      const pctSaved = Math.min(99, Math.max(10, Math.round((savedLiters / flood) * 100)));
+
+      let fmtSaved = `${savedLiters.toLocaleString()} L`;
+      if (savedLiters >= 1000000) {
+        fmtSaved = `${(savedLiters / 1000000).toFixed(2)}M Liters`;
+      } else if (savedLiters >= 1000) {
+        fmtSaved = `${(savedLiters / 1000).toFixed(1)}k Liters`;
+      }
+
+      const areaLabel = state.targetArea === 'stress' ? 'Stress Zone (25%)' : 'Full Field';
+      const payload = `[EARTHWORM] ${farm.location} ${farm.parcelId}: Run ${state.pumpHp}HP pump for ${fmtRuntime} (${areaLabel}) before 8:30 AM. Saves ${pctSaved}% water. Reply 1 when done.`;
+
+      return {
+        farm,
+        activeHectares: activeHa,
+        requiredLiters: reqLiters,
+        runtimeMinutes: runtimeMins,
+        formattedRuntime: fmtRuntime,
+        floodLiters: flood,
+        waterSavedLiters: savedLiters,
+        formattedWaterSaved: fmtSaved,
+        pctWaterSaved: pctSaved,
+        smsPayload: payload
+      };
+    }
+
+    function setPumpTargetArea(val) {
+      if (val !== 'stress' && val !== 'full') return;
+      pumpCalcState.targetArea = val;
+      updatePumpTimerCalculator();
+    }
+
+    function setPumpHp(hp) {
+      const num = Number(hp);
+      if (![3, 5, 7.5].includes(num)) return;
+      pumpCalcState.pumpHp = num;
+      updatePumpTimerCalculator();
+    }
+
+    function setPumpDeliveryMethod(method) {
+      if (method !== 'drip' && method !== 'channel') return;
+      pumpCalcState.deliveryMethod = method;
+      updatePumpTimerCalculator();
+    }
+
+    function openPumpTimerModal() {
+      updatePumpTimerCalculator();
+      const modal = document.getElementById('pumpTimerModal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.remove('opacity-0'), 10);
+      }
+    }
+
+    function updatePumpTimerCalculator(regionKey = currentRegionKey) {
+      const farm = getFarmMetadata(regionKey);
+      const calc = calculatePumpTimer(farm, pumpCalcState);
+
+      const dischargeMap = { 3: "2,700 L/min", 5: "4,400 L/min", 7.5: "6,500 L/min" };
+      const farmMetaText = `${farm.location} • ${farm.parcelId} • ${farm.crop} (${farm.totalHectares} Ha)`;
+      const activeHaAcres = `${calc.activeHectares.toFixed(2)} Ha (~${(calc.activeHectares * 2.471).toFixed(1)} Ac)`;
+
+      ['modal', 'step2'].forEach(prefix => {
+        // Meta
+        const metaEl = document.getElementById(`${prefix}-pump-farm-meta`);
+        if (metaEl) metaEl.textContent = farmMetaText;
+
+        // Target Area Buttons & Label
+        const btnStress = document.getElementById(`${prefix}-target-stress`);
+        const btnFull = document.getElementById(`${prefix}-target-full`);
+        if (btnStress && btnFull) {
+          if (pumpCalcState.targetArea === 'stress') {
+            btnStress.className = prefix === 'step2'
+              ? 'py-1 px-1.5 rounded transition-all cursor-pointer truncate bg-primary text-on-primary'
+              : 'py-1.5 px-2 rounded-md transition-all cursor-pointer truncate bg-primary text-on-primary shadow-xs';
+            btnFull.className = prefix === 'step2'
+              ? 'py-1 px-1.5 rounded transition-all cursor-pointer truncate text-on-surface hover:text-primary'
+              : 'py-1.5 px-2 rounded-md transition-all cursor-pointer truncate text-on-surface hover:text-primary';
+          } else {
+            btnStress.className = prefix === 'step2'
+              ? 'py-1 px-1.5 rounded transition-all cursor-pointer truncate text-on-surface hover:text-primary'
+              : 'py-1.5 px-2 rounded-md transition-all cursor-pointer truncate text-on-surface hover:text-primary';
+            btnFull.className = prefix === 'step2'
+              ? 'py-1 px-1.5 rounded transition-all cursor-pointer truncate bg-primary text-on-primary'
+              : 'py-1.5 px-2 rounded-md transition-all cursor-pointer truncate bg-primary text-on-primary shadow-xs';
+          }
+        }
+        const haLabel = document.getElementById(`${prefix}-target-ha-label`);
+        if (haLabel) {
+          haLabel.innerHTML = `Active: <strong class="text-on-surface">${activeHaAcres}</strong>`;
+        }
+
+        // HP Buttons & Label
+        [3, 5, 7.5].forEach(hpVal => {
+          const hpKey = hpVal === 7.5 ? '75' : hpVal;
+          const hpBtn = document.getElementById(`${prefix}-hp-${hpKey}`);
+          if (hpBtn) {
+            if (pumpCalcState.pumpHp === hpVal) {
+              hpBtn.className = prefix === 'step2'
+                ? 'py-1 rounded transition-all cursor-pointer bg-primary text-on-primary'
+                : 'py-1.5 px-1 rounded-md transition-all cursor-pointer bg-primary text-on-primary shadow-xs';
+            } else {
+              hpBtn.className = prefix === 'step2'
+                ? 'py-1 rounded transition-all cursor-pointer text-on-surface hover:text-primary'
+                : 'py-1.5 px-1 rounded-md transition-all cursor-pointer text-on-surface hover:text-primary';
+            }
+          }
+        });
+        const disLabel = document.getElementById(`${prefix}-discharge-label`);
+        if (disLabel) {
+          disLabel.innerHTML = `Discharge: <strong class="text-on-surface">${dischargeMap[pumpCalcState.pumpHp]}</strong>`;
+        }
+
+        // Delivery Method Buttons & Label
+        const btnDrip = document.getElementById(`${prefix}-delivery-drip`);
+        const btnChan = document.getElementById(`${prefix}-delivery-channel`);
+        if (btnDrip && btnChan) {
+          if (pumpCalcState.deliveryMethod === 'drip') {
+            btnDrip.className = prefix === 'step2'
+              ? 'py-1 px-1.5 rounded transition-all cursor-pointer truncate bg-primary text-on-primary'
+              : 'py-1.5 px-2 rounded-md transition-all cursor-pointer truncate bg-primary text-on-primary shadow-xs';
+            btnChan.className = prefix === 'step2'
+              ? 'py-1 px-1.5 rounded transition-all cursor-pointer truncate text-on-surface hover:text-primary'
+              : 'py-1.5 px-2 rounded-md transition-all cursor-pointer truncate text-on-surface hover:text-primary';
+          } else {
+            btnDrip.className = prefix === 'step2'
+              ? 'py-1 px-1.5 rounded transition-all cursor-pointer truncate text-on-surface hover:text-primary'
+              : 'py-1.5 px-2 rounded-md transition-all cursor-pointer truncate text-on-surface hover:text-primary';
+            btnChan.className = prefix === 'step2'
+              ? 'py-1 px-1.5 rounded transition-all cursor-pointer truncate bg-primary text-on-primary'
+              : 'py-1.5 px-2 rounded-md transition-all cursor-pointer truncate bg-primary text-on-primary shadow-xs';
+          }
+        }
+        const effLabel = document.getElementById(`${prefix}-eff-label`);
+        if (effLabel) {
+          effLabel.innerHTML = `Eff: <strong class="text-on-surface">${pumpCalcState.deliveryMethod === 'drip' ? '85% (Optimal)' : '65% (Losses)'}</strong>`;
+        }
+
+        // Runtime & Need Liters
+        const runDisp = document.getElementById(`${prefix}-runtime-display`);
+        if (runDisp) runDisp.textContent = calc.formattedRuntime;
+        const litDisp = document.getElementById(`${prefix}-liters-display`);
+        if (litDisp) litDisp.innerHTML = `Net Need: <strong class="text-on-surface">${calc.requiredLiters.toLocaleString()} L</strong>`;
+
+        // Water Saved & Flood Baseline
+        const savDisp = document.getElementById(`${prefix}-saved-display`);
+        if (savDisp) savDisp.textContent = calc.formattedWaterSaved;
+        const pctBadge = document.getElementById(`${prefix}-pct-saved-badge`);
+        if (pctBadge) pctBadge.textContent = `${calc.pctWaterSaved}% Saved`;
+        const fldDisp = document.getElementById(`${prefix}-flood-display`);
+        if (fldDisp) fldDisp.innerHTML = `Flood: <span class="line-through">${calc.floodLiters.toLocaleString()} L</span>`;
+
+        // SMS Preview & Char Count
+        const smsPrev = document.getElementById(`${prefix}-sms-preview`);
+        if (smsPrev) smsPrev.textContent = calc.smsPayload;
+        const charCount = document.getElementById(`${prefix}-sms-char-count`);
+        if (charCount) {
+          charCount.textContent = `${calc.smsPayload.length} / 160 chars`;
+          charCount.className = calc.smsPayload.length <= 160
+            ? 'font-mono text-[9px] sm:text-[10px] font-bold text-emerald-600'
+            : 'font-mono text-[9px] sm:text-[10px] font-bold text-amber-500';
+        }
+      });
+    }
+
+    function sendPumpTimerSms() {
+      const farm = getFarmMetadata(currentRegionKey);
+      const calc = calculatePumpTimer(farm, pumpCalcState);
+      if (typeof promptAndSendFarmerSms === 'function') {
+        promptAndSendFarmerSms(calc.smsPayload);
+      } else {
+        alert("Pump Timer SMS Payload:\n\n" + calc.smsPayload);
+      }
+    }
+
+    function speakPumpTimerVoice() {
+      if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+        if (typeof showToast === 'function') {
+          showToast("Voice Alert", "Speech synthesis is not supported on this browser.");
+        } else {
+          alert("Speech synthesis is not supported on this browser.");
+        }
+        return;
+      }
+
+      if (pumpSpeechActive) {
+        window.speechSynthesis.cancel();
+        pumpSpeechActive = false;
+        setPumpVoiceUiState(false);
+        return;
+      }
+
+      const farm = getFarmMetadata(currentRegionKey);
+      const calc = calculatePumpTimer(farm, pumpCalcState);
+      const areaName = pumpCalcState.targetArea === 'stress' ? 'stress zone' : 'entire field';
+
+      let voiceText = `Earthworm irrigation advisory for ${farm.parcelId} in ${farm.location}. For your ${farm.crop}, turn on your ${pumpCalcState.pumpHp} horse power pump for ${calc.formattedRuntime} on the ${areaName}. Complete irrigation before 8:30 AM to save ${calc.pctWaterSaved} percent water.`;
+
+      if (currentLang === 'kn') {
+        voiceText = `ಅರ್ಥ್‌ವರ್ಮ್ ನೀರಾವರಿ ಸಲಹೆ. ${farm.location} ನ ${farm.parcelId} ಜಮೀನಿಗೆ ನಿಮ್ಮ ${pumpCalcState.pumpHp} ಎಚ್‌ಪಿ ಪಂಪ್ ಅನ್ನು ${calc.formattedRuntime} ಚಲಾಯಿಸಿ. ಬೆಳಗ್ಗೆ 8:30 ರೊಳಗೆ ನೀರು ಹರಿಸಿ ${calc.pctWaterSaved} ಪ್ರತಿಶತ ನೀರು ಉಳಿಸಿ.`;
+      } else if (currentLang === 'hi') {
+        voiceText = `अर्थवर्म सिंचाई सलाह। ${farm.location} के ${farm.parcelId} खेत के लिए, अपने ${pumpCalcState.pumpHp} एचपी पंप को ${calc.formattedRuntime} चलाएं। सुबह 8:30 से पहले सिंचाई पूरी करें और ${calc.pctWaterSaved} प्रतिशत पानी बचाएं।`;
+      } else if (currentLang === 'te') {
+        voiceText = `ఎర్త్‌వర్మ్ సాగునీటి సలహా. ${farm.location} లోని ${farm.parcelId} కోసం మీ ${pumpCalcState.pumpHp} హెచ్‌పీ పంపును ${calc.formattedRuntime} నడపండి. ఉదయం 8:30 లోపు నీరు అందించి ${calc.pctWaterSaved} శాతం నీటిని ఆదా చేయండి.`;
+      } else if (currentLang === 'ta') {
+        voiceText = `எர்த்வார்ம் பாசன ஆலோசனை. ${farm.location} நிலம் ${farm.parcelId} க்காக உங்கள் ${pumpCalcState.pumpHp} ஹெச்பி பம்பை ${calc.formattedRuntime} இயக்கவும். காலை 8:30 மணிக்குள் பாசனம் செய்து ${calc.pctWaterSaved} சதவீத தண்ணீரை சேமியுங்கள்.`;
+      } else if (currentLang === 'mr') {
+        voiceText = `अर्थवर्म सिंचन सल्ला. ${farm.location} मधील ${farm.parcelId} शेतासाठी तुमचा ${pumpCalcState.pumpHp} एचपी पंप ${calc.formattedRuntime} चालवा. सकाळी 8:30 पूर्वी सिंचन पूर्ण करून ${calc.pctWaterSaved} टक्के पाणी वाचवा.`;
+      } else if (currentLang === 'bn') {
+        voiceText = `আর্থওয়ার্ম সেচ পরামর্শ। ${farm.location}-এর ${farm.parcelId} জমির জন্য আপনার ${pumpCalcState.pumpHp} এইচপি পাম্প ${calc.formattedRuntime} চালান। সকাল ৮:৩০ এর আগে সেচ সম্পন্ন করে ${calc.pctWaterSaved} শতাংশ জল বাঁচান।`;
+      }
+
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(voiceText);
+      utterance.rate = 0.92;
+
+      const voices = window.speechSynthesis.getVoices();
+      const langPrefix = currentLang === 'en' ? 'en' : currentLang;
+      const matchedVoice = voices.find(v => v.lang.startsWith(langPrefix) || v.lang.includes('IN'));
+      if (matchedVoice) {
+        utterance.voice = matchedVoice;
+      }
+
+      utterance.onstart = () => {
+        pumpSpeechActive = true;
+        setPumpVoiceUiState(true);
+      };
+      utterance.onend = () => {
+        pumpSpeechActive = false;
+        setPumpVoiceUiState(false);
+      };
+      utterance.onerror = () => {
+        pumpSpeechActive = false;
+        setPumpVoiceUiState(false);
+      };
+
+      pumpSpeechActive = true;
+      setPumpVoiceUiState(true);
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function setPumpVoiceUiState(speaking) {
+      const iconName = speaking ? 'stop_circle' : 'volume_up';
+      const textLabel = speaking ? 'Stop Audio' : 'Hear Voice Timer Alert';
+
+      ['modal', 'step2'].forEach(prefix => {
+        const icon = document.getElementById(`${prefix}-voice-icon`);
+        const txt = document.getElementById(`${prefix}-voice-text`);
+        const btn = document.getElementById(`${prefix}-btn-voice`);
+        if (icon) icon.textContent = iconName;
+        if (txt) txt.textContent = textLabel;
+        if (btn) {
+          if (speaking) {
+            btn.classList.add('bg-amber-500/20', 'text-amber-900', 'border-amber-500');
+          } else {
+            btn.classList.remove('bg-amber-500/20', 'text-amber-900', 'border-amber-500');
+          }
+        }
+      });
+    }
+
   </script>
 </body>
 </html>

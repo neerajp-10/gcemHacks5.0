@@ -227,6 +227,41 @@ Section 3 details an operational timetable:
 - **Step 3 (Days 2–3)**: Lateral line flushing and acid/salt emitter de-clogging.
 - **Step 4 (Day 5)**: Satellite overpass verification against next Sentinel-2 5-day cycle.
 
+### Interactive Smart Pump Timer & Water Savings Calculator
+To convert space-borne vegetative moisture alerts into immediate on-ground water management actions, Earthworm integrates a real-time **Smart Pump Timer & Water Savings Calculator**:
+
+1. **Agronomic & Hydrological Computation Engine**:
+   - **Target Area Multiplier**:
+     - `Stress Zone Only (25% of Parcel)`: Targets micro-irrigation solely to the satellite-flagged stress zone (`activeHectares = totalHectares * 0.25`).
+     - `Full Field (100%)`: Calibrates irrigation across the whole farm parcel (`activeHectares = totalHectares * 1.0`).
+   - **Delivery Method Efficiency Multiplier**:
+     - `Drip / Micro-Pipe`: 0.85 efficiency factor (high precision, low surface loss).
+     - `Channel / Furrow`: 1.15 efficiency factor (compensates for 30–35% conveyance losses).
+   - **Pump Discharge Rating**:
+     - `3 HP`: 2,700 Liters/min
+     - `5 HP`: 4,400 Liters/min (standard rural electric submersible)
+     - `7.5 HP`: 6,500 Liters/min
+   - **Exact Formulas**:
+     $$\text{Required Liters} = \text{activeHectares} \times 10,000\text{ m}^2/\text{ha} \times \text{waterDeficitMm} \times \text{efficiencyFactor}$$
+     $$\text{Runtime Minutes} = \max\left(5, \text{round}\left(\frac{\text{Required Liters}}{\text{Discharge LPM}}\right)\right)$$
+     $$\text{Flood Irrigation Baseline} = \text{totalHectares} \times 10,000\text{ m}^2/\text{ha} \times 45\text{ mm}$$
+     $$\text{Water Saved (Liters)} = \max(0, \text{Flood Baseline} - \text{Required Liters})$$
+     $$\%\text{ Water Saved} = \min\left(99, \max\left(10, \text{round}\left(\frac{\text{Water Saved}}{\text{Flood Baseline}} \times 100\right)\right)\right)$$
+
+2. **Dual-Tab UI Wiring**:
+   - **Home Tab (Tile 2: "2. Should I Water?")**: Clicking the tile opens the responsive modal (`#pumpTimerModal`) pre-populated with the selected parcel's acreage, crop, and deficit.
+   - **Advice Tab (Step 2: Calibrated Irrigation Correction)**: Embedded directly into the Step 2 action card (`#adv-step2-pump-calculator`), enabling agronomists and farmers to toggle HP and zone settings interactively inside the advisory flow.
+
+3. **Low-Bandwidth SMS & Voice Delivery**:
+   - **Monospace Compressed SMS Box**: Generates a standard GSM-7 message with a live character counter (`X / 160 chars`):
+     `[EARTHWORM] <Location> <ParcelId>: Run <HP>HP pump for <Runtime> (<TargetArea>) before 8:30 AM. Saves <Percent>% water. Reply 1 when done.`
+   - **Cellular SMS Dispatch**: Directly routes through the Twilio / simulation backend.
+   - **Farmer-Friendly Voice Alert**: Uses the Web Speech API (`window.speechSynthesis`) to deliver clear localized audio instructions in English, Kannada, Hindi, Telugu, Tamil, Marathi, and Bengali.
+
+4. **Component Code Artifacts**:
+   - Standalone Modular TypeScript Component: [components/PumpTimerCalculator.tsx](file:///c:/Earthworm/components/PumpTimerCalculator.tsx) (verified with 0 TypeScript compiler errors).
+   - Inlined HTML/JS Widget across all 6 distribution mirrors.
+
 ---
 
 ## 4. Low-Bandwidth Rural Agri-Telephony Subsystem
