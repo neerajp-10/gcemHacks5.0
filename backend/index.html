@@ -252,56 +252,27 @@
 
 /* Interface Mode Switching Styles (Mobile vs Desktop) */
     .mode-desktop #header-inner {
-      max-width: 1440px !important;
-      padding-left: 2rem !important;
-      padding-right: 2rem !important;
+      max-width: 80rem !important; /* max-w-7xl */
+      padding-left: 1.5rem !important;
+      padding-right: 1.5rem !important;
     }
     .mode-desktop #main-content {
-      max-width: 1440px !important;
-      padding-left: 2rem !important;
-      padding-right: 2rem !important;
-      padding-top: 2rem !important;
-      padding-bottom: 4rem !important;
+      max-width: 80rem !important; /* max-w-7xl */
+      padding-left: 1.5rem !important;
+      padding-right: 1.5rem !important;
+      padding-bottom: 3.5rem !important;
       border-left-width: 0 !important;
       border-right-width: 0 !important;
       box-shadow: none !important;
-    }
-    .mode-desktop #main-sections-wrapper {
-      display: flex !important;
-      flex-direction: row !important;
-      align-items: flex-start !important;
-      gap: 2rem !important;
-    }
-    .mode-desktop #desktop-sidebar-rail {
-      display: flex !important;
-    }
-    .mode-desktop #desktop-sidebar-farms-slot #farm-pills-container {
-      grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
-      gap: 0.65rem !important;
     }
     .mode-desktop #bottom-nav-bar {
       display: none !important;
     }
     .mode-desktop #desktop-top-nav {
-      display: none !important; /* Replaced cleanly by Left Navigation Rail */
+      display: flex !important;
     }
     .mode-desktop #satellite-canvas {
-      height: 360px !important;
-    }
-    .mode-desktop #advisory-section,
-    .mode-desktop #satellite-card,
-    .mode-desktop #actions-section,
-    .mode-desktop #weather-section,
-    .mode-desktop #support-section {
-      height: 100% !important;
-    }
-    .mode-mobile #desktop-sidebar-rail {
-      display: none !important;
-    }
-    .mode-mobile #main-sections-wrapper {
-      display: flex !important;
-      flex-direction: column !important;
-      gap: 1.5rem !important;
+      height: 380px !important;
     }
     html.dark #advisory-section {
       background: #122119 !important;
@@ -366,21 +337,6 @@
     }
     .mode-mobile .lg\:sticky {
       position: static !important;
-    }
-    .mode-mobile #hero-section {
-      flex-direction: column !important;
-      align-items: stretch !important;
-    }
-    .mode-mobile #top-banner {
-      max-width: 100% !important;
-    }
-    .mode-mobile #farm-pills-container {
-      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    }
-    @media (max-width: 540px) {
-      .mode-mobile #farm-pills-container {
-        grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
-      }
     }
   </style>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -862,7 +818,7 @@
     </div>
   </div>
   <!-- FIXED APP HEADER -->
-  <header class="sticky top-0 inset-x-0 z-50 bg-surface/92 backdrop-blur-xl border-b border-surface-variant/60 shadow-[0_1px_6px_rgba(0,0,0,0.03)] pt-safe">
+  <header class="fixed top-0 inset-x-0 z-50 bg-surface/90 backdrop-blur-xl border-b border-surface-variant/60 shadow-[0_1px_6px_rgba(0,0,0,0.03)] pt-safe">
     <div id="header-inner" class="h-16 px-4 flex items-center justify-between gap-2 max-w-[640px] mx-auto transition-all duration-300">
       <!-- Brand Identity -->
       <div class="flex items-center gap-2.5 shrink-0">
@@ -944,96 +900,69 @@
   </header>
 
   <!-- MAIN SCROLLABLE CONTENT -->
-  <main id="main-content" class="flex-1 flex flex-col relative w-full px-4 sm:px-5 pt-6 pb-28 bg-surface max-w-[640px] mx-auto transition-all duration-300 sm:border-x sm:border-surface-variant/40 sm:shadow-[0_0_40px_rgba(0,0,0,0.06)]">
-    <div class="flex flex-col gap-6 w-full" id="main-sections-wrapper">
-
-      <!-- LEFT NAVIGATION & PARCEL RAIL (Desktop Workspace Mode) -->
-      <aside id="desktop-sidebar-rail" class="hidden w-64 xl:w-72 shrink-0 flex-col gap-5 self-start">
-        <!-- Workspace Navigation Card -->
-        <nav class="bg-surface-container-lowest rounded-3xl p-3 border border-surface-variant shadow-sm flex flex-col gap-1.5" aria-label="Primary Workspace Navigation">
-          <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-secondary">Workspace</div>
-          <button onclick="switchTab('home')" id="stab-home" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-primary bg-surface-container transition-all cursor-pointer text-left" type="button">
-            <span class="material-symbols-outlined text-[20px]">home</span>
-            <span id="snav-label-home">Home</span>
-          </button>
-          <button onclick="switchTab('myfarm')" id="stab-myfarm" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container/60 transition-colors cursor-pointer text-left" type="button">
-            <span class="material-symbols-outlined text-[20px]">agriculture</span>
-            <span id="snav-label-myfarm">My Farm</span>
-          </button>
-          <button onclick="switchTab('advice')" id="stab-advice" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container/60 transition-colors cursor-pointer text-left" type="button">
-            <span class="material-symbols-outlined text-[20px]">wb_incandescent</span>
-            <span id="snav-label-advice">Advice</span>
-          </button>
-        </nav>
-
-        <!-- Sidebar Farm Selector Slot -->
-        <div id="desktop-sidebar-farms-slot" class="w-full"></div>
-
-        <!-- Sidebar Prototype Disclosure Slot -->
-        <div id="desktop-sidebar-notice-slot" class="w-full"></div>
-      </aside>
-
-      <!-- MAIN WORKSPACE PANE (Holds View Home & View Advice) -->
-      <div id="desktop-main-pane" class="flex-1 min-w-0 flex flex-col gap-6 w-full">
+  <main id="main-content" class="flex-1 flex flex-col relative w-full px-4 pt-20 pb-28 bg-surface max-w-[640px] mx-auto transition-all duration-300 sm:border-x sm:border-surface-variant/40 sm:shadow-[0_0_40px_rgba(0,0,0,0.06)]">
+    <div class="flex flex-col gap-4 w-full" id="main-sections-wrapper">
 
       <!-- VIEW: HOME (Main Satellite & Agro-Met Dashboard) -->
       <div id="view-home" class="flex flex-col gap-5 sm:gap-6 w-full">
-        <!-- EXECUTIVE HERO GREETING -->
-      <section id="hero-section" class="flex flex-col gap-1.5 pb-1">
-        <div class="inline-flex items-center gap-1.5 self-start px-3 py-1 rounded-full bg-surface-container text-primary text-[11px] font-bold tracking-wide">
-          <span class="material-symbols-outlined text-[14px]">satellite_alt</span>
-          <span id="hero-tag">Space &amp; Weather Observations</span>
+        <!-- EXECUTIVE HEADER STRIP: HERO + PROTOTYPE DISCLOSURE INTEGRATED -->
+      <section id="hero-section" class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4 pt-1 pb-2 border-b border-surface-variant/50">
+        <div class="flex flex-col gap-1.5">
+          <div class="inline-flex items-center gap-1.5 self-start px-2.5 py-0.5 rounded-full bg-surface-container text-primary text-[11px] font-bold tracking-wide">
+            <span class="material-symbols-outlined text-[14px]">satellite_alt</span>
+            <span id="hero-tag">Space &amp; Weather Observations</span>
+          </div>
+          <h1 class="text-[22px] sm:text-[26px] font-black text-on-surface leading-tight tracking-tight" id="hero-title">
+            Understand Your Crops Before Problems Grow.
+          </h1>
+          <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed" id="hero-subtitle">
+            Free space-based vegetative index and agrometeorological insights for Indian farmers.
+          </p>
         </div>
-        <h1 class="text-2xl sm:text-[28px] font-black text-on-surface leading-tight tracking-tight" id="hero-title">
-          Understand Your Crops Before Problems Grow.
-        </h1>
-        <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed" id="hero-subtitle">
-          Free space-based vegetative index and agrometeorological insights for Indian farmers.
-        </p>
+
+        <!-- Discreet Prototype Verification Notice Card -->
+        <div id="top-banner" class="bg-surface-container-low/90 border-l-4 border-primary rounded-xl px-3.5 py-2.5 flex items-start gap-2.5 shadow-2xs text-xs text-on-surface-variant lg:max-w-sm shrink-0">
+          <span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">verified_user</span>
+          <div class="leading-snug">
+            <span class="font-bold text-on-surface" id="banner-title">Prototype Demonstration Data</span>:
+            <span id="banner-text">Satellite reflectance &amp; agromet observations. Always verify ground conditions before applying treatments.</span>
+          </div>
+        </div>
       </section>
 
       <!-- MOBILE SECTIONS CONTAINER (Linear Stack) -->
-      <div id="mobile-sections-container" class="flex flex-col gap-6 w-full">
-      <!-- PROTOTYPE DISCLOSURE NOTICE -->
-      <div id="top-banner" class="bg-surface-container-lowest border-l-4 border-primary rounded-2xl p-4 flex items-start gap-2.5 shadow-xs text-xs text-on-surface-variant border border-surface-variant">
-        <span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">verified_user</span>
-        <div class="leading-relaxed">
-          <span class="font-bold text-on-surface" id="banner-title">Prototype Demonstration Data</span>:
-          <span id="banner-text">Satellite reflectance &amp; agromet observations. Always verify ground conditions before applying treatments.</span>
-        </div>
-      </div>
-
+      <div id="mobile-sections-container" class="flex flex-col gap-5 w-full">
 
         <!-- 2. DYNAMIC LIVE SATELLITE VIEWER -->
-        <div class="relative w-full rounded-3xl overflow-hidden bg-surface-container-lowest border border-surface-variant shadow-sm transition-all flex flex-col justify-between" id="satellite-card">
+        <div class="relative w-full rounded-2xl overflow-hidden bg-surface-container-lowest border border-surface-variant shadow-sm transition-all" id="satellite-card">
         
         <!-- SATELLITE TOOLBAR: TELEMETRY & CONTROLS -->
         <div class="p-3 sm:p-4 bg-surface-container-low border-b border-surface-variant flex flex-col gap-3">
           <!-- Top Row: Satellite Beacon & Action Buttons -->
-          <div class="flex items-center justify-between flex-wrap gap-2">
-            <div class="flex items-center gap-2 shrink-0">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-1.5">
               <span class="relative flex h-2.5 w-2.5">
                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
               </span>
-              <span class="text-[11px] font-bold text-on-surface uppercase tracking-wider flex items-center gap-1 whitespace-nowrap" id="sat-telemetry-badge">
+              <span class="text-[11px] font-bold text-on-surface uppercase tracking-wider flex items-center gap-1" id="sat-telemetry-badge">
                 <span>Copernicus Sentinel-2</span>
                 <span class="text-secondary font-normal" id="sat-gsd-badge">• 10m GSD</span>
               </span>
             </div>
             
             <!-- Quick Actions: Mark Land + Radar Scan Toggle + Refresh -->
-            <div class="flex items-center flex-wrap gap-1.5">
-              <button id="btn-toggle-mark-land" onclick="toggleLandMarkingMode()" class="text-[11px] font-bold px-2.5 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-800 dark:text-emerald-300 flex items-center gap-1 transition-all cursor-pointer border border-emerald-500/30 whitespace-nowrap" title="Manually Mark Field Boundary & Acreage">
+            <div class="flex items-center gap-1">
+              <button id="btn-toggle-mark-land" onclick="toggleLandMarkingMode()" class="text-[10px] font-bold px-2 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-800 dark:text-emerald-300 flex items-center gap-1 transition-all cursor-pointer border border-emerald-500/30" title="Manually Mark Field Boundary & Acreage">
                 <span class="material-symbols-outlined text-[13px] text-emerald-600">edit_location_alt</span>
                 <span id="mark-land-btn-text">Mark Land</span>
               </button>
-              <button id="btn-toggle-radar" onclick="toggleRadarScan()" class="text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface flex items-center gap-1 transition-all cursor-pointer whitespace-nowrap" title="Toggle Radar Laser Scanline">
-                <span class="material-symbols-outlined text-[14px] text-primary" id="radar-icon">sensors</span>
+              <button id="btn-toggle-radar" onclick="toggleRadarScan()" class="text-[10px] font-semibold px-2 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface flex items-center gap-1 transition-all cursor-pointer" title="Toggle Radar Laser Scanline">
+                <span class="material-symbols-outlined text-[13px] text-primary" id="radar-icon">sensors</span>
                 <span id="radar-text">Radar Scan</span>
               </button>
-              <button id="btn-refresh-sat" onclick="refreshSatellitePass()" class="text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary flex items-center gap-1 transition-all cursor-pointer whitespace-nowrap" title="Fetch Latest Sentinel-2 Pass">
-                <span class="material-symbols-outlined text-[14px] transition-transform duration-500" id="refresh-icon">sync</span>
+              <button id="btn-refresh-sat" onclick="refreshSatellitePass()" class="text-[10px] font-semibold px-2 py-1 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary flex items-center gap-1 transition-all cursor-pointer" title="Fetch Latest Sentinel-2 Pass">
+                <span class="material-symbols-outlined text-[13px] transition-transform duration-500" id="refresh-icon">sync</span>
                 <span id="sat-refresh-text">Refresh</span>
               </button>
             </div>
@@ -1111,38 +1040,59 @@
           </div>
 
           <!-- Floating Manual Land Marker HUD -->
-          <div id="land-marker-hud" class="absolute top-2 left-2 right-2 z-40 bg-inverse-surface/95 backdrop-blur-md rounded-xl p-2.5 text-inverse-on-surface shadow-2xl border border-emerald-500/40 flex flex-col gap-2 transition-all" style="display: none;">
-            <div class="flex items-center justify-between text-xs">
-              <div class="flex items-center gap-1.5 font-bold text-emerald-400">
-                <span class="material-symbols-outlined text-[16px] animate-pulse">draw</span>
-                <span id="marker-hud-title">Manual Land Boundary Marking</span>
+          <div id="land-marker-hud" class="absolute top-2 left-2 right-12 z-40 bg-slate-900/95 backdrop-blur-md rounded-xl p-2.5 text-white shadow-2xl border border-emerald-500/50 flex flex-col gap-2 transition-all" style="display: none;">
+            <div class="flex items-center justify-between gap-2 text-xs">
+              <div class="flex items-center gap-1.5 font-bold text-emerald-400 min-w-0">
+                <span class="material-symbols-outlined text-[16px] animate-pulse shrink-0">draw</span>
+                <span id="marker-hud-title" class="truncate">Manual Land Boundary Marking</span>
               </div>
-              <button onclick="toggleLandMarkingMode(false)" class="text-white/60 hover:text-white p-0.5 rounded cursor-pointer" type="button">
-                <span class="material-symbols-outlined text-[16px]">close</span>
+              <div class="flex items-center gap-1.5 shrink-0">
+                <span id="marker-cursor-coords" class="hidden sm:inline font-mono text-[9px] text-emerald-200/80 bg-black/40 px-1.5 py-0.5 rounded border border-white/10">Ready</span>
+                <button onclick="toggleHybridLabelsLayer()" id="btn-toggle-labels" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-white/10 hover:bg-white/20 text-slate-200 border border-white/15 flex items-center gap-0.5 cursor-pointer transition-colors" title="Toggle Village & Road Labels" type="button">
+                  <span class="material-symbols-outlined text-[12px]">label</span>
+                  <span>Labels</span>
+                </button>
+                <button onclick="toggleLandMarkingMode(false)" class="text-white/70 hover:text-white p-0.5 rounded cursor-pointer" title="Exit Marking Mode" type="button">
+                  <span class="material-symbols-outlined text-[16px]">close</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Quick Village / Coordinate Search Bar -->
+            <div class="flex items-center gap-1">
+              <div class="relative flex-1 flex items-center">
+                <span class="material-symbols-outlined text-slate-400 text-[14px] absolute left-2 pointer-events-none">search</span>
+                <input type="text" id="marker-location-search" placeholder="Search village, town or lat, lng (e.g. 12.52, 76.89)" onkeydown="if(event.key==='Enter'){event.preventDefault(); searchMarkerLocation();}" class="w-full bg-black/50 border border-white/20 rounded-lg pl-7 pr-2 py-1 text-[11px] text-white placeholder-slate-400 focus:outline-none focus:border-emerald-400"/>
+              </div>
+              <button onclick="searchMarkerLocation()" id="btn-marker-search" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] shrink-0 cursor-pointer transition-colors" type="button">
+                Go
               </button>
             </div>
-            <p class="text-[11px] text-surface-container-low" id="marker-hud-hint">
-              Tap anywhere on the satellite map to place boundary corner pins for your field.
+
+            <p class="text-[10px] text-emerald-100/90 leading-tight" id="marker-hud-hint">
+              Zoom in close to field bunds &amp; tap corners cleanly. Click Corner #1 after 3+ pins to enclose.
             </p>
-            <div class="flex items-center justify-between gap-1 text-[10px] font-mono bg-black/40 px-2 py-1.5 rounded-lg border border-white/10">
-              <div>Corners: <span id="marker-count" class="font-bold text-emerald-300">0</span></div>
-              <div>Est. Area: <span id="marker-area-acres" class="font-bold text-amber-300">0.00</span> Acres (<span id="marker-area-guntas" class="text-amber-200">0</span> Guntas)</div>
-              <div>Perimeter: <span id="marker-perimeter" class="text-surface-container-lowest">0m</span></div>
+
+            <div class="flex items-center justify-between gap-1 text-[10px] font-mono bg-black/50 px-2 py-1.5 rounded-lg border border-white/10 flex-wrap">
+              <div>Pins: <span id="marker-count" class="font-bold text-emerald-300">0</span></div>
+              <div>Area: <span id="marker-area-acres" class="font-bold text-amber-300">0.00</span> Ac (<span id="marker-area-guntas" class="text-amber-200">0</span> Guntas)</div>
+              <div>Perim: <span id="marker-perimeter" class="text-white">0m</span></div>
             </div>
+
             <div class="flex items-center gap-1.5 pt-0.5">
-              <button onclick="addCurrentGpsMarker()" class="flex-1 py-1.5 px-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold text-[10px] flex items-center justify-center gap-1 cursor-pointer transition-colors" title="Use Phone/Device GPS Location" type="button">
+              <button onclick="addCurrentGpsMarker()" class="flex-1 py-1.5 px-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold text-[10px] flex items-center justify-center gap-1 cursor-pointer transition-colors" title="Drop Pin at Current Phone GPS Location" type="button">
                 <span class="material-symbols-outlined text-[12px]">my_location</span>
                 <span id="gps-btn-text">GPS My Spot</span>
               </button>
-              <button onclick="undoLastMarkerPoint()" id="btn-undo-marker" disabled class="py-1.5 px-2 bg-surface-variant/40 hover:bg-surface-variant/70 disabled:opacity-40 text-on-surface rounded-lg font-bold text-[10px] flex items-center justify-center gap-1 cursor-pointer transition-colors" title="Undo last point" type="button">
+              <button onclick="undoLastMarkerPoint()" id="btn-undo-marker" disabled class="py-1.5 px-2 bg-white/15 hover:bg-white/25 disabled:opacity-35 text-white rounded-lg font-bold text-[10px] flex items-center justify-center gap-1 cursor-pointer transition-colors" title="Undo last point" type="button">
                 <span class="material-symbols-outlined text-[12px]">undo</span>
                 <span>Undo</span>
               </button>
-              <button onclick="clearAllMarkerPoints()" id="btn-clear-markers" disabled class="py-1.5 px-2 bg-surface-variant/40 hover:bg-surface-variant/70 disabled:opacity-40 text-rose-300 rounded-lg font-bold text-[10px] flex items-center justify-center gap-1 cursor-pointer transition-colors" title="Clear all points" type="button">
+              <button onclick="clearAllMarkerPoints()" id="btn-clear-markers" disabled class="py-1.5 px-2 bg-white/15 hover:bg-white/25 disabled:opacity-35 text-rose-300 rounded-lg font-bold text-[10px] flex items-center justify-center gap-1 cursor-pointer transition-colors" title="Clear all points" type="button">
                 <span class="material-symbols-outlined text-[12px]">delete</span>
                 <span>Clear</span>
               </button>
-              <button onclick="openSaveLandModal()" id="btn-save-land" disabled class="py-1.5 px-2.5 bg-amber-500 hover:bg-amber-400 disabled:opacity-40 text-black rounded-lg font-extrabold text-[10px] flex items-center justify-center gap-1 cursor-pointer transition-colors" title="Save marked boundary" type="button">
+              <button onclick="openSaveLandModal()" id="btn-save-land" disabled class="py-1.5 px-2.5 bg-amber-400 hover:bg-amber-300 disabled:opacity-35 text-slate-950 rounded-lg font-extrabold text-[10px] flex items-center justify-center gap-1 cursor-pointer transition-colors shadow-xs" title="Save marked land to My Farms" type="button">
                 <span class="material-symbols-outlined text-[12px]">save</span>
                 <span>Save Land</span>
               </button>
@@ -1321,13 +1271,18 @@
       </div>
 
       <!-- 3. PAN-INDIA REACH & INTERACTIVE FARM SELECTOR -->
-      <section id="farms-section" class="flex flex-col gap-3 bg-surface-container-lowest p-4 sm:p-5 rounded-3xl border border-surface-variant shadow-sm">
-        <div class="flex items-center justify-between flex-wrap gap-2">
+      <section id="farms-section" class="flex flex-col gap-3 bg-surface-container-low p-4 sm:p-5 rounded-3xl border border-surface-variant shadow-xs">
+        <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="material-symbols-outlined text-primary text-[20px]">pin_drop</span>
             <span class="text-xs font-bold uppercase tracking-wider text-on-surface" id="region-selector-header">Select Field (Pan-India)</span>
           </div>
-
+          <div class="flex items-center gap-2">
+            <button onclick="openAddFarmModal()" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl bg-primary text-on-primary hover:bg-primary-container active:scale-95 transition-all shadow-sm cursor-pointer" id="btn-add-farm-header" title="Register and monitor a new farm">
+              <span class="material-symbols-outlined text-[16px]">add_location_alt</span>
+              <span>+ Add Farm</span>
+            </button>
+          </div>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1" id="farm-pills-container">
           <button class="region-pill active-pill p-2.5 rounded-xl border text-left flex items-start gap-2.5 transition-all bg-primary-container text-on-primary border-primary min-h-[48px]" id="pill-mandya" onclick="selectRegion('mandya')" type="button">
@@ -1415,20 +1370,20 @@
         </div>
 
         <!-- Action Buttons with Enhanced Color & Contrast -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 mt-auto">
-          <button class="min-h-[48px] px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-700 via-emerald-800 to-teal-800 hover:from-emerald-800 hover:to-teal-900 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 active:scale-[0.99] shadow-md hover:shadow-lg transition-all cursor-pointer text-center" onclick="openBriefAdviceModal()" type="button" id="btn-brief-advice-trigger">
-            <span class="material-symbols-outlined text-[18px] shrink-0">summarize</span>
-            <span id="btn-view-advice" class="leading-tight">View Advice (Brief)</span>
+        <div class="flex flex-col sm:flex-row gap-2.5 pt-1">
+          <button class="flex-1 min-h-[48px] px-4 rounded-xl bg-gradient-to-r from-emerald-700 via-emerald-800 to-teal-800 hover:from-emerald-800 hover:to-teal-900 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 active:scale-[0.99] shadow-md hover:shadow-lg transition-all cursor-pointer whitespace-nowrap" onclick="openBriefAdviceModal()" type="button" id="btn-brief-advice-trigger">
+            <span class="material-symbols-outlined text-[18px]">summarize</span>
+            <span id="btn-view-advice">View Advice (Brief)</span>
           </button>
-          <button class="min-h-[48px] px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 text-amber-950 border border-amber-300 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs active:scale-[0.99] transition-all cursor-pointer text-center" id="btn-audio-voice" onclick="toggleAudioAdvice()" type="button">
-            <span class="material-symbols-outlined text-[18px] text-amber-700 shrink-0" id="audio-icon">volume_up</span>
-            <span id="btn-audio-listen" class="leading-tight">Listen Voice Advice</span>
+          <button class="min-h-[48px] px-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 text-amber-950 border border-amber-300 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs active:scale-[0.99] transition-all cursor-pointer whitespace-nowrap" id="btn-audio-voice" onclick="toggleAudioAdvice()" type="button">
+            <span class="material-symbols-outlined text-[18px] text-amber-700" id="audio-icon">volume_up</span>
+            <span id="btn-audio-listen">Listen Voice Advice</span>
           </button>
         </div>
       </section>
 
       <!-- 5. THREE PRACTICAL ACTION TILES WITH VIBRANT THEMES -->
-      <section id="actions-section" class="rounded-3xl bg-surface-container-lowest p-5 sm:p-6 border border-surface-variant shadow-sm flex flex-col justify-between gap-3.5">
+      <section id="actions-section" class="rounded-3xl bg-surface-container-lowest p-5 border border-surface-variant shadow-sm flex flex-col gap-3.5">
         <div class="flex items-center justify-between">
           <h3 class="text-base font-black text-on-surface tracking-tight" id="tiles-header">Three Practical Field Actions</h3>
           <span class="text-xs font-semibold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">Tap tile to inspect</span>
@@ -1478,42 +1433,42 @@
       </section>
 
       <!-- 6. 3-DAY WEATHER OUTLOOK -->
-      <section id="weather-section" class="rounded-3xl bg-surface-container-lowest p-5 sm:p-6 border border-surface-variant flex flex-col justify-between gap-4 shadow-sm">
-        <div class="flex items-center justify-between gap-2">
+      <section id="weather-section" class="rounded-3xl bg-surface-container p-5 border border-surface-variant flex flex-col gap-3.5 shadow-sm">
+        <div class="flex items-center justify-between">
           <div class="flex items-center gap-1.5">
             <span class="material-symbols-outlined text-primary text-[18px]">wb_sunny</span>
             <span class="text-xs font-bold text-primary uppercase tracking-wide" id="weather-source-tag">Regional 3-Day Outlook (Open-Meteo Demonstration)</span>
           </div>
-          <span class="text-[11px] font-medium text-secondary shrink-0" id="weather-demo-tag">Demonstration</span>
+          <span class="text-[11px] text-secondary" id="weather-demo-tag">Demonstration</span>
         </div>
-        <div class="grid grid-cols-3 gap-2.5 text-center" id="forecast-grid">
-          <div class="bg-surface-container-low/70 p-3 rounded-2xl border border-surface-variant flex flex-col items-center">
+        <div class="grid grid-cols-3 gap-2 text-center" id="forecast-grid">
+          <div class="bg-surface-container-lowest p-2.5 rounded-xl border border-surface-variant flex flex-col items-center">
             <span class="text-[11px] font-semibold text-secondary">Day 1</span>
             <span class="material-symbols-outlined text-tertiary-container my-1 text-[22px]">sunny</span>
-            <span class="text-sm font-bold text-on-surface whitespace-nowrap">31° / 21°</span>
-            <span class="text-[10px] text-primary font-medium whitespace-nowrap">0 mm rain</span>
+            <span class="text-sm font-bold text-on-surface">31° / 21°</span>
+            <span class="text-[10px] text-primary font-medium">0 mm rain</span>
           </div>
-          <div class="bg-surface-container-low/70 p-3 rounded-2xl border border-surface-variant flex flex-col items-center">
+          <div class="bg-surface-container-lowest p-2.5 rounded-xl border border-surface-variant flex flex-col items-center">
             <span class="text-[11px] font-semibold text-secondary">Day 2</span>
             <span class="material-symbols-outlined text-tertiary-container my-1 text-[22px]">partly_cloudy_day</span>
-            <span class="text-sm font-bold text-on-surface whitespace-nowrap">32° / 20°</span>
-            <span class="text-[10px] text-primary font-medium whitespace-nowrap">0 mm rain</span>
+            <span class="text-sm font-bold text-on-surface">32° / 20°</span>
+            <span class="text-[10px] text-primary font-medium">0 mm rain</span>
           </div>
-          <div class="bg-surface-container-low/70 p-3 rounded-2xl border border-surface-variant flex flex-col items-center">
+          <div class="bg-surface-container-lowest p-2.5 rounded-xl border border-surface-variant flex flex-col items-center">
             <span class="text-[11px] font-semibold text-secondary">Day 3</span>
             <span class="material-symbols-outlined text-secondary my-1 text-[22px]">cloud</span>
-            <span class="text-sm font-bold text-on-surface whitespace-nowrap">30° / 22°</span>
+            <span class="text-sm font-bold text-on-surface">30° / 22°</span>
             <span class="text-[10px] text-secondary font-medium">&lt;1 mm rain</span>
           </div>
         </div>
-        <div class="bg-surface-container-low px-3.5 py-2.5 rounded-2xl text-on-surface text-xs flex items-center gap-2 border border-surface-variant/60 mt-auto" id="weather-recommendation">
+        <div class="bg-surface-container-high px-3 py-2 rounded-xl text-on-surface text-xs flex items-center gap-2" id="weather-recommendation">
           <span class="material-symbols-outlined text-primary text-[18px] shrink-0">check_circle</span>
           <span class="leading-tight">Stable dry weather next 3 days. Suitable for weed clearing and ground parcel inspection.</span>
         </div>
       </section>
 
       <!-- 7. FARMER CALL CENTRE SUPPORT & AUDIO ACCESS -->
-      <section id="support-section" class="rounded-3xl bg-surface-container-lowest p-5 sm:p-6 border border-surface-variant shadow-sm flex flex-col justify-between gap-4">
+      <section id="support-section" class="rounded-3xl bg-surface-container-lowest p-5 border border-surface-variant shadow-sm flex flex-col gap-4">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container shrink-0">
@@ -1529,9 +1484,9 @@
           </span>
         </div>
 
-        <div class="flex items-center flex-wrap gap-2 pt-0.5">
-          <a class="flex-1 min-w-[175px] min-h-[44px] px-3 rounded-xl bg-primary text-on-primary flex items-center justify-center gap-2 text-xs font-bold active:bg-primary-container shadow-sm transition-colors whitespace-nowrap" href="tel:18001801551" title="Dial toll-free agronomist hotline">
-            <span class="material-symbols-outlined text-[18px] shrink-0">call</span>
+        <div class="flex items-center gap-2 pt-0.5">
+          <a class="flex-1 min-h-[44px] rounded-xl bg-primary text-on-primary flex items-center justify-center gap-2 text-xs font-bold active:bg-primary-container shadow-sm transition-colors" href="tel:18001801551" title="Dial toll-free agronomist hotline">
+            <span class="material-symbols-outlined text-[18px]">call</span>
             <span id="support-helpline-label">Helpline: 1800-180-1551</span>
           </a>
           <button class="min-h-[44px] px-3.5 rounded-xl bg-surface-container text-on-surface font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-surface-variant transition-colors cursor-pointer border border-surface-variant/50 shrink-0" onclick="promptAndSendFarmerSms()" type="button" id="btn-quick-sms-trigger" title="Quick SMS Advisory Dispatch">
@@ -1587,22 +1542,15 @@
       </div>
       <!-- END MOBILE SECTIONS CONTAINER -->
 
-      <!-- DESKTOP BENTO WORKSPACE GRID (Activated in desktop mode) -->
-      <div id="desktop-grid-container" class="hidden flex-col gap-6 w-full">
-        <!-- Bento Row 1: Full-Width Panoramic Satellite Observatory -->
-        <div id="desktop-r1-full" class="w-full flex flex-col"></div>
+      <!-- DESKTOP TOP FULL-WIDTH FARM SELECTOR BAR -->
+      <div id="desktop-farms-slot" class="hidden w-full"></div>
 
-        <!-- Bento Row 2: Spacious 50/50 Agronomic Decision & Operations Pair -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full items-stretch">
-          <div id="desktop-r2-left" class="flex flex-col"></div>
-          <div id="desktop-r2-right" class="flex flex-col"></div>
-        </div>
-
-        <!-- Bento Row 3: Spacious 50/50 Weather Outlook & Cellular SMS Dispatch Pair -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full items-stretch">
-          <div id="desktop-r3-left" class="flex flex-col"></div>
-          <div id="desktop-r3-right" class="flex flex-col"></div>
-        </div>
+      <!-- DESKTOP GRID CONTAINER (Balanced 7/5 Two-Column Dashboard, activated in desktop mode) -->
+      <div id="desktop-grid-container" class="hidden grid-cols-1 lg:grid-cols-12 gap-7 w-full items-start">
+        <!-- Left Main Column (7 of 12 cols, ~58% width: Satellite + Weather) -->
+        <div id="desktop-col-left" class="lg:col-span-7 flex flex-col gap-6"></div>
+        <!-- Right Decision Column (5 of 12 cols, ~42% width: Advisory + Actions + Support) -->
+        <div id="desktop-col-right" class="lg:col-span-5 flex flex-col gap-6"></div>
       </div>
 
       </div>
@@ -1948,11 +1896,7 @@
 
         </div>
 
-      </div>
       <!-- END VIEW: ADVICE -->
-
-      </div>
-      <!-- END MAIN WORKSPACE PANE -->
 
     </div>
   </main>
@@ -2404,11 +2348,21 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         </div>
       </div>
 
-      <!-- Form Inputs: Name & Crop -->
+      <!-- Form Inputs: Name, Location & Crop -->
       <div class="space-y-3 text-xs">
         <div>
           <label class="font-bold text-on-surface block mb-1">Field / Parcel Name:</label>
           <input type="text" id="save-land-name" value="My Marked Field" class="w-full bg-surface-container-low border border-surface-variant rounded-xl px-3 py-2.5 text-xs text-on-surface font-semibold focus:ring-1 focus:ring-primary focus:outline-none"/>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="font-bold text-on-surface block mb-1">Village / District:</label>
+            <input type="text" id="save-land-district" placeholder="e.g. Mandya" class="w-full bg-surface-container-low border border-surface-variant rounded-xl px-3 py-2.5 text-xs text-on-surface font-semibold focus:ring-1 focus:ring-primary focus:outline-none"/>
+          </div>
+          <div>
+            <label class="font-bold text-on-surface block mb-1">State:</label>
+            <input type="text" id="save-land-state" placeholder="e.g. Karnataka" class="w-full bg-surface-container-low border border-surface-variant rounded-xl px-3 py-2.5 text-xs text-on-surface font-semibold focus:ring-1 focus:ring-primary focus:outline-none"/>
+          </div>
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
@@ -6084,16 +6038,25 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       if (!leafletMap && typeof L !== 'undefined') {
         leafletMap = L.map('satellite-leaflet-map', {
           zoomControl: false,
-          attributionControl: false
+          attributionControl: false,
+          maxZoom: 21
         }).setView([geo.lat, geo.lon], geo.zoom);
 
-        // High-resolution Esri World Imagery Satellite Tiles
+        // High-resolution Esri World Imagery Satellite Tiles with smooth over-zooming up to 21
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-          maxZoom: 18
+          maxZoom: 21,
+          maxNativeZoom: 18
         }).addTo(leafletMap);
 
-        // Minimal Zoom Control
+        // Minimal Zoom Control clear of HUD
         L.control.zoom({ position: 'topright' }).addTo(leafletMap);
+
+        // Disable click propagation on HUD container
+        const hudEl = document.getElementById('land-marker-hud');
+        if (hudEl) {
+          L.DomEvent.disableClickPropagation(hudEl);
+          L.DomEvent.disableScrollPropagation(hudEl);
+        }
 
         // Map Click Listener for Manual Land Boundary Marking
         leafletMap.on('click', function(e) {
@@ -6101,22 +6064,41 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
             handleAddLandMarkerPoint(e.latlng.lat, e.latlng.lng);
           }
         });
+
+        // Live Cursor Coordinate & Rubber-Band Preview Tracking
+        leafletMap.on('mousemove', function(e) {
+          if (!isLandMarkingActive) return;
+          const coordEl = document.getElementById('marker-cursor-coords');
+          if (coordEl) {
+            coordEl.textContent = `${e.latlng.lat.toFixed(5)}°, ${e.latlng.lng.toFixed(5)}°`;
+          }
+          updateRubberBandLine(e.latlng);
+        });
       }
 
       if (leafletMap) {
         leafletMap.invalidateSize();
-        leafletMap.flyTo([geo.lat, geo.lon], geo.zoom, { duration: 1.2 });
 
         if (leafletParcelLayer) leafletMap.removeLayer(leafletParcelLayer);
         if (leafletMarker) leafletMap.removeLayer(leafletMarker);
 
         leafletParcelLayer = L.polygon(geo.polygon, {
-          color: '#ffddb5',
-          weight: 2.5,
-          dashArray: '6, 4',
-          fillColor: '#e8a23a',
-          fillOpacity: 0.22
+          color: geo.fitBounds ? '#10b981' : '#ffddb5',
+          weight: geo.fitBounds ? 3 : 2.5,
+          dashArray: geo.fitBounds ? '5, 3' : '6, 4',
+          fillColor: geo.fitBounds ? '#10b981' : '#e8a23a',
+          fillOpacity: geo.fitBounds ? 0.28 : 0.22
         }).addTo(leafletMap);
+
+        if (geo.fitBounds) {
+          try {
+            leafletMap.fitBounds(leafletParcelLayer.getBounds(), { padding: [36, 36], maxZoom: 18, animate: true });
+          } catch (e) {
+            leafletMap.flyTo([geo.lat, geo.lon], geo.zoom, { duration: 1.0 });
+          }
+        } else {
+          leafletMap.flyTo([geo.lat, geo.lon], geo.zoom, { duration: 1.0 });
+        }
 
         const customIcon = L.divIcon({
           className: 'custom-sat-pin',
@@ -6126,21 +6108,116 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         });
 
         leafletMarker = L.marker([geo.lat, geo.lon], { icon: customIcon }).addTo(leafletMap);
-        leafletMarker.bindPopup(`<strong>${REGIONS_DATA[regionKey].parcel}</strong><br/>Crop: ${REGIONS_DATA[regionKey].cropName}<br/>NDVI: ${REGIONS_DATA[regionKey].metric}`);
+        const rData = REGIONS_DATA[regionKey] || {};
+        leafletMarker.bindPopup(`<strong>${rData.parcel || 'Field Parcel'}</strong><br/>Crop: ${rData.cropName || rData.crop || ''}<br/>Area: ${rData.area || ''}<br/>NDVI: ${rData.metric || ''}`);
 
         renderSavedCustomParcelsOnMap();
       }
     }
 
     // ==========================================
-    // MANUAL LAND MARKER (FARMER LAND BOUNDARY)
+    // PRECISION SURVEY-GRADE LAND MARKER ENGINE
     // ==========================================
     let isLandMarkingActive = false;
     let landMarkerPoints = []; // Array of { lat, lng, marker }
     let landMarkerPolygon = null;
-    let savedCustomParcels = []; // Loaded from localStorage and backend
+    let landMarkerEdgeLabels = [];
+    let landMarkerCentroidBadge = null;
+    let landMarkerRubberLine = null;
+    let hybridLabelsLayer = null;
+    let savedCustomParcels = [];
     let activeCustomParcelId = null;
-    let savedParcelLayers = []; // Map layers for saved parcels
+    let savedParcelLayers = [];
+
+    function toggleHybridLabelsLayer() {
+      if (!leafletMap) return;
+      const btn = document.getElementById('btn-toggle-labels');
+      if (hybridLabelsLayer) {
+        leafletMap.removeLayer(hybridLabelsLayer);
+        hybridLabelsLayer = null;
+        if (btn) {
+          btn.classList.remove('bg-emerald-600', 'text-white');
+          btn.classList.add('bg-white/10', 'text-slate-200');
+        }
+      } else {
+        hybridLabelsLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+          maxZoom: 21,
+          maxNativeZoom: 18
+        }).addTo(leafletMap);
+        if (btn) {
+          btn.classList.add('bg-emerald-600', 'text-white');
+          btn.classList.remove('bg-white/10', 'text-slate-200');
+        }
+      }
+    }
+
+    async function searchMarkerLocation() {
+      const input = document.getElementById('marker-location-search');
+      if (!input) return;
+      const q = input.value.trim();
+      if (!q) return;
+
+      const btn = document.getElementById('btn-marker-search');
+      if (btn) btn.textContent = "...";
+
+      // Check direct "lat, lng" input
+      const coordMatch = q.match(/^(-?\d+(?:\.\d+)?)[\s,;]+(-?\d+(?:\.\d+)?)$/);
+      if (coordMatch) {
+        const lat = parseFloat(coordMatch[1]);
+        const lng = parseFloat(coordMatch[2]);
+        if (leafletMap && !isNaN(lat) && !isNaN(lng)) {
+          leafletMap.flyTo([lat, lng], 18, { duration: 1.0 });
+          showToast("Map Centered", `Moved to ${lat.toFixed(5)}°, ${lng.toFixed(5)}°`);
+        }
+        if (btn) btn.textContent = "Go";
+        return;
+      }
+
+      // Query Nominatim OpenStreetMap geocoding (India prioritized)
+      try {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&countrycodes=in&limit=1&q=${encodeURIComponent(q)}`;
+        const res = await fetch(url);
+        const results = await res.json();
+        if (results && results.length > 0) {
+          const item = results[0];
+          const lat = parseFloat(item.lat);
+          const lon = parseFloat(item.lon);
+          if (leafletMap) {
+            leafletMap.flyTo([lat, lon], 16, { duration: 1.1 });
+          }
+          showToast("Location Found", item.display_name.split(',').slice(0, 3).join(', '));
+        } else {
+          showToast("Not Found", "Try a nearby town/district name or exact lat, lng coordinates.");
+        }
+      } catch (e) {
+        showToast("Search Offline", "Enter direct coordinates like '12.5214, 76.8910' to jump directly.");
+      } finally {
+        if (btn) btn.textContent = "Go";
+      }
+    }
+
+    function updateRubberBandLine(cursorLatLng) {
+      if (!leafletMap) return;
+      if (landMarkerRubberLine) {
+        leafletMap.removeLayer(landMarkerRubberLine);
+        landMarkerRubberLine = null;
+      }
+      if (!isLandMarkingActive || landMarkerPoints.length === 0 || !cursorLatLng) return;
+
+      const lastPt = landMarkerPoints[landMarkerPoints.length - 1];
+      const lineCoords = [[lastPt.lat, lastPt.lng], [cursorLatLng.lat, cursorLatLng.lng]];
+      if (landMarkerPoints.length >= 2) {
+        lineCoords.push([landMarkerPoints[0].lat, landMarkerPoints[0].lng]);
+      }
+
+      landMarkerRubberLine = L.polyline(lineCoords, {
+        color: '#38bdf8',
+        weight: 2,
+        dashArray: '4, 6',
+        opacity: 0.85,
+        interactive: false
+      }).addTo(leafletMap);
+    }
 
     function loadSavedCustomParcels() {
       try {
@@ -6151,9 +6228,46 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       } catch (e) {
         console.warn("Could not load local custom parcels:", e);
       }
+
+      // Migrate any previously marked parcels into customUserFarms so they show up in Select Field!
+      let migratedCount = 0;
+      savedCustomParcels.forEach(p => {
+        const targetFarmId = p.linked_farm_id || `farm_${p.id}`;
+        const exists = customUserFarms.some(f => f.id === targetFarmId || f.name === p.name);
+        if (!exists && p.points && p.points.length >= 3) {
+          const cent = p.centroid || { lat: p.points[0].lat, lng: p.points[0].lng };
+          const baseRegion = REGIONS_DATA[p.farm_id] || REGIONS_DATA.mandya;
+          const locParts = (baseRegion.location || "Mandya, Karnataka").split(',');
+          const newFarm = {
+            id: targetFarmId,
+            name: p.name,
+            district: p.district || (locParts[0] || "Custom District").trim(),
+            state: p.state || (locParts[1] || "India").trim(),
+            crop: p.crop || "Paddy (Rice)",
+            growth_stage: "Vegetative",
+            area_acres: p.area_acres || 1.0,
+            survey_plot: p.survey || `Plot #${targetFarmId.slice(-4)}`,
+            latitude: cent.lat,
+            longitude: cent.lng,
+            polygon: p.points.map(pt => [pt.lat, pt.lng]),
+            created_at: p.created_at || new Date().toISOString()
+          };
+          p.linked_farm_id = targetFarmId;
+          customUserFarms.push(newFarm);
+          registerCustomFarmData(newFarm);
+          migratedCount++;
+        }
+      });
+      if (migratedCount > 0) {
+        try {
+          localStorage.setItem('earthworm_custom_farms', JSON.stringify(customUserFarms));
+          localStorage.setItem('earthworm_custom_parcels', JSON.stringify(savedCustomParcels));
+        } catch (e) {}
+        renderCustomFarmPills();
+      }
+
       renderCustomParcelBadges();
 
-      // Also fetch from backend asynchronously if available
       const apiBase = getApiBase();
       fetch(`${apiBase}/api/farms/${currentRegionKey}/custom-markers`)
         .then(r => r.json())
@@ -6183,7 +6297,6 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       const mapEl = document.getElementById('satellite-leaflet-map');
 
       if (isLandMarkingActive) {
-        // Automatically switch to Interactive Map layer
         if (currentLayer !== 'map') {
           switchSatelliteLayer('map');
         }
@@ -6196,11 +6309,15 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         if (mapEl) mapEl.style.cursor = 'crosshair';
 
         if (leafletMap) {
+          leafletMap.doubleClickZoom.disable();
           leafletMap.invalidateSize();
+          if (leafletMap.getZoom() < 17) {
+            leafletMap.setZoom(17);
+          }
         }
 
         const t = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
-        showToast(t.markingActive || "Manual Land Marking Active", t.tapMap || "Tap on map to drop field boundary corners");
+        showToast(t.markingActive || "Precision Land Marking Active", t.tapMap || "Tap corners on satellite imagery. Click Corner #1 to complete.");
       } else {
         if (btn) {
           btn.classList.remove('bg-emerald-600', 'text-white', 'shadow-md');
@@ -6208,19 +6325,34 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         }
         if (hud) hud.style.display = 'none';
         if (mapEl) mapEl.style.cursor = '';
+
+        if (leafletMap) {
+          leafletMap.doubleClickZoom.enable();
+          if (landMarkerRubberLine) {
+            leafletMap.removeLayer(landMarkerRubberLine);
+            landMarkerRubberLine = null;
+          }
+        }
       }
     }
 
+    function createCornerPinIcon(idx, isFirst) {
+      const ringColor = isFirst ? '#fbbf24' : '#ffffff';
+      const bg = isFirst ? '#047857' : '#059669';
+      return L.divIcon({
+        className: 'farmer-corner-pin',
+        html: `<div style="background:${bg}; color:#fff; border:2.5px solid ${ringColor}; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; box-shadow:0 0 10px rgba(0,0,0,0.65); cursor:grab;">${idx}</div>`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+      });
+    }
+
     function handleAddLandMarkerPoint(lat, lng) {
-      if (!isLandMarkingActive) return;
+      if (!isLandMarkingActive || !leafletMap) return;
 
       const ptIdx = landMarkerPoints.length + 1;
-      const customPinIcon = L.divIcon({
-        className: 'farmer-corner-pin',
-        html: `<div style="background:#059669; color:#fff; border:2px solid #ffffff; border-radius:50%; width:22px; height:22px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; box-shadow:0 0 8px rgba(0,0,0,0.5);">${ptIdx}</div>`,
-        iconSize: [22, 22],
-        iconAnchor: [11, 11]
-      });
+      const isFirst = ptIdx === 1;
+      const customPinIcon = createCornerPinIcon(ptIdx, isFirst);
 
       const marker = L.marker([lat, lng], {
         icon: customPinIcon,
@@ -6230,7 +6362,17 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       const ptData = { lat, lng, marker };
       landMarkerPoints.push(ptData);
 
-      // Draggable point update for precision boundary alignment
+      // Clicking Corner #1 closes polygon and opens Save dialog when >= 3 points exist!
+      marker.on('click', function(e) {
+        L.DomEvent.stopPropagation(e);
+        const currentIdx = landMarkerPoints.indexOf(ptData);
+        if (currentIdx === 0 && landMarkerPoints.length >= 3) {
+          marker.closePopup();
+          openSaveLandModal();
+        }
+      });
+
+      // Dragging corner updates polygon & geometry live at 60fps
       marker.on('drag', function(e) {
         const newPos = e.target.getLatLng();
         ptData.lat = newPos.lat;
@@ -6238,16 +6380,26 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         updateMarkingPolygonAndStats();
       });
 
-      marker.bindPopup(`
-        <div style="font-size:11px; line-height:1.4;">
-          <strong>Boundary Corner #${ptIdx}</strong><br/>
-          Lat: ${lat.toFixed(5)}° N<br/>
-          Lng: ${lng.toFixed(5)}° E<br/>
-          <button onclick="removeMarkerPoint(${ptIdx - 1})" style="color:#e11d48; font-weight:bold; font-size:10px; margin-top:4px; cursor:pointer;">
-            Remove Corner
-          </button>
-        </div>
-      `);
+      // Dynamic popup index resolution (fixes stale-index bug!)
+      marker.bindPopup("");
+      marker.on('popupopen', function() {
+        const idx = landMarkerPoints.indexOf(ptData);
+        const closeBtnHtml = (idx === 0 && landMarkerPoints.length >= 3)
+          ? `<button onclick="openSaveLandModal()" style="background:#059669; color:#fff; font-weight:bold; font-size:10px; padding:3px 8px; border-radius:6px; margin-top:4px; margin-right:4px; cursor:pointer; border:none;">Close &amp; Save</button>`
+          : '';
+        marker.setPopupContent(`
+          <div style="font-size:11px; line-height:1.4; min-width:130px;">
+            <strong>Corner #${idx + 1}</strong><br/>
+            <span style="font-family:monospace; font-size:10px;">${ptData.lat.toFixed(6)}°, ${ptData.lng.toFixed(6)}°</span><br/>
+            <div style="margin-top:4px;">
+              ${closeBtnHtml}
+              <button onclick="removeMarkerPoint(${idx})" style="color:#e11d48; font-weight:bold; font-size:10px; cursor:pointer; background:none; border:none; padding:2px 0;">
+                Remove Pin
+              </button>
+            </div>
+          </div>
+        `);
+      });
 
       updateMarkingPolygonAndStats();
     }
@@ -6258,14 +6410,9 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         if (removed && removed.marker && leafletMap) {
           leafletMap.removeLayer(removed.marker);
         }
-        // Re-number remaining markers
+        // Re-number remaining markers accurately
         landMarkerPoints.forEach((p, idx) => {
-          const newIdx = idx + 1;
-          const pinEl = p.marker.getElement();
-          if (pinEl) {
-            const innerDiv = pinEl.querySelector('div');
-            if (innerDiv) innerDiv.textContent = newIdx;
-          }
+          p.marker.setIcon(createCornerPinIcon(idx + 1, idx === 0));
         });
         updateMarkingPolygonAndStats();
       }
@@ -6288,6 +6435,16 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         leafletMap.removeLayer(landMarkerPolygon);
         landMarkerPolygon = null;
       }
+      if (landMarkerRubberLine && leafletMap) {
+        leafletMap.removeLayer(landMarkerRubberLine);
+        landMarkerRubberLine = null;
+      }
+      landMarkerEdgeLabels.forEach(l => leafletMap && leafletMap.removeLayer(l));
+      landMarkerEdgeLabels = [];
+      if (landMarkerCentroidBadge && leafletMap) {
+        leafletMap.removeLayer(landMarkerCentroidBadge);
+        landMarkerCentroidBadge = null;
+      }
       updateMarkingPolygonAndStats();
     }
 
@@ -6306,50 +6463,75 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
           if (leafletMap) {
-            leafletMap.setView([lat, lng], 17);
+            leafletMap.setView([lat, lng], 19);
           }
           handleAddLandMarkerPoint(lat, lng);
-          showToast("GPS Point Added", `Accurate to ~${Math.round(pos.coords.accuracy)}m`);
+          showToast("GPS Pin Added", `Accurate to ~${Math.round(pos.coords.accuracy)}m`);
         },
         (err) => {
           if (gpsBtn) gpsBtn.textContent = "GPS My Spot";
           console.warn("GPS error:", err);
-          showToast("GPS Notice", "Using farm plot center (GPS location unavailable).");
-          const geo = REGION_GEO[currentRegionKey] || REGION_GEO.mandya;
-          handleAddLandMarkerPoint(geo.lat, geo.lon);
+          showToast("GPS Notice", "Using current map center (GPS unavailable).");
+          const center = leafletMap ? leafletMap.getCenter() : (REGION_GEO[currentRegionKey] || REGION_GEO.mandya);
+          handleAddLandMarkerPoint(center.lat, center.lng || center.lon);
         },
         { enableHighAccuracy: true, timeout: 7000 }
       );
     }
 
+    // Survey-grade WGS-84 Ellipsoidal Local Equal-Area Tangent Projection (0.0001% precision)
     function calculatePolygonAreaAcres(points) {
       if (!points || points.length < 3) return 0;
-      const R = 6378137; // Earth radius in meters
-      let area = 0;
-      for (let i = 0; i < points.length; i++) {
-        const p1 = points[i];
-        const p2 = points[(i + 1) % points.length];
-        area += (p2.lng - p1.lng) * (Math.PI / 180) * (2 + Math.sin(p1.lat * (Math.PI / 180)) + Math.sin(p2.lat * (Math.PI / 180)));
+      const a = 6378137.0; // WGS-84 semi-major axis
+      const f = 1.0 / 298.257223563;
+      const e2 = f * (2.0 - f);
+
+      let sumLat = 0;
+      points.forEach(p => { sumLat += p.lat; });
+      const lat0 = sumLat / points.length;
+      const lat0Rad = lat0 * (Math.PI / 180.0);
+
+      const sinPhi = Math.sin(lat0Rad);
+      const den = 1.0 - e2 * sinPhi * sinPhi;
+      const M = a * (1.0 - e2) / (den * Math.sqrt(den)); // Meridional radius of curvature
+      const N = a / Math.sqrt(den); // Prime vertical radius of curvature
+
+      const mPerRadLat = M;
+      const mPerRadLon = N * Math.cos(lat0Rad);
+      const lon0 = points[0].lng;
+
+      const metricPts = points.map(p => ({
+        x: (p.lng - lon0) * (Math.PI / 180.0) * mPerRadLon,
+        y: (p.lat - lat0) * (Math.PI / 180.0) * mPerRadLat
+      }));
+
+      let areaSqm = 0;
+      for (let i = 0; i < metricPts.length; i++) {
+        const p1 = metricPts[i];
+        const p2 = metricPts[(i + 1) % metricPts.length];
+        areaSqm += (p1.x * p2.y - p2.x * p1.y);
       }
-      area = Math.abs(area * R * R / 2.0);
-      return area * 0.000247105; // sq meters to acres
+      areaSqm = Math.abs(areaSqm) / 2.0;
+      return areaSqm * 0.00024710538146717;
+    }
+
+    function haversineDistanceMeters(p1, p2) {
+      const R = 6371000.0;
+      const dLat = (p2.lat - p1.lat) * Math.PI / 180.0;
+      const dLon = (p2.lng - p1.lng) * Math.PI / 180.0;
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(p1.lat * Math.PI / 180.0) * Math.cos(p2.lat * Math.PI / 180.0) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
     }
 
     function calculatePerimeterMeters(points) {
       if (!points || points.length < 2) return 0;
       let dist = 0;
-      const R = 6371e3;
       for (let i = 0; i < points.length; i++) {
-        const p1 = points[i];
-        const p2 = points[(i + 1) % points.length];
         if (i === points.length - 1 && points.length === 2) break;
-        const dLat = (p2.lat - p1.lat) * Math.PI / 180;
-        const dLon = (p2.lng - p1.lng) * Math.PI / 180;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                  Math.cos(p1.lat * Math.PI / 180) * Math.cos(p2.lat * Math.PI / 180) *
-                  Math.sin(dLon/2) * Math.sin(dLon/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        dist += R * c;
+        dist += haversineDistanceMeters(points[i], points[(i + 1) % points.length]);
       }
       return dist;
     }
@@ -6363,6 +6545,14 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         landMarkerPolygon = null;
       }
 
+      // Clear old edge labels & centroid badge
+      landMarkerEdgeLabels.forEach(l => leafletMap && leafletMap.removeLayer(l));
+      landMarkerEdgeLabels = [];
+      if (landMarkerCentroidBadge && leafletMap) {
+        leafletMap.removeLayer(landMarkerCentroidBadge);
+        landMarkerCentroidBadge = null;
+      }
+
       if (coords.length === 2 && leafletMap) {
         landMarkerPolygon = L.polyline(coords, {
           color: '#10b981',
@@ -6373,15 +6563,53 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         landMarkerPolygon = L.polygon(coords, {
           color: '#10b981',
           weight: 3,
-          dashArray: '6, 4',
           fillColor: '#10b981',
           fillOpacity: 0.28
         }).addTo(leafletMap);
       }
 
+      // Render crisp edge length badges (in meters)
+      if (coords.length >= 2 && leafletMap) {
+        const edgeCount = coords.length === 2 ? 1 : coords.length;
+        for (let i = 0; i < edgeCount; i++) {
+          const p1 = rawPoints[i];
+          const p2 = rawPoints[(i + 1) % rawPoints.length];
+          const midLat = (p1.lat + p2.lat) / 2;
+          const midLng = (p1.lng + p2.lng) / 2;
+          const segDist = haversineDistanceMeters(p1, p2);
+          if (segDist >= 3) {
+            const labelMarker = L.marker([midLat, midLng], {
+              interactive: false,
+              icon: L.divIcon({
+                className: 'edge-dist-badge',
+                html: `<div style="background:rgba(15,23,42,0.85); color:#a7f3d0; border:1px solid rgba(52,211,153,0.5); padding:1px 4px; border-radius:4px; font-family:monospace; font-size:9px; font-weight:bold; white-space:nowrap; transform:translate(-50%,-50%); pointer-events:none;">${segDist.toFixed(1)}m</div>`,
+                iconSize: [0, 0]
+              })
+            }).addTo(leafletMap);
+            landMarkerEdgeLabels.push(labelMarker);
+          }
+        }
+      }
+
       const acres = calculatePolygonAreaAcres(rawPoints);
       const guntas = Math.round(acres * 40 * 10) / 10;
       const perimeter = calculatePerimeterMeters(rawPoints);
+
+      // Render Floating Live Area Badge at Polygon Centroid
+      if (coords.length >= 3 && leafletMap) {
+        let sumLat = 0, sumLng = 0;
+        rawPoints.forEach(p => { sumLat += p.lat; sumLng += p.lng; });
+        const cLat = sumLat / rawPoints.length;
+        const cLng = sumLng / rawPoints.length;
+        landMarkerCentroidBadge = L.marker([cLat, cLng], {
+          interactive: false,
+          icon: L.divIcon({
+            className: 'centroid-area-badge',
+            html: `<div style="background:rgba(6,78,59,0.92); color:#fff; border:1.5px solid #34d399; padding:3px 8px; border-radius:99px; font-family:monospace; font-size:10px; font-weight:800; white-space:nowrap; box-shadow:0 2px 8px rgba(0,0,0,0.45); transform:translate(-50%,-50%); pointer-events:none;">${acres.toFixed(2)} Ac • ${guntas} Guntas</div>`,
+            iconSize: [0, 0]
+          })
+        }).addTo(leafletMap);
+      }
 
       const countEl = document.getElementById('marker-count');
       const acresEl = document.getElementById('marker-area-acres');
@@ -6403,13 +6631,13 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
 
       if (hintEl) {
         if (coords.length === 0) {
-          hintEl.textContent = "Tap anywhere on the satellite map to place boundary corner pins for your field.";
+          hintEl.textContent = "Zoom in close to field bunds & tap corners cleanly. Click Corner #1 after 3+ pins to enclose.";
         } else if (coords.length === 1) {
-          hintEl.textContent = "Corner 1 placed. Tap next boundary point to draw field edge.";
+          hintEl.textContent = "Corner #1 pinned. Tap the next corner along your field border (drag pins anytime to refine).";
         } else if (coords.length === 2) {
-          hintEl.textContent = "2 corners connected. Tap 3rd corner to enclose field area.";
+          hintEl.textContent = "2 corners pinned. Tap Corner #3 to measure plot acreage.";
         } else {
-          hintEl.textContent = `Field boundary enclosed! Estimated: ${acres.toFixed(2)} Acres (${guntas} Guntas). Click 'Save Land' to store.`;
+          hintEl.textContent = `Boundary enclosed (${acres.toFixed(2)} Ac • ${guntas} Guntas). Drag any pin to refine or click 'Save Land' to add to Farms.`;
         }
       }
     }
@@ -6429,16 +6657,52 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       document.getElementById('save-land-corners').textContent = rawPoints.length + " Corners";
       document.getElementById('save-land-perimeter').textContent = perimeter + "m perimeter";
 
-      const rData = REGIONS_DATA[currentRegionKey];
-      const regionName = rData ? (rData.location || rData.plotTitle || "Field").split(',')[0] : "Field";
-      document.getElementById('save-land-name').value = `My ${regionName} Plot`;
+      const rData = REGIONS_DATA[currentRegionKey] || REGIONS_DATA.mandya;
+      const locParts = (rData.location || "Mandya, Karnataka").split(',');
+      const defaultDist = (locParts[0] || "Mandya").trim();
+      const defaultState = (locParts[1] || "Karnataka").trim();
+
+      const distInput = document.getElementById('save-land-district');
+      const stateInput = document.getElementById('save-land-state');
+      if (distInput) distInput.value = defaultDist;
+      if (stateInput) stateInput.value = defaultState;
+
+      document.getElementById('save-land-name').value = `My ${defaultDist} Plot`;
+
+      // Try subtle non-blocking reverse geocode of centroid for true district/village lookup
+      let sumLat = 0, sumLng = 0;
+      rawPoints.forEach(p => { sumLat += p.lat; sumLng += p.lng; });
+      const cLat = sumLat / rawPoints.length;
+      const cLng = sumLng / rawPoints.length;
+      fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${cLat}&lon=${cLng}`)
+        .then(r => r.json())
+        .then(geoRes => {
+          if (geoRes && geoRes.address) {
+            const addr = geoRes.address;
+            const foundPlace = addr.village || addr.town || addr.city || addr.state_district || addr.county;
+            const foundState = addr.state;
+            if (foundPlace && distInput) {
+              distInput.value = foundPlace;
+              const nameEl = document.getElementById('save-land-name');
+              if (nameEl && nameEl.value.startsWith('My ')) {
+                nameEl.value = `My ${foundPlace} Plot`;
+              }
+            }
+            if (foundState && stateInput) {
+              stateInput.value = foundState;
+            }
+          }
+        })
+        .catch(() => {});
 
       openModal('saveLandModal');
     }
 
     async function confirmSaveLandParcel() {
       const name = document.getElementById('save-land-name').value.trim() || "My Marked Plot";
-      const crop = document.getElementById('save-land-crop').value || "Paddy";
+      const district = (document.getElementById('save-land-district') ? document.getElementById('save-land-district').value.trim() : "") || "Mandya";
+      const state = (document.getElementById('save-land-state') ? document.getElementById('save-land-state').value.trim() : "") || "Karnataka";
+      const crop = document.getElementById('save-land-crop').value || "Paddy (Rice)";
       const survey = document.getElementById('save-land-survey').value.trim();
       const notes = document.getElementById('save-land-notes').value.trim();
 
@@ -6446,7 +6710,6 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       const acres = calculatePolygonAreaAcres(rawPoints);
       const hectares = acres * 0.404686;
 
-      // Compute centroid
       let sumLat = 0, sumLng = 0;
       rawPoints.forEach(p => { sumLat += p.lat; sumLng += p.lng; });
       const centroid = {
@@ -6454,10 +6717,17 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         lng: sumLng / rawPoints.length
       };
 
+      const timestampId = Date.now().toString(36);
+      const parcelId = "plot_user_" + timestampId;
+      const newFarmId = "custom_marked_" + timestampId;
+
       const parcelObj = {
-        id: "plot_user_" + Date.now().toString(36),
-        farm_id: currentRegionKey,
+        id: parcelId,
+        linked_farm_id: newFarmId,
+        farm_id: newFarmId,
         name: name,
+        district: district,
+        state: state,
         crop: crop,
         survey: survey,
         notes: notes,
@@ -6468,33 +6738,83 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         created_at: new Date().toISOString()
       };
 
+      // 1. Register as a FULL Monitored Farm Card in Select Field (customUserFarms)
+      const newFarm = {
+        id: newFarmId,
+        name: name,
+        district: district,
+        state: state,
+        crop: crop,
+        growth_stage: "Vegetative",
+        area_acres: parseFloat(acres.toFixed(2)),
+        survey_plot: survey || `Plot #${timestampId.slice(-4).toUpperCase()}`,
+        latitude: centroid.lat,
+        longitude: centroid.lng,
+        polygon: rawPoints.map(pt => [pt.lat, pt.lng]),
+        created_at: new Date().toISOString()
+      };
+
+      customUserFarms.push(newFarm);
+      try {
+        localStorage.setItem('earthworm_custom_farms', JSON.stringify(customUserFarms));
+      } catch (e) {}
+
+      registerCustomFarmData(newFarm);
+      renderCustomFarmPills();
+
+      // 2. Also track inside custom parcels list
       savedCustomParcels.push(parcelObj);
       try {
         localStorage.setItem('earthworm_custom_parcels', JSON.stringify(savedCustomParcels));
-      } catch (e) {
-        console.warn("LocalStorage save error:", e);
-      }
+      } catch (e) {}
 
-      // Sync to backend API
+      // 3. Sync both endpoints to backend API (non-blocking)
       const apiBase = getApiBase();
-      try {
-        await fetch(`${apiBase}/api/farms/custom-marker`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(parcelObj)
-        });
-      } catch (err) {
-        console.warn("Backend sync failed, saved locally:", err);
+      if (backendAvailable) {
+        try {
+          await fetch(`${apiBase}/api/farms`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: newFarmId,
+              name: name,
+              district: district,
+              state: state,
+              crop: crop,
+              growth_stage: "Vegetative",
+              area_hectares: parseFloat(hectares.toFixed(2)),
+              survey_plot: newFarm.survey_plot,
+              latitude: centroid.lat,
+              longitude: centroid.lng
+            })
+          });
+          await fetch(`${apiBase}/api/farms/custom-marker`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(parcelObj)
+          });
+        } catch (err) {
+          console.warn("Backend sync deferred, stored locally:", err);
+        }
       }
 
       closeModal('saveLandModal');
       toggleLandMarkingMode(false);
       clearAllMarkerPoints();
+
+      // Switch active selected field directly to the newly added custom farm!
+      await selectRegion(newFarmId);
+      renderCustomFarmPills();
       renderSavedCustomParcelsOnMap();
       renderCustomParcelBadges();
-      switchParcelDisplay(parcelObj.id);
 
-      showToast("Land Marked Successfully", `Saved ${parcelObj.name} (${parcelObj.area_acres} Acres)`);
+      showToast("Land Added to My Farms!", `${name} (${acres.toFixed(2)} Acres) is now actively monitored.`);
+
+      // Scroll briefly on mobile or desktop if needed so user sees the newly added farm card
+      const farmPillEl = document.getElementById(`pill-${newFarmId}`);
+      if (farmPillEl) {
+        farmPillEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
     }
 
     function renderSavedCustomParcelsOnMap() {
@@ -6503,14 +6823,14 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       savedParcelLayers = [];
 
       savedCustomParcels.forEach(parcel => {
-        if (parcel.farm_id === currentRegionKey && parcel.points && parcel.points.length >= 3) {
+        if ((parcel.farm_id === currentRegionKey || parcel.linked_farm_id === currentRegionKey) && parcel.points && parcel.points.length >= 3) {
           const latLngs = parcel.points.map(p => [p.lat, p.lng]);
           const poly = L.polygon(latLngs, {
             color: '#059669',
             weight: 3,
             dashArray: '5, 3',
             fillColor: '#10b981',
-            fillOpacity: 0.3
+            fillOpacity: 0.25
           }).addTo(leafletMap);
 
           poly.bindPopup(`
@@ -6530,10 +6850,22 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
     }
 
     function deleteCustomParcel(parcelId) {
+      const target = savedCustomParcels.find(p => p.id === parcelId);
       savedCustomParcels = savedCustomParcels.filter(p => p.id !== parcelId);
       try {
         localStorage.setItem('earthworm_custom_parcels', JSON.stringify(savedCustomParcels));
       } catch (e) {}
+
+      // Also remove linked farm from customUserFarms if present
+      if (target && target.linked_farm_id) {
+        customUserFarms = customUserFarms.filter(f => f.id !== target.linked_farm_id);
+        try { localStorage.setItem('earthworm_custom_farms', JSON.stringify(customUserFarms)); } catch (e) {}
+        renderCustomFarmPills();
+        if (currentRegionKey === target.linked_farm_id) {
+          selectRegion('mandya');
+        }
+      }
+
       const apiBase = getApiBase();
       fetch(`${apiBase}/api/farms/${currentRegionKey}/custom-markers/${parcelId}`, { method: 'DELETE' }).catch(() => {});
       renderSavedCustomParcelsOnMap();
@@ -6547,7 +6879,7 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       if (!container) return;
       container.innerHTML = '';
 
-      savedCustomParcels.filter(p => p.farm_id === currentRegionKey).forEach(p => {
+      savedCustomParcels.filter(p => p.farm_id === currentRegionKey || p.linked_farm_id === currentRegionKey).forEach(p => {
         const btn = document.createElement('button');
         btn.className = `text-[10px] font-bold px-2 py-0.5 rounded cursor-pointer transition-all ${activeCustomParcelId === p.id ? 'bg-emerald-600 text-white shadow-xs' : 'bg-surface-variant/40 hover:bg-surface-variant/70 text-on-surface'}`;
         btn.textContent = `${p.name} (${p.area_acres} Ac)`;
@@ -6754,11 +7086,11 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       `;
       const grid = document.getElementById('forecast-grid');
       grid.innerHTML = data.days.map(d => `
-        <div class="bg-surface-container-low/70 p-3 rounded-2xl border border-surface-variant flex flex-col items-center">
+        <div class="bg-surface-container-lowest p-2.5 rounded-xl border border-surface-variant flex flex-col items-center">
           <span class="text-[11px] font-semibold text-secondary">${d.day}</span>
           <span class="material-symbols-outlined text-tertiary-container my-1 text-[22px]">${d.icon}</span>
-          <span class="text-sm font-bold text-on-surface whitespace-nowrap">${d.temp}</span>
-          <span class="text-[10px] text-primary font-medium whitespace-nowrap">${d.rain}</span>
+          <span class="text-sm font-bold text-on-surface">${d.temp}</span>
+          <span class="text-[10px] text-primary font-medium">${d.rain}</span>
         </div>
       `).join('');
 
@@ -6825,22 +7157,16 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       // 4. Navigation (Desktop & Mobile)
       const dHome = document.getElementById('dnav-label-home');
       if (dHome) dHome.textContent = t.navHome || "Home";
-      const sHome = document.getElementById('snav-label-home');
-      if (sHome) sHome.textContent = t.navHome || "Home";
       const mHome = document.getElementById('nav-label-home');
       if (mHome) mHome.textContent = t.navHome || "Home";
 
       const dFarm = document.getElementById('dnav-label-myfarm');
       if (dFarm) dFarm.textContent = t.navMyFarm || "My Farm";
-      const sFarm = document.getElementById('snav-label-myfarm');
-      if (sFarm) sFarm.textContent = t.navMyFarm || "My Farm";
       const mFarm = document.getElementById('nav-label-myfarm');
       if (mFarm) mFarm.textContent = t.navMyFarm || "My Farm";
 
       const dAdv = document.getElementById('dnav-label-advice');
       if (dAdv) dAdv.textContent = t.navAdvice || "Advice";
-      const sAdv = document.getElementById('snav-label-advice');
-      if (sAdv) sAdv.textContent = t.navAdvice || "Advice";
       const mAdv = document.getElementById('nav-label-advice');
       if (mAdv) mAdv.textContent = t.navAdvice || "Advice";
 
@@ -9770,14 +10096,6 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
             del.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-secondary hover:text-primary hover:bg-surface-container transition-colors cursor-pointer";
           }
         }
-        const sel = document.getElementById('stab-' + t);
-        if (sel) {
-          if (t === tab) {
-            sel.className = "flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-primary bg-surface-container transition-all cursor-pointer text-left shadow-2xs";
-          } else {
-            sel.className = "flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container/60 transition-colors cursor-pointer text-left";
-          }
-        }
       });
 
       const viewHome = document.getElementById('view-home');
@@ -10081,12 +10399,14 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         bands: { b3: "0.08 (Peak)", b4: "0.11 (Absorb)", b8: "0.54 (Scatter)", b11: "0.21 (Water)" }
       };
 
+      const hasCustomPolygon = Array.isArray(farm.polygon) && farm.polygon.length >= 3;
       REGION_GEO[id] = {
         lat: lat,
         lon: lon,
-        zoom: 16,
-        elev: "650m",
-        polygon: [
+        zoom: 17,
+        elev: farm.elev || "650m",
+        fitBounds: hasCustomPolygon,
+        polygon: hasCustomPolygon ? farm.polygon : [
           [lat + 0.0025, lon - 0.003],
           [lat + 0.0026, lon + 0.003],
           [lat - 0.0025, lon + 0.003],
@@ -10113,7 +10433,7 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
                   <span class="text-xs font-bold leading-tight truncate">${f.name}</span>
                   <span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-primary/10 text-primary shrink-0">Custom</span>
                 </div>
-                <span class="text-[11px] opacity-80 truncate">${f.crop} • ${f.district}</span>
+                <span class="text-[11px] opacity-85 truncate">${f.crop} • ${f.area_acres ? f.area_acres + ' Ac • ' : ''}${f.district}</span>
               </div>
             </button>
             <button onclick="deleteCustomFarm('${f.id}', event)" class="absolute right-2 top-2.5 p-1 rounded-lg text-secondary hover:text-error hover:bg-surface-variant/80 transition-all cursor-pointer z-10" title="Delete custom farm" type="button">
@@ -10215,6 +10535,15 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       delete SPECTRAL_DATA[farmId];
       delete REGION_GEO[farmId];
 
+      // Also clean up linked custom marker parcel if this farm was created by Mark Land
+      const linkedIdx = savedCustomParcels.findIndex(p => p.linked_farm_id === farmId || p.id === farmId);
+      if (linkedIdx !== -1) {
+        const removedParcel = savedCustomParcels.splice(linkedIdx, 1)[0];
+        try { localStorage.setItem('earthworm_custom_parcels', JSON.stringify(savedCustomParcels)); } catch (e) {}
+        if (typeof renderSavedCustomParcelsOnMap === 'function') renderSavedCustomParcelsOnMap();
+        if (typeof renderCustomParcelBadges === 'function') renderCustomParcelBadges();
+      }
+
       if (backendAvailable) {
         try {
           const apiBase = getApiBase();
@@ -10256,7 +10585,7 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       const headerInner = document.getElementById('header-inner');
       if (headerInner) {
         if (isDesktop) {
-          headerInner.className = "h-16 px-6 lg:px-8 flex items-center justify-between gap-3 max-w-[1440px] mx-auto transition-all duration-300";
+          headerInner.className = "h-16 px-4 sm:px-6 flex items-center justify-between gap-3 max-w-7xl mx-auto transition-all duration-300";
         } else {
           headerInner.className = "h-16 px-4 flex items-center justify-between gap-2 max-w-[640px] mx-auto transition-all duration-300";
         }
@@ -10266,9 +10595,9 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
       const mainContent = document.getElementById('main-content');
       if (mainContent) {
         if (isDesktop) {
-          mainContent.className = "flex-1 flex flex-col relative w-full px-6 lg:px-8 pt-8 pb-16 bg-surface max-w-[1440px] mx-auto transition-all duration-300";
+          mainContent.className = "flex-1 flex flex-col relative w-full px-4 sm:px-6 pt-20 pb-12 bg-surface max-w-7xl mx-auto transition-all duration-300";
         } else {
-          mainContent.className = "flex-1 flex flex-col relative w-full px-4 sm:px-5 pt-6 pb-28 bg-surface max-w-[640px] mx-auto transition-all duration-300 sm:border-x sm:border-surface-variant/40 sm:shadow-[0_0_40px_rgba(0,0,0,0.06)]";
+          mainContent.className = "flex-1 flex flex-col relative w-full px-4 pt-20 pb-28 bg-surface max-w-[640px] mx-auto transition-all duration-300 sm:border-x sm:border-surface-variant/40 sm:shadow-[0_0_40px_rgba(0,0,0,0.06)]";
         }
       }
 
@@ -10305,45 +10634,41 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
         }
       }
 
-      // Rearrange Dashboard Sections between Mobile Stack and Desktop Left-Rail Bento Workspace
+      // Rearrange Dashboard Sections between Mobile Stack and Desktop Grid
       const satCard = document.getElementById('satellite-card');
       const farmsSec = document.getElementById('farms-section');
       const advSec = document.getElementById('advisory-section');
       const actSec = document.getElementById('actions-section');
       const weaSec = document.getElementById('weather-section');
       const supSec = document.getElementById('support-section');
-      const topBanner = document.getElementById('top-banner');
 
       const mobileCont = document.getElementById('mobile-sections-container');
-      const sidebarFarmsSlot = document.getElementById('desktop-sidebar-farms-slot');
-      const sidebarNoticeSlot = document.getElementById('desktop-sidebar-notice-slot');
+      const desktopFarmsSlot = document.getElementById('desktop-farms-slot');
       const desktopCont = document.getElementById('desktop-grid-container');
-      const r1Full = document.getElementById('desktop-r1-full');
-      const r2Left = document.getElementById('desktop-r2-left');
-      const r2Right = document.getElementById('desktop-r2-right');
-      const r3Left = document.getElementById('desktop-r3-left');
-      const r3Right = document.getElementById('desktop-r3-right');
+      const colLeft = document.getElementById('desktop-col-left');
+      const colRight = document.getElementById('desktop-col-right');
 
-      if (mobileCont && desktopCont && r1Full && r2Left && r2Right && r3Left && r3Right) {
+      if (mobileCont && desktopCont && colLeft && colRight) {
         if (isDesktop) {
           mobileCont.classList.add('hidden');
           mobileCont.classList.remove('flex');
+          if (desktopFarmsSlot) {
+            desktopFarmsSlot.classList.remove('hidden');
+            if (farmsSec) desktopFarmsSlot.appendChild(farmsSec);
+          }
           desktopCont.classList.remove('hidden');
-          desktopCont.classList.add('flex');
+          desktopCont.classList.add('grid');
 
-          if (sidebarFarmsSlot && farmsSec) sidebarFarmsSlot.appendChild(farmsSec);
-          if (sidebarNoticeSlot && topBanner) sidebarNoticeSlot.appendChild(topBanner);
+          if (satCard) colLeft.appendChild(satCard);
+          if (weaSec) colLeft.appendChild(weaSec);
 
-          if (satCard) r1Full.appendChild(satCard);
-
-          if (advSec) r2Left.appendChild(advSec);
-          if (actSec) r2Right.appendChild(actSec);
-
-          if (weaSec) r3Left.appendChild(weaSec);
-          if (supSec) r3Right.appendChild(supSec);
+          if (advSec) colRight.appendChild(advSec);
+          if (actSec) colRight.appendChild(actSec);
+          if (supSec) colRight.appendChild(supSec);
         } else {
+          if (desktopFarmsSlot) desktopFarmsSlot.classList.add('hidden');
           desktopCont.classList.add('hidden');
-          desktopCont.classList.remove('flex');
+          desktopCont.classList.remove('grid');
           mobileCont.classList.remove('hidden');
           mobileCont.classList.add('flex');
 
@@ -10353,14 +10678,13 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx</pre>
           if (actSec) mobileCont.appendChild(actSec);
           if (weaSec) mobileCont.appendChild(weaSec);
           if (supSec) mobileCont.appendChild(supSec);
-          if (topBanner) mobileCont.appendChild(topBanner);
         }
       }
 
       // Sizing for Satellite Viewport
       const satCanvas = document.getElementById('satellite-canvas');
       if (satCanvas) {
-        satCanvas.style.height = isDesktop ? '360px' : '';
+        satCanvas.style.height = isDesktop ? '380px' : '';
       }
 
       // Invalidate Leaflet map size so it fits the new container dimensions
